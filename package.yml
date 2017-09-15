@@ -1,0 +1,18 @@
+package: jquery_file_upload
+version: '1.0.0'
+author: Ingo Winter
+supportpage: www.redaxo.org/de/forum/
+
+page:
+    title: 'jQuery File Upload'
+    subpages:
+        upload:
+            title: 'Upload'
+        endpoint:
+            title: 'endpoint'
+            hidden: true
+            hasLayout: false
+requires:
+    redaxo: '>=5.0.0'
+
+endpoint: '/redaxo/index.php?page=jquery_file_upload/endpoint'
