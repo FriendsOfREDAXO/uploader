@@ -1,5 +1,5 @@
-jquery\_file\_upload
-====================
+Uploader
+========
 
 Upload mehrerer Dateien gleichzeitig in den Medienpool. Übergroße Bilder können vorher verkleinert werden.
 
