@@ -1,5 +1,5 @@
 <?php
-$addon = rex_addon::get('jquery_file_upload');
+$addon = rex_addon::get('uploader');
 $addon->setProperty('uploadfolder', rex_path::media());
 
 rex_extension::register('PACKAGES_INCLUDED', function ()
@@ -10,11 +10,11 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
         {
             $compiler = new rex_scss_compiler();
             $compiler->setRootDir($this->getPath());
-            $compiler->setScssFile($this->getPath('scss/jquery_file_upload.scss'));
-            $compiler->setCssFile($this->getPath('assets/jquery_file_upload.css'));
+            $compiler->setScssFile($this->getPath('scss/uploader.scss'));
+            $compiler->setCssFile($this->getPath('assets/uploader.css'));
             $compiler->compile();
-            rex_file::copy($this->getPath('assets/jquery_file_upload.css'), $this->getAssetsPath('jquery_file_upload.css'));
-            rex_file::copy($this->getPath('assets/jquery_file_upload.js'), $this->getAssetsPath('jquery_file_upload.js'));
+            rex_file::copy($this->getPath('assets/uploader.css'), $this->getAssetsPath('uploader.css'));
+            rex_file::copy($this->getPath('assets/uploader.js'), $this->getAssetsPath('uploader.js'));
         }
         $include_assets = 0;
         if (rex_get('page', 'string') == 'mediapool/upload')
@@ -29,7 +29,7 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
             $include_assets = 1;
         }
         */
-        elseif (rex_get('page', 'string') == 'jquery_file_upload/upload')
+        elseif (rex_get('page', 'string') == 'uploader/upload')
         {
             $this->setProperty('context', 'addon_upload');
             $include_assets = 1;
@@ -50,15 +50,15 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
             rex_view::addJsFile($this->getAssetsUrl('vendor/jquery-file-upload/js/jquery.fileupload-ui.js'));
             rex_view::addCssFile($this->getAssetsUrl('vendor/jquery-file-upload/css/jquery.fileupload.css'));
             rex_view::addCssFile($this->getAssetsUrl('vendor/jquery-file-upload/css/jquery.fileupload-ui.css'));
-            rex_view::addCssFile($this->getAssetsUrl('jquery_file_upload.css'));
-            rex_view::addJsFile($this->getAssetsUrl('jquery_file_upload.js'));
+            rex_view::addCssFile($this->getAssetsUrl('uploader.css'));
+            rex_view::addJsFile($this->getAssetsUrl('uploader.js'));
 
             rex_extension::register('OUTPUT_FILTER', function (rex_extension_point $ep)
             {
-                $buttonbar_template = include(rex_path::addon('jquery_file_upload') . 'inc/buttonbar.php');
+                $buttonbar_template = include(rex_path::addon('uploader') . 'inc/buttonbar.php');
                 $ep->setSubject(str_replace('</body>', $buttonbar_template . '</body>', $ep->getSubject()));
-                $vars = include(rex_path::addon('jquery_file_upload') . 'inc/vars.php');
-                $file_list_templates = include(rex_path::addon('jquery_file_upload') . 'inc/filelists.php');
+                $vars = include(rex_path::addon('uploader') . 'inc/vars.php');
+                $file_list_templates = include(rex_path::addon('uploader') . 'inc/filelists.php');
                 $ep->setSubject(str_replace('</head>', $file_list_templates . $vars . '</head>', $ep->getSubject()));
             });
         }

@@ -10,7 +10,7 @@ return '
         <div class="preview"></div>
 
         <p class="name">{%=file.name%}</p>
-        <p class="size">'.$this->i18n('jquery_file_upload_filelist_processing').'</p>
+        <p class="size">'.$this->i18n('uploader_filelist_processing').'</p>
         <p class="error"></p>
 
         <div class="buttons">
@@ -23,7 +23,7 @@ return '
             {% if (!i) { %}
                 <button class="btn btn-warning cancel">
                     <i class="glyphicon glyphicon-ban-circle"></i>
-                    <span>'.$this->i18n('jquery_file_upload_filelist_cancel').'</span>
+                    <span>'.$this->i18n('uploader_filelist_cancel').'</span>
                 </button>
             {% } %}
             <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar progress-bar-success" style="width:0%;"></div></div>
@@ -59,10 +59,10 @@ return '
         <div class="buttons">
             <button style="display: none" class="btn btn-warning cancel">
                 <i class="glyphicon glyphicon-ban-circle"></i>
-                <span>'.$this->i18n('jquery_file_upload_filelist_cancel').'</span>
+                <span>'.$this->i18n('uploader_filelist_cancel').'</span>
             </button>
             {% if ('.$add_to_widget.') { %}
-                <a class="btn btn-xs btn-select" data-filename="{%=file.name%}">'.$this->i18n('jquery_file_upload_filelist_add_to_widget').'</a>
+                <a class="btn btn-xs btn-select" data-filename="{%=file.name%}">'.$this->i18n('uploader_filelist_add_to_widget').'</a>
             {% } %}
         </div>
     </li>

@@ -1,10 +1,11 @@
-package: jquery_file_upload
+package: uploader
 version: '1.0.0'
 author: 'Friends Of REDAXO'
 supportpage: 'https://github.com/FriendsOfREDAXO/uploader'
 
 page:
-    title: 'jQuery File Upload'
+    title: 'Uploader'
+    icon: rex-icon rex-icon-import
     subpages:
         upload:
             title: 'Upload'
@@ -15,4 +16,4 @@ page:
 requires:
     redaxo: '>=5.0.0'
 
-endpoint: '/redaxo/index.php?page=jquery_file_upload/endpoint'
+endpoint: '/redaxo/index.php?page=uploader/endpoint'

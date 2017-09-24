@@ -1,5 +1,5 @@
 <?php
-class jquery_file_upload_metainfo_handler extends rex_metainfo_handler
+class uploader_metainfo_handler extends rex_metainfo_handler
 {
     const PREFIX = 'med_';
 

@@ -1,6 +1,6 @@
 $border-grey: #c1c9d4;
 $error-color: #a94442;
-.jquery-file-upload-dropzone {
+.uploader-dropzone {
     background: #fff;
     border: 2px dashed $border-grey;
     min-height: 91px;
@@ -19,7 +19,7 @@ $error-color: #a94442;
         font-size: 2em;
     }
 }
-.jquery-file-upload-queue {
+.uploader-queue {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -80,7 +80,7 @@ $error-color: #a94442;
     }
 }
 @media (max-width: 767px) {
-    .jquery-file-upload-queue {
+    .uploader-queue {
         li {
 
             padding: 10px 110px 0 90px;
@@ -94,7 +94,7 @@ $error-color: #a94442;
     }
 }
 @media (max-width: 500px) {
-    .jquery-file-upload-queue {
+    .uploader-queue {
         li {
             padding: 86px 10px 0 10px;
         }

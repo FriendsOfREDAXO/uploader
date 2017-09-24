@@ -1,23 +1,23 @@
-<dl class="rex-form-group form-group preserve" id="jquery-file-upload-row">
+<dl class="rex-form-group form-group preserve" id="uploader-row">
 <dt></dt>
 <dd>
 <!-- The table listing the files available for upload/download -->
-<ul role="presentation" class="jquery-file-upload-queue files"></ul>
+<ul role="presentation" class="uploader-queue files"></ul>
 <div class="row fileupload-buttonbar">
     <div class="col-lg-7">
         <!-- The fileinput-button span is used to style the file input field as button -->
         <span class="btn btn-success fileinput-button">
             <i class="glyphicon glyphicon-plus"></i>
-            <span>'.$this->i18n('jquery_file_upload_buttonbar_add_files').'</span>
+            <span>'.$this->i18n('uploader_buttonbar_add_files').'</span>
             <input type="file" name="files[]" multiple="">
         </span>
         <button type="submit" class="btn btn-primary start">
             <i class="glyphicon glyphicon-upload"></i>
-            <span>'.$this->i18n('jquery_file_upload_buttonbar_start_upload').'</span>
+            <span>'.$this->i18n('uploader_buttonbar_start_upload').'</span>
         </button>
         <button type="reset" class="btn btn-warning cancel">
             <i class="glyphicon glyphicon-ban-circle"></i>
-            <span>'.$this->i18n('jquery_file_upload_buttonbar_cancel').'</span>
+            <span>'.$this->i18n('uploader_buttonbar_cancel').'</span>
         </button>
     </div>
     <!-- The global progress state -->

@@ -1,6 +1,6 @@
 <?php
 
-class jquery_file_upload_iw_upload_handler extends jquery_file_upload_upload_handler
+class uploader_iw_upload_handler extends uploader_upload_handler
 {
 
     protected function upcount_name_callback($matches) {
@@ -94,7 +94,7 @@ class jquery_file_upload_iw_upload_handler extends jquery_file_upload_upload_han
                 $success = rex_mediapool_syncFile($file->name, $catid, $title, $file->size, $file->type);
 
                 // metainfos schreiben
-                jquery_file_upload_meta::save($success);
+                uploader_meta::save($success);
 
                 // iw patch end
 

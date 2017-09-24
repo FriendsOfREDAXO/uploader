@@ -1,33 +1,30 @@
-jquery_file_upload_title = jQuery File Upload
+uploader_title = Uploader
 
-jquery_file_upload_filelist_processing = verarbeite...
-jquery_file_upload_filelist_cancel = entfernen
-jquery_file_upload_filelist_error = Fehler
-jquery_file_upload_filelist_add_to_widget = Datei übernehmen
+uploader_filelist_processing = verarbeite...
+uploader_filelist_cancel = entfernen
+uploader_filelist_error = Fehler
+uploader_filelist_add_to_widget = Datei übernehmen
 
-jquery_file_upload_buttonbar_add_file = Datei wählen
-jquery_file_upload_buttonbar_add_files = Datei(en) wählen
-jquery_file_upload_buttonbar_start_upload = Upload starten
-jquery_file_upload_buttonbar_cancel = alle entfernen
+uploader_buttonbar_add_file = Datei wählen
+uploader_buttonbar_add_files = Datei(en) wählen
+uploader_buttonbar_start_upload = Upload starten
+uploader_buttonbar_cancel = alle entfernen
 
-jquery_file_upload_errors_1 = Datei zu groß (upload_max_filesize/ php.ini)
-jquery_file_upload_errors_2 = Datei zu groß (MAX_FILE_SIZE/ Formular)
-jquery_file_upload_errors_3 = Die Datei wurde nur teilweise hochgeladen
-jquery_file_upload_errors_4 = Es wurde keine Datei hochgeladen
-jquery_file_upload_errors_6 = Temporäres Verzeichnis fehlt
-jquery_file_upload_errors_7 = Konnte Datei nicht auf Festplatte schreiben
-jquery_file_upload_errors_8 = Eine PHP Erweiterung hat das Hochladen verhindert
-jquery_file_upload_errors_post_max_size = Datei zu groß (post_max_size/ php.ini)
-jquery_file_upload_errors_max_file_size = Datei zu groß
-jquery_file_upload_errors_min_file_size = Datei zu klein
-jquery_file_upload_errors_accept_file_types = Unzulässiger Dateityp
-jquery_file_upload_errors_max_number_of_files = Maximale Anzahl an Dateien überschritten
-jquery_file_upload_errors_max_width = Bild zu breit
-jquery_file_upload_errors_min_width = Bild nicht breit genug
-jquery_file_upload_errors_max_height = Bild zu hoch
-jquery_file_upload_errors_min_height = Bild nicht hoch genug
-jquery_file_upload_errors_abort = Hochladen abgebrochen
-jquery_file_upload_errors_image_resize = Bildresize fehlgeschlagen
-
-
-
+uploader_errors_1 = Datei zu groß (upload_max_filesize/ php.ini)
+uploader_errors_2 = Datei zu groß (MAX_FILE_SIZE/ Formular)
+uploader_errors_3 = Die Datei wurde nur teilweise hochgeladen
+uploader_errors_4 = Es wurde keine Datei hochgeladen
+uploader_errors_6 = Temporäres Verzeichnis fehlt
+uploader_errors_7 = Konnte Datei nicht auf Festplatte schreiben
+uploader_errors_8 = Eine PHP Erweiterung hat das Hochladen verhindert
+uploader_errors_post_max_size = Datei zu groß (post_max_size/ php.ini)
+uploader_errors_max_file_size = Datei zu groß
+uploader_errors_min_file_size = Datei zu klein
+uploader_errors_accept_file_types = Unzulässiger Dateityp
+uploader_errors_max_number_of_files = Maximale Anzahl an Dateien überschritten
+uploader_errors_max_width = Bild zu breit
+uploader_errors_min_width = Bild nicht breit genug
+uploader_errors_max_height = Bild zu hoch
+uploader_errors_min_height = Bild nicht hoch genug
+uploader_errors_abort = Hochladen abgebrochen
+uploader_errors_image_resize = Bildresize fehlgeschlagen

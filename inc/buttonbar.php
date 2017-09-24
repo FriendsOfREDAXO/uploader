@@ -2,24 +2,24 @@
 if ($this->getProperty('context') == 'mediapool_media')
 {
     $tmp = '
-    <dl class="rex-form-group form-group preserve" id="jquery-file-upload-row">
+    <dl class="rex-form-group form-group preserve" id="uploader-row">
     <dt></dt>
     <dd>
     <!-- The table listing the files available for upload/download -->
-    <div class="jquery-file-upload-dropzone"><span class="hint">Datei(en) hierhin ziehen</span>
-    <ul role="presentation" class="jquery-file-upload-queue files"></ul>
+    <div class="uploader-dropzone"><span class="hint">Datei(en) hierhin ziehen</span>
+    <ul role="presentation" class="uploader-queue files"></ul>
     </div>
     <div class="row fileupload-buttonbar">
         <div class="col-lg-12">
             <!-- The fileinput-button span is used to style the file input field as button -->
             <span class="btn btn-success fileinput-button">
                 <i class="glyphicon glyphicon-plus"></i>
-                <span>' . $this->i18n('jquery_file_upload_buttonbar_add_file') . '</span>
+                <span>' . $this->i18n('uploader_buttonbar_add_file') . '</span>
                 <input type="file" name="files[]" multiple="">
             </span>
             <button type="submit" class="btn btn-primary start">
                 <i class="glyphicon glyphicon-upload"></i>
-                <span>' . $this->i18n('jquery_file_upload_buttonbar_start_upload') . '</span>
+                <span>' . $this->i18n('uploader_buttonbar_start_upload') . '</span>
             </button>
         </div>
     </div>
@@ -35,28 +35,28 @@ if ($this->getProperty('context') == 'mediapool_media')
 else
 {
     $tmp = '
-    <dl class="rex-form-group form-group preserve" id="jquery-file-upload-row">
+    <dl class="rex-form-group form-group preserve" id="uploader-row">
     <dt></dt>
     <dd>
     <!-- The table listing the files available for upload/download -->
-    <div class="jquery-file-upload-dropzone"><span class="hint">Datei(en) hierhin ziehen</span>
-    <ul role="presentation" class="jquery-file-upload-queue files"></ul>
+    <div class="uploader-dropzone"><span class="hint">Datei(en) hierhin ziehen</span>
+    <ul role="presentation" class="uploader-queue files"></ul>
     </div>
     <div class="row fileupload-buttonbar">
         <div class="col-lg-7">
             <!-- The fileinput-button span is used to style the file input field as button -->
             <span class="btn btn-success fileinput-button">
                 <i class="glyphicon glyphicon-plus"></i>
-                <span>' . $this->i18n('jquery_file_upload_buttonbar_add_files') . '</span>
+                <span>' . $this->i18n('uploader_buttonbar_add_files') . '</span>
                 <input type="file" name="files[]" multiple="">
             </span>
             <button type="submit" class="btn btn-primary start">
                 <i class="glyphicon glyphicon-upload"></i>
-                <span>' . $this->i18n('jquery_file_upload_buttonbar_start_upload') . '</span>
+                <span>' . $this->i18n('uploader_buttonbar_start_upload') . '</span>
             </button>
             <button type="reset" class="btn btn-warning cancel">
                 <i class="glyphicon glyphicon-ban-circle"></i>
-                <span>' . $this->i18n('jquery_file_upload_buttonbar_cancel') . '</span>
+                <span>' . $this->i18n('uploader_buttonbar_cancel') . '</span>
             </button>
         </div>
         <!-- The global progress state -->
@@ -78,4 +78,4 @@ else
     </dl>
     ';
 }
-return '<div id="jquery-file-upload-buttonbar-template" style="display: none">' . $tmp . '</div>';
+return '<div id="uploader-buttonbar-template" style="display: none">' . $tmp . '</div>';

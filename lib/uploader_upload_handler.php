@@ -10,7 +10,7 @@
  * http://www.opensource.org/licenses/MIT
  */
 
-class jquery_file_upload_upload_handler
+class uploader_upload_handler
 {
 
     protected $options;

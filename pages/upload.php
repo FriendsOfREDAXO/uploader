@@ -1,6 +1,6 @@
 <?php
-echo rex_view::title('jQuery File Upload');
-$addon = rex_addon::get('jquery_file_upload');
+echo rex_view::title('Uploader');
+$addon = rex_addon::get('uploader');
 
 $rex_file_category = rex_request('rex_file_category', 'int', -1);
 $PERMALL = rex::getUser()->getComplexPerm('media')->hasCategoryPerm(0);

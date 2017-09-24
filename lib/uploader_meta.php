@@ -1,9 +1,9 @@
 <?php
-class jquery_file_upload_meta
+class uploader_meta
 {
     public static function save($params)
     {
-        $handler = new jquery_file_upload_metainfo_handler();
+        $handler = new uploader_metainfo_handler();
         $handler->save($params);
     }
 }

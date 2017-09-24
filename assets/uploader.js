@@ -43,11 +43,11 @@ jQuery(function() {
     function get_fileupload_options() {
         var options = {
             dataType: 'json',
-            acceptFileTypes: jquery_file_upload_options.acceptFileTypes,
+            acceptFileTypes: uploader_options.acceptFileTypes,
             disableImagePreview: true,
             loadImageMaxFileSize: 20000000, // 20 mb
             maxChunkSize: 10000000, // 10 mb
-            messages: jquery_file_upload_options.messages
+            messages: uploader_options.messages
         };
         if (get_option('resize-images')) {
             options.disableImageResize = /Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent);
@@ -72,9 +72,9 @@ jQuery(function() {
 
     var $mediacatselect = $('#rex-mediapool-category'),
         $form = $mediacatselect.closest('form'),
-        $buttonbar = $('#jquery-file-upload-row'),
+        $buttonbar = $('#uploader-row'),
         $buttonbar_wrapper = $('<fieldset></fieldset>'),
-        context = jquery_file_upload_options.context
+        context = uploader_options.context
 
     // damit die detailansicht regulaer geladen wird
     /*
@@ -87,7 +87,7 @@ jQuery(function() {
 
     // kontextunabhaengig html anpassen
     $mediacatselect.prop('onchange', null).off('onchange');
-    $form.attr('action', jquery_file_upload_options.endpoint);
+    $form.attr('action', uploader_options.endpoint);
     $form.find('[name="ftitle"]').closest('.form-group').addClass('preserve');
     $mediacatselect.closest('.form-group').addClass('preserve append-meta-after');
 
