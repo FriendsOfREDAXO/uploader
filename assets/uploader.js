@@ -1,6 +1,11 @@
-/* globals jQuery,$,selectMedia */
+/* globals jQuery,$,selectMedia,selectMediaList,uploader_options */
 
-jQuery(function() {
+jQuery(function () {
+
+    // https://stackoverflow.com/a/11582513
+    function getURLParameter(name) {
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+    }
 
     function update_metafields(str_html) {
 
@@ -9,7 +14,7 @@ jQuery(function() {
             $meta_to_append;
 
         // neue metas zusammenstellen
-        $ajax_parent.find('.form-group').each(function() {
+        $ajax_parent.find('.form-group').each(function () {
             var $this = $(this),
                 name = $this.find('[name]:eq(0)').attr('name'),
                 $existing_name = $('[name="' + name + '"]'),
@@ -32,7 +37,7 @@ jQuery(function() {
         // neue metas einsetzen
         $meta_to_append = $ajax_parent.find('.form-group');
         if ($meta_to_append.length) {
-            $($meta_to_append.get().reverse()).each(function() {
+            $($meta_to_append.get().reverse()).each(function () {
                 $local_parent.find('.append-meta-after').after($(this));
             });
             $(document).trigger('rex:ready', [$local_parent]);
@@ -65,7 +70,7 @@ jQuery(function() {
         return false;
     }
 
-    function get_mime_icon (filename) {
+    function get_mime_icon(filename) {
         var ext = filename.toLowerCase().split('.').pop();
         return '<i class="rex-mime rex-mime-' + ext + '" data-extension="' + ext + '"></i>';
     }
@@ -74,16 +79,7 @@ jQuery(function() {
         $form = $mediacatselect.closest('form'),
         $buttonbar = $('#uploader-row'),
         $buttonbar_wrapper = $('<fieldset></fieldset>'),
-        context = uploader_options.context
-
-    // damit die detailansicht regulaer geladen wird
-    /*
-    if (context == 'mediapool_media') {
-        $('[href*="file_id"]').each(function () {
-            $(this).attr('data-pjax', 'false');
-        });
-    }
-    */
+        context = uploader_options.context;
 
     // kontextunabhaengig html anpassen
     $mediacatselect.prop('onchange', null).off('onchange');
@@ -92,7 +88,7 @@ jQuery(function() {
     $mediacatselect.closest('.form-group').addClass('preserve append-meta-after');
 
     // erlaubte metafelder bei kategoriewechsel holen
-    $mediacatselect.on('change', function() {
+    $mediacatselect.on('change', function () {
         $.ajax({
             url: '/redaxo/index.php',
             type: 'POST',
@@ -101,30 +97,20 @@ jQuery(function() {
                 rex_file_category: $mediacatselect.val()
             },
             dataType: 'html',
-            success: function(result) {
+            success: function (result) {
                 update_metafields(result);
             }
         });
     });
 
     // kontextabhaengig html anpassen
-    if (context == 'mediapool_upload') {
+    if (context === 'mediapool_upload') {
         $('#rex-mediapool-choose-file').closest('dl').remove();
         $form.find('footer').remove();
         $buttonbar_wrapper.append($buttonbar);
         $form.find('fieldset:last').after($buttonbar_wrapper);
     }
-    /*
-    else if (context == 'mediapool_media') {
-        $('[name="file_new"]').closest('dl').remove();
-        $form.find('.rex-form-panel-footer').remove();
-        $form.find('.form-control-static').closest('dl').addClass('preserve');
-        $buttonbar_wrapper = $('<div class="row"><div class="col-sm-12"></div></div>');
-        $buttonbar_wrapper.find('div').append($buttonbar);
-        $form.append($buttonbar_wrapper);
-    }
-    */
-    else if (context == 'addon_upload') {
+    else if (context === 'addon_upload') {
         $buttonbar_wrapper.append($buttonbar);
         $form.find('fieldset').after($buttonbar_wrapper);
         // metainfos holen
@@ -133,7 +119,7 @@ jQuery(function() {
 
     $form.fileupload(get_fileupload_options());
 
-    $form.bind('fileuploadadded', function(e, data) {
+    $form.bind('fileuploadadded', function (e, data) {
         $(data.context[0]).find('.preview').append(get_mime_icon(data.files[0].name));
     });
 
@@ -142,8 +128,7 @@ jQuery(function() {
         $form.fileupload(get_fileupload_options());
     });
 
-    $form.bind('fileuploadcompleted', function(e, data) {
-        var $li = $(data.context[0]);
+    $form.bind('fileuploadcompleted', function (e, data) {
         if (data.result.files[0].hasOwnProperty('error')) {
             return true;
         }
@@ -156,9 +141,15 @@ jQuery(function() {
     });
 
     // datei nach upload uebernehmen
-    $form.on('click', '.btn-select', function(e) {
+    $form.on('click', '.btn-select', function (e) {
+        var opener_input_field = getURLParameter('opener_input_field');
         e.preventDefault();
-        selectMedia($(this).data('filename'), '');
+        if (opener_input_field.substr(0, 14) === 'REX_MEDIALIST_') {
+            selectMedialist($(this).data('filename'), '');
+        }
+        else {
+            selectMedia($(this).data('filename'), '');
+        }
     });
 
 });
