@@ -1,7 +1,7 @@
 package: jquery_file_upload
 version: '1.0.0'
-author: Ingo Winter
-supportpage: www.redaxo.org/de/forum/
+author: 'Friends Of REDAXO'
+supportpage: 'https://github.com/FriendsOfREDAXO/uploader'
 
 page:
     title: 'jQuery File Upload'
