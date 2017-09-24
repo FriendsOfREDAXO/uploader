@@ -15,4 +15,4 @@ page:
 requires:
     redaxo: '^5.0.0'
 
-endpoint: '/redaxo/index.php?page=jquery_file_upload/endpoint'
+endpoint: '/redaxo/index.php?page=uploader/endpoint'
