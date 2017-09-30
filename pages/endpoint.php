@@ -1,9 +1,8 @@
 <?php
-$allowed_filetypes = implode('|', array_unique(array_merge(['mp4'], rex_addon::get('mediapool')->getProperty('allowed_doctypes'))));
 $options = [
     'upload_dir' => rex_path::media(),
     'upload_url' => rex_url::media(),
-    'accept_file_types' => '/\.('.$allowed_filetypes.')$/i',
+    'accept_file_types' => '/\.('.$this->getProperty('allowed_filetypes').')$/i',
     'image_versions' => [
         '' => [
             'auto_orient' => true

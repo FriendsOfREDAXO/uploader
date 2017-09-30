@@ -50,14 +50,17 @@ jQuery(function () {
             dataType: 'json',
             acceptFileTypes: uploader_options.acceptFileTypes,
             disableImagePreview: true,
-            loadImageMaxFileSize: 20000000, // 20 mb
+            loadImageMaxFileSize: uploader_options.loadImageMaxFileSize, // 20 mb
             maxChunkSize: 10000000, // 10 mb
+            disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent),
+            imageMaxWidth: uploader_options.imageMaxWidth,
+            imageMaxHeight: uploader_options.imageMaxHeight,
             messages: uploader_options.messages
         };
-        if (get_option('resize-images')) {
-            options.disableImageResize = /Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent);
-            options.imageMaxWidth = 4000;
-            options.imageMaxHeight = 4000;
+        if (!get_option('resize-images')) {
+            delete options.disableImageResize;
+            delete options.imageMaxWidth;
+            delete options.imageMaxHeight;
         }
         return options;
     }
@@ -72,7 +75,7 @@ jQuery(function () {
 
     function get_mime_icon(filename) {
         var ext = filename.toLowerCase().split('.').pop();
-        return '<i class="rex-mime rex-mime-' + ext + '" data-extension="' + ext + '"></i>';
+        return '<i class="rex-mime" data-extension="' + ext + '"></i>';
     }
 
     var $mediacatselect = $('#rex-mediapool-category'),
