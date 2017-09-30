@@ -1,5 +1,5 @@
 <?php
-$allowed_filetypes = implode('|', rex_addon::get('mediapool')->getProperty('allowed_doctypes'));
+//$allowed_filetypes = implode('|', rex_addon::get('mediapool')->getProperty('allowed_doctypes'));
 return '
 <script>
 var uploader_options = {
@@ -11,7 +11,10 @@ var uploader_options = {
     },
     context: "'.$this->getProperty('context').'",
     endpoint: "'.$this->getProperty('endpoint').'",
-    acceptFileTypes: /\.('.$allowed_filetypes.')$/i
+    loadImageMaxFileSize: '.((int)$this->getConfig('image-max-filesize')*1000000).',
+    imageMaxWidth: '.(int)$this->getConfig('image-max-width').',
+    imageMaxHeight: '.(int)$this->getConfig('image-max-height').',
+    acceptFileTypes: /\.('.$this->getProperty('allowed_filetypes').')$/i
 };
 </script>
 ';

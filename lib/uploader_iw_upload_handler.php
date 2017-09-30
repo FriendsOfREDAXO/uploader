@@ -3,13 +3,15 @@
 class uploader_iw_upload_handler extends uploader_upload_handler
 {
 
-    protected function upcount_name_callback($matches) {
+    protected function upcount_name_callback($matches)
+    {
         $index = isset($matches[1]) ? ((int)$matches[1]) + 1 : 1;
         $ext = isset($matches[2]) ? $matches[2] : '';
-        return ' (jfucounter'.$index.'jfucounter)'.$ext;
+        return ' (jfucounter' . $index . 'jfucounter)' . $ext;
     }
 
-    protected function upcount_name($name) {
+    protected function upcount_name($name)
+    {
         return preg_replace_callback(
             '/(?:(?: \(jfucounter([\d]+)jfucounter\))?(\.[^.]+))?$/',
             array($this, 'upcount_name_callback'),
@@ -18,34 +20,41 @@ class uploader_iw_upload_handler extends uploader_upload_handler
         );
     }
 
-    protected function handle_file_upload($uploaded_file, $name, $size, $type, $error,
-            $index = null, $content_range = null) {
+    protected function handle_file_upload($uploaded_file, $name, $size, $type, $error, $index = null, $content_range = null)
+    {
         $file = new \stdClass();
-        $file->name = $this->get_file_name($uploaded_file, $name, $size, $type, $error,
-            $index, $content_range);
+        $file->name = $this->get_file_name($uploaded_file, $name, $size, $type, $error, $index, $content_range);
         $file->size = $this->fix_integer_overflow((int)$size);
         $file->type = $type;
-        if ($this->validate($uploaded_file, $file, $error, $index)) {
+        if ($this->validate($uploaded_file, $file, $error, $index))
+        {
             $this->handle_form_data($file, $index);
             $upload_dir = $this->get_upload_path();
-            if (!is_dir($upload_dir)) {
+            if (!is_dir($upload_dir))
+            {
                 mkdir($upload_dir, $this->options['mkdir_mode'], true);
             }
             $file_path = $this->get_upload_path($file->name);
             $append_file = $content_range && is_file($file_path) &&
                 $file->size > $this->get_file_size($file_path);
-            if ($uploaded_file && is_uploaded_file($uploaded_file)) {
+            if ($uploaded_file && is_uploaded_file($uploaded_file))
+            {
                 // multipart/formdata uploads (POST method uploads)
-                if ($append_file) {
+                if ($append_file)
+                {
                     file_put_contents(
                         $file_path,
                         fopen($uploaded_file, 'r'),
                         FILE_APPEND
                     );
-                } else {
+                }
+                else
+                {
                     move_uploaded_file($uploaded_file, $file_path);
                 }
-            } else {
+            }
+            else
+            {
                 // Non-multipart uploads (PUT method support)
                 file_put_contents(
                     $file_path,
@@ -55,7 +64,8 @@ class uploader_iw_upload_handler extends uploader_upload_handler
             }
             $file_size = $this->get_file_size($file_path, $append_file);
             // iw upload complete
-            if ($file_size === $file->size) {
+            if ($file_size === $file->size)
+            {
 
                 // iw patch start
                 $file->upload_complete = 1;
@@ -67,18 +77,21 @@ class uploader_iw_upload_handler extends uploader_upload_handler
 
                 // dateiname endet mit " (jfucounterXjfucounter)" -> vom uploader hochgezaehlt
                 preg_match('/(.+)( \(jfucounter\d+jfucounter\))/', $new_name, $matches);
-                if ($matches) {
+                if ($matches)
+                {
                     $new_name = $matches[1];
                 }
 
                 // dateiname genauso fertig machen wie im medienpoolupload/ -sync
                 $new_name = rex_string::normalize($new_name, '_', '-.');
-                if (isset($path_parts['extension'])) {
-                    $new_name = $new_name.'.'.$path_parts['extension'];
+                if (isset($path_parts['extension']))
+                {
+                    $new_name = $new_name . '.' . $path_parts['extension'];
                 }
 
                 // es gibt schon eine datei mit dem neuen namen, mp muss hochzaehlen
-                if ($new_name != $old_name  && is_file(rex_path::media($new_name))) {
+                if ($new_name != $old_name && is_file(rex_path::media($new_name)))
+                {
                     $do_subindexing = true;
                 }
 
@@ -99,12 +112,16 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 // iw patch end
 
                 $file->url = $this->get_download_url($file->name);
-                if ($this->is_valid_image_file($file_path)) {
+                if ($this->is_valid_image_file($file_path))
+                {
                     $this->handle_image_file($file_path, $file);
                 }
-            } else {
+            }
+            else
+            {
                 $file->size = $file_size;
-                if (!$content_range && $this->options['discard_aborted_uploads']) {
+                if (!$content_range && $this->options['discard_aborted_uploads'])
+                {
                     unlink($file_path);
                     $file->error = $this->get_error_message('abort');
                 }
@@ -114,52 +131,58 @@ class uploader_iw_upload_handler extends uploader_upload_handler
         return $file;
     }
 
-    public function generate_response($content, $print_response = true) {
+    public function generate_response($content, $print_response = true)
+    {
         $this->response = $content;
-        if ($print_response) {
+        if ($print_response)
+        {
             // iw patch redaxo thumbnails laden
 
             foreach ($content['files'] as $v)
             {
-                if (isset($v->upload_complete)) {
+                if (isset($v->upload_complete))
+                {
                     $media = rex_media::get($v->name);
-                    if ($media->isImage()) {
-                        $v->thumbnailUrl = '/redaxo/index.php?rex_media_type=rex_mediapool_preview&rex_media_file='.$v->name;
+                    if ($media->isImage())
+                    {
+                        $v->thumbnailUrl = '/redaxo/index.php?rex_media_type=rex_mediapool_preview&rex_media_file=' . $v->name;
                     }
-                    else {
+                    else
+                    {
                         $file_ext = substr(strrchr($v->name, '.'), 1);
-                        $icon_class = ' rex-mime-'.$file_ext;
-                        if (!rex_media::isDocType($file_ext)) {
-                            $icon_class = ' rex-mime-error';
-                        }
+                        $icon_class = '';
                         $v->icon = 1;
-                        $v->iconclass =  $icon_class;
+                        $v->iconclass = $icon_class;
                         $v->iconextension = $file_ext;
                     }
                 }
-                else {
-                        $file_ext = substr(strrchr($v->name, '.'), 1);
-                        $icon_class = ' rex-mime-error';
-                        $v->icon = 1;
-                        $v->iconclass =  $icon_class;
-                        $v->iconextension = $file_ext;
+                else
+                {
+                    $file_ext = substr(strrchr($v->name, '.'), 1);
+                    $icon_class = ' rex-mime-error';
+                    $v->icon = 1;
+                    $v->iconclass = $icon_class;
+                    $v->iconextension = $file_ext;
                 }
             }
 
             $json = json_encode($content);
             $redirect = stripslashes($this->get_post_param('redirect'));
-            if ($redirect && preg_match($this->options['redirect_allow_target'], $redirect)) {
-                $this->header('Location: '.sprintf($redirect, rawurlencode($json)));
+            if ($redirect && preg_match($this->options['redirect_allow_target'], $redirect))
+            {
+                $this->header('Location: ' . sprintf($redirect, rawurlencode($json)));
                 return;
             }
             $this->head();
-            if ($this->get_server_var('HTTP_CONTENT_RANGE')) {
+            if ($this->get_server_var('HTTP_CONTENT_RANGE'))
+            {
                 $files = isset($content[$this->options['param_name']]) ?
                     $content[$this->options['param_name']] : null;
-                if ($files && is_array($files) && is_object($files[0]) && $files[0]->size) {
-                    $this->header('Range: 0-'.(
-                        $this->fix_integer_overflow((int)$files[0]->size) - 1
-                    ));
+                if ($files && is_array($files) && is_object($files[0]) && $files[0]->size)
+                {
+                    $this->header('Range: 0-' . (
+                            $this->fix_integer_overflow((int)$files[0]->size) - 1
+                        ));
                 }
             }
             $this->body($json);

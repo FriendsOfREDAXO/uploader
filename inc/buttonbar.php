@@ -1,4 +1,5 @@
 <?php
+$resize = $this->getConfig('image-resize-checked') == 'true' ? 'checked' : '';
 if ($this->getProperty('context') == 'mediapool_media')
 {
     $tmp = '
@@ -25,7 +26,7 @@ if ($this->getProperty('context') == 'mediapool_media')
     </div>
     <div class="row fileupload-options">
         <div class="col-lg-12">
-            <label><input type="checkbox" checked id="resize-images"> ' . $this->i18n('buttonbar_resize_image') . '</label>
+            <label><input type="checkbox" '.$resize.' id="resize-images"> ' . $this->i18n('buttonbar_resize_image') . '</label>
         </div>
     </div>
     </dd>
@@ -71,7 +72,7 @@ else
     </div>
     <div class="row fileupload-options">
         <div class="col-lg-12">
-            <label><input type="checkbox" checked id="resize-images"> ' . $this->i18n('buttonbar_resize_images') . '</label>
+            <label><input type="checkbox" '.$resize.' id="resize-images"> ' . $this->i18n('buttonbar_resize_images') . '</label>
         </div>
     </div>
     </dd>
