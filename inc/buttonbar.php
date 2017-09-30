@@ -6,7 +6,7 @@ if ($this->getProperty('context') == 'mediapool_media')
     <dt></dt>
     <dd>
     <!-- The table listing the files available for upload/download -->
-    <div class="uploader-dropzone"><span class="hint">Datei(en) hierhin ziehen</span>
+    <div class="uploader-dropzone"><span class="hint">' . $this->i18n('buttonbar_dropzone') . '</span>
     <ul role="presentation" class="uploader-queue files"></ul>
     </div>
     <div class="row fileupload-buttonbar">
@@ -25,7 +25,7 @@ if ($this->getProperty('context') == 'mediapool_media')
     </div>
     <div class="row fileupload-options">
         <div class="col-lg-12">
-            <label><input type="checkbox" checked id="resize-images"> übergroßes Bild vor Upload verkleinern</label>
+            <label><input type="checkbox" checked id="resize-images"> ' . $this->i18n('buttonbar_resize_image') . '</label>
         </div>
     </div>
     </dd>
@@ -39,7 +39,7 @@ else
     <dt></dt>
     <dd>
     <!-- The table listing the files available for upload/download -->
-    <div class="uploader-dropzone"><span class="hint">Datei(en) hierhin ziehen</span>
+    <div class="uploader-dropzone"><span class="hint">' . $this->i18n('buttonbar_dropzone') . '</span>
     <ul role="presentation" class="uploader-queue files"></ul>
     </div>
     <div class="row fileupload-buttonbar">
@@ -71,7 +71,7 @@ else
     </div>
     <div class="row fileupload-options">
         <div class="col-lg-12">
-            <label><input type="checkbox" checked id="resize-images"> übergroße Bilder vor Upload verkleinern</label>
+            <label><input type="checkbox" checked id="resize-images"> ' . $this->i18n('buttonbar_resize_images') . '</label>
         </div>
     </div>
     </dd>
