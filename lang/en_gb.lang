@@ -1,0 +1,44 @@
+uploader_title = Uploader
+
+uploader_settings = Settings
+uploader_settings_image_section = Images
+uploader_settings_image_intro = If images exceed the max size, they can be automatically resized by the browser before being uploaded.
+uploader_settings_image_max_width = Maximum width
+uploader_settings_image_max_height = Maximum height
+uploader_settings_image_max_filesize = Maximum file size
+uploader_settings_image_resize_checked = Image resizing enabled by default
+uploader_settings_save = Save settings
+uploader_settings_saved = Settings have been saved
+uploader_settings_error = An error occured
+
+uploader_filelist_processing = in progress...
+uploader_filelist_cancel = remove
+uploader_filelist_error = Error
+uploader_filelist_add_to_widget = Select file
+
+uploader_buttonbar_dropzone = Drop file(s) here
+uploader_buttonbar_resize_image = Resize image above maximum size
+uploader_buttonbar_resize_images = Resize images above maximum size
+uploader_buttonbar_add_file = Add file
+uploader_buttonbar_add_files = Add files
+uploader_buttonbar_start_upload = Start upload
+uploader_buttonbar_cancel = Remove all
+
+uploader_errors_1 = File size exceeded (upload_max_filesize/ php.ini)
+uploader_errors_2 = File size exceeded (MAX_FILE_SIZE/ form)
+uploader_errors_3 = File upload incomplete
+uploader_errors_4 = No file has been uploaded
+uploader_errors_6 = Temp folder missing
+uploader_errors_7 = Could not write to drive
+uploader_errors_8 = Upload prevented by PHP extension
+uploader_errors_post_max_size = File size exceeded (post_max_size/ php.ini)
+uploader_errors_max_file_size = File size exceeded
+uploader_errors_min_file_size = File size below minimum
+uploader_errors_accept_file_types = File type not allowed
+uploader_errors_max_number_of_files = Maximum number of files exceeded
+uploader_errors_max_width = Image width exceeded
+uploader_errors_min_width = Image width below minimum
+uploader_errors_max_height = Image height exceeded
+uploader_errors_min_height = Image height below minimum
+uploader_errors_abort = Upload aborted
+uploader_errors_image_resize = Image resize failed
