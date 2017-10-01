@@ -6,11 +6,11 @@ page:
     title: 'Uploader'
     icon: rex-icon rex-icon-import
     subpages:
+        settings:
+            title: 'Settings'
+            perm: admin
         upload:
             title: 'Upload'
-        settings:
-            perm: uploader[settings]
-            title: 'Settings'
         endpoint:
             title: 'endpoint'
             hidden: true
