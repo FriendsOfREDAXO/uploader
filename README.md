@@ -3,7 +3,7 @@ Uploader
 
 Upload mehrerer Dateien gleichzeitig in den Medienpool. Übergroße Bilder können vorher verkleinert werden.
 
-![Screenshot](https://raw.githubusercontent.com/FriendsOfREDAXO/uploader/assets/file-upload_01.jpg)
+![Screenshot](https://raw.githubusercontent.com/FriendsOfREDAXO/uploader/assets/uploader_01.jpg)
 
 ### Fehlermeldung _Empty file upload result_
 
