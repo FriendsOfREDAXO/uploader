@@ -1,6 +1,5 @@
 <?php
 $addon = rex_addon::get('uploader');
-$addon->setProperty('allowed_filetypes', implode('|', array_unique(array_merge(['mp4', 'svg'], rex_addon::get('mediapool')->getProperty('allowed_doctypes')))));
 
 rex_extension::register('PACKAGES_INCLUDED', function ()
 {

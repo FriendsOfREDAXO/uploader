@@ -2,7 +2,6 @@
 $options = [
     'upload_dir' => rex_path::media(),
     'upload_url' => rex_url::media(),
-    'accept_file_types' => '/\.('.$this->getProperty('allowed_filetypes').')$/i',
     'image_versions' => [
         '' => [
             'auto_orient' => true

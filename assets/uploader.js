@@ -48,7 +48,6 @@ jQuery(function () {
     function get_fileupload_options() {
         var options = {
             dataType: 'json',
-            acceptFileTypes: uploader_options.acceptFileTypes,
             disableImagePreview: true,
             loadImageMaxFileSize: uploader_options.loadImageMaxFileSize, // 20 mb
             maxChunkSize: 10000000, // 10 mb
