@@ -86,6 +86,18 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 $new_name = rex_string::normalize($new_name, '_', '-.');
                 if (isset($path_parts['extension']))
                 {
+                    // ---- ext checken - alle scriptendungen rausfiltern
+                    if (in_array($path_parts['extension'], rex_addon::get('mediapool')->getProperty('blocked_extensions')))
+                    {
+                        $new_name .= $path_parts['extension'];
+                        $path_parts['extension'] = 'txt';
+                    }
+
+                    // ---- multiple extension check
+                    foreach (rex_addon::get('mediapool')->getProperty('blocked_extensions') as $ext)
+                    {
+                        $new_name = str_replace($ext . '.', $ext . '_.', $new_name);
+                    }
                     $new_name = $new_name . '.' . $path_parts['extension'];
                 }
 
