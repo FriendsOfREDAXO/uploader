@@ -18,6 +18,10 @@ $error-color: #a94442;
         color: $border-grey;
         font-size: 2em;
     }
+    img {
+        max-width: 100%;
+        height: auto;
+    }
 }
 .uploader-queue {
     list-style: none;
