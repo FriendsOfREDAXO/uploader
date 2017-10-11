@@ -158,6 +158,9 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                     if ($media->isImage())
                     {
                         $v->thumbnailUrl = '/redaxo/index.php?rex_media_type=rex_mediapool_preview&rex_media_file=' . $v->name;
+                        if (rex_file::extension($v->name) == 'svg') {
+                            $v->thumbnailUrl = '/media/'.$v->name;
+                        }
                     }
                     else
                     {
