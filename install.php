@@ -6,7 +6,7 @@ if (!$this->hasConfig()) {
     $this->setConfig([
         'image-max-width' => 4000, // px
         'image-max-height' => 4000, // px
-        'image-max-filesize' => 20, // MB
+        'image-max-filesize' => 30, // MB
         'image-resize-checked' => true // resize option checked per default?
     ]);
 }
