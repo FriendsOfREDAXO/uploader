@@ -8,7 +8,6 @@ if (rex_post('config-submit', 'boolean')) {
     $this->setConfig(rex_post('settings', [
         ['image-max-width', 'int'],
         ['image-max-height', 'int'],
-        ['image-max-filesize', 'int'],
         ['image-resize-checked', 'bool']
     ]));
 
@@ -54,24 +53,6 @@ $n = [];
 $n['before'] = '<div style="max-width: 200px;">';
 $n['after'] = '</div>';
 $n['label'] = '<label for="uploader-image-max-height">' . $this->i18n('settings_image_max_height') . '</label>';
-$n['field'] = $inputGroup;
-$formElements[] = $n;
-
-// max filesize
-$inputGroups = [];
-$n = [];
-$n['field'] = '<input class="form-control" id="uploader-image-max-filesize" type="text" name="settings[image-max-filesize]" value="' . $this->getConfig('image-max-filesize') . '">';
-$n['right'] = '<div style="min-width: 2em;">MB</div>';
-$inputGroups[] = $n;
-
-$fragment = new rex_fragment();
-$fragment->setVar('elements', $inputGroups, false);
-$inputGroup = $fragment->parse('core/form/input_group.php');
-
-$n = [];
-$n['before'] = '<div style="max-width: 200px;">';
-$n['after'] = '</div>';
-$n['label'] = '<label for="uploader-image-max-filesize">' . $this->i18n('settings_image_max_filesize') . '</label>';
 $n['field'] = $inputGroup;
 $formElements[] = $n;
 
