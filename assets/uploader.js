@@ -92,7 +92,7 @@ jQuery(function () {
     // erlaubte metafelder bei kategoriewechsel holen
     $mediacatselect.on('change', function () {
         $.ajax({
-            url: '/redaxo/index.php',
+            url: 'index.php',
             type: 'POST',
             data: {
                 page: 'mediapool/upload',
