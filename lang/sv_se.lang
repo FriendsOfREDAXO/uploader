@@ -1,0 +1,44 @@
+uploader_title = Uploader
+
+uploader_settings = Inställningar
+uploader_settings_image_section = Bilder
+uploader_settings_image_intro = Bilder kan automatiskt minskas i webbläsaren när de laddas upp, om de är större än här definierade.
+uploader_settings_image_max_width = Maximum bredd
+uploader_settings_image_max_height = Max höjd
+uploader_settings_image_max_filesize = Ma filstorlek
+uploader_settings_image_resize_checked = Bildreduktion aktiverad som standard
+uploader_settings_save = Spara inställningar
+uploader_settings_saved = Inställningarna har sparats.
+uploader_settings_error = Ett fel har inträffat.
+
+uploader_filelist_processing = pågående...
+uploader_filelist_cancel = ta bort
+uploader_filelist_error = Fel
+uploader_filelist_add_to_widget = Välj fil
+
+uploader_buttonbar_dropzone = Dra fil (er) hit
+uploader_buttonbar_resize_image = Minka överdimensionerad bild före uppladdning
+uploader_buttonbar_resize_images = Ändra storlek på bilder som är för stora
+uploader_buttonbar_add_file = Välj fil
+uploader_buttonbar_add_files = Välj fil(er)
+uploader_buttonbar_start_upload = Starta uppladdning
+uploader_buttonbar_cancel = Radera alla
+
+uploader_errors_1 = Filen är för stor (upload_max_filesize / php.ini)
+uploader_errors_2 = Filen är för stor (MAX_FILE_SIZE / form)
+uploader_errors_3 = Filen har endast delvis uppladdats
+uploader_errors_4 = Ingen fil har laddats upp
+uploader_errors_6 = Temporär katalog saknas
+uploader_errors_7 = Det gick inte att skriva filen på hårddisken
+uploader_errors_8 = Ett PHP-tillägg har hindrat uppladdning
+uploader_errors_post_max_size = Filen är för stor (post_max_size / php.ini)
+uploader_errors_max_file_size = Filen är för stor
+uploader_errors_min_file_size = Filen är för liten
+uploader_errors_accept_file_types = Filtyp inte tillåten
+uploader_errors_max_number_of_files = Maximalt antal filer överskridits
+uploader_errors_max_width = Bild för bred
+uploader_errors_min_width = Bilden är inte tillräckligt stor
+uploader_errors_max_height = Bilden är för hög
+uploader_errors_min_height = Bilden är inte tillräckligt hög
+uploader_errors_abort = Uppladdningen avbröts
+uploader_errors_image_resize = Bildresize misslyckades
