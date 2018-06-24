@@ -1,0 +1,44 @@
+uploader_title = Cargador
+
+uploader_settings = Ajustes
+uploader_settings_image_section = Fotos
+uploader_settings_image_intro = Las imágenes se pueden reducir automáticamente en el navegador cuando se cargan, si son más grandes que las definidas aquí.
+uploader_settings_image_max_width = Ancho máximo
+uploader_settings_image_max_height = Altura máxima
+uploader_settings_image_max_filesize = Tamaño máximo de archivo
+uploader_settings_image_resize_checked = Reducción de imagen habilitada por defecto
+uploader_settings_save = Guardar configuraciones
+uploader_settings_saved = La configuración ha sido guardada.
+uploader_settings_error = Un error ha ocurrido
+
+uploader_filelist_processing = procesado...
+uploader_filelist_cancel = eliminar
+uploader_filelist_error = Error
+uploader_filelist_add_to_widget = Transferir archivo
+
+uploader_buttonbar_dropzone = Arrastre archivo (s) aquí
+uploader_buttonbar_resize_image = Reducir la imagen sobredimensionada antes de cargar
+uploader_buttonbar_resize_images = Reducir las imágenes sobredimensionadas antes de subirlas
+uploader_buttonbar_add_file = Seleccionar archivo
+uploader_buttonbar_add_files = Seleccionar archivo (s)
+uploader_buttonbar_start_upload = Comience a cargar
+uploader_buttonbar_cancel = Eliminar todo
+
+uploader_errors_1 = Archivo demasiado grande (upload_max_filesize / php.ini)
+uploader_errors_2 = Archivo demasiado grande (MAX_FILE_SIZE/ Form)
+uploader_errors_3 = El archivo solo se subió parcialmente
+uploader_errors_4 = No se cargó ningún archivo
+uploader_errors_6 = Falta el directorio temporal
+uploader_errors_7 = No se pudo escribir el archivo en el disco
+uploader_errors_8 = Una extensión de PHP ha impedido la carga
+uploader_errors_post_max_size = Archivo demasiado grande (post_max_size/ php.ini)
+uploader_errors_max_file_size = Archivo demasiado grande
+uploader_errors_min_file_size = Archivo demasiado pequeño
+uploader_errors_accept_file_types = Tipo de archivo ilegal
+uploader_errors_max_number_of_files = Número máximo de archivos excedidos
+uploader_errors_max_width = Imagen demasiado amplia
+uploader_errors_min_width = La imagen no es lo suficientemente ancha
+uploader_errors_max_height = Imagen muy alta
+uploader_errors_min_height = La imagen no es lo suficientemente alta
+uploader_errors_abort = Carga abortada
+uploader_errors_image_resize = El tamaño de la imagen falló
