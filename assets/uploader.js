@@ -83,6 +83,9 @@ jQuery(function () {
         $buttonbar_wrapper = $('<fieldset></fieldset>'),
         context = uploader_options.context;
 
+    // reload per pjax verhindern
+    $('a[href="index.php?page=mediapool/upload"]').attr('data-pjax', 'false');
+
     // kontextunabhaengig html anpassen
     $mediacatselect.prop('onchange', null).off('onchange');
     $form.attr('action', uploader_options.endpoint);
