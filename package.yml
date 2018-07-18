@@ -16,6 +16,6 @@ page:
             hidden: true
             hasLayout: false
 requires:
-    redaxo: '^5.0.0'
+    redaxo: '^5.1.0'
 
 endpoint: 'index.php?page=uploader/endpoint'
