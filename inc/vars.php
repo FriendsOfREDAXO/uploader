@@ -11,6 +11,7 @@ var uploader_options = {
     },
     context: "'.$this->getProperty('context').'",
     endpoint: "'.$this->getProperty('endpoint').'",
+    loadImageFileTypes: /^image\/(gif|jpeg|png)$/,
     loadImageMaxFileSize: '.((int)$this->getConfig('image-max-filesize')*1000000).',
     imageMaxWidth: '.(int)$this->getConfig('image-max-width').',
     imageMaxHeight: '.(int)$this->getConfig('image-max-height').',
