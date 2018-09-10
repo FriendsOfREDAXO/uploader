@@ -1,5 +1,5 @@
 package: uploader
-version: '1.2.0'
+version: '1.2.0-dev'
 author: 'Friends Of REDAXO'
 supportpage: 'https://github.com/FriendsOfREDAXO/uploader'
 page:
