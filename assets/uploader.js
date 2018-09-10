@@ -89,8 +89,8 @@ jQuery(function () {
     // kontextunabhaengig html anpassen
     $mediacatselect.prop('onchange', null).off('onchange');
     $form.attr('action', uploader_options.endpoint);
-    $form.find('[name="ftitle"]').closest('.form-group').addClass('preserve');
-    $mediacatselect.closest('.form-group').addClass('preserve append-meta-after');
+    $form.find('[name="ftitle"]').closest('.form-group').addClass('preserve append-meta-after');
+    $mediacatselect.closest('.form-group').addClass('preserve');
 
     // erlaubte metafelder bei kategoriewechsel holen
     $mediacatselect.on('change', function () {
