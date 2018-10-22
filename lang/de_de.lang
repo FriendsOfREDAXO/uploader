@@ -42,3 +42,6 @@ uploader_errors_max_height = Bild zu hoch
 uploader_errors_min_height = Bild nicht hoch genug
 uploader_errors_abort = Hochladen abgebrochen
 uploader_errors_image_resize = Bildresize fehlgeschlagen
+
+perm_general_uploader[] = Uploader
+perm_general_uploader[page] = Uploader Seite anzeigen
