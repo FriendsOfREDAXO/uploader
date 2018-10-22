@@ -1,9 +1,13 @@
 <?php
 $addon = rex_addon::get('uploader');
 
+if (rex::isBackend() && rex::getUser()) {
+    rex_perm::register('uploader[]');
+}
+
 rex_extension::register('PACKAGES_INCLUDED', function ()
 {
-    if (rex::isBackend() && rex::getUser())
+    if (rex::isBackend() && rex::getUser() && rex::getUser()->hasPerm('quick_navigation[]'))
     {
         if (rex::isDebugMode() && rex_request_method() == 'get')
         {
@@ -16,7 +20,7 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
             rex_file::copy($this->getPath('assets/uploader.js'), $this->getAssetsPath('uploader.js'));
         }
         $include_assets = 0;
-        if (rex_get('page', 'string') == 'mediapool/upload')
+        if (rex_get('page', 'string') == 'mediapool/upload' )
         {
             $this->setProperty('context', 'mediapool_upload');
             $include_assets = 1;
@@ -64,3 +68,4 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
 
     }
 }, 'LATE');
+
