@@ -2,9 +2,11 @@ package: uploader
 version: '1.2.0-dev'
 author: 'Friends Of REDAXO'
 supportpage: 'https://github.com/FriendsOfREDAXO/uploader'
+perm: uploader[]
 page:
     title: 'Uploader'
     icon: rex-icon rex-icon-import
+    perm: uploader[page]
     subpages:
         settings:
             title: 'Settings'
