@@ -7,7 +7,7 @@ if (rex::isBackend() && rex::getUser()) {
 
 rex_extension::register('PACKAGES_INCLUDED', function ()
 {
-    if (rex::isBackend() && rex::getUser() && rex::getUser()->hasPerm('quick_navigation[]'))
+    if (rex::isBackend() && rex::getUser() && rex::getUser()->hasPerm('uploader[]'))
     {
         if (rex::isDebugMode() && rex_request_method() == 'get')
         {
@@ -68,4 +68,3 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
 
     }
 }, 'LATE');
-
