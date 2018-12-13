@@ -1,12 +1,12 @@
 package: uploader
-version: '2.0.0-dev'
+version: '2.0.1'
 author: 'Friends Of REDAXO'
 supportpage: 'https://github.com/FriendsOfREDAXO/uploader'
 perm: uploader[]
+perm: uploader[page]
 page:
     title: 'Uploader'
     icon: rex-icon rex-icon-import
-    perm: uploader[page]
     subpages:
         settings:
             title: 'Settings'
@@ -21,3 +21,4 @@ requires:
     redaxo: '^5.1.0'
 
 endpoint: 'index.php?page=uploader/endpoint'
+
