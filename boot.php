@@ -3,7 +3,17 @@ $addon = rex_addon::get('uploader');
 
 if (rex::isBackend() && rex::getUser()) {
     rex_perm::register('uploader[]');
+    rex_perm::register('uploader[page]');
+
+if (!rex::getUser()->hasPerm('uploader[page]')) {
+   $page = $this->getProperty('page');
+   $page['hidden'] = 'true';
+   $this->setProperty('page', $page);
 }
+dump($page);
+}    
+
+
 
 rex_extension::register('PACKAGES_INCLUDED', function ()
 {
@@ -68,3 +78,4 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
 
     }
 }, 'LATE');
+
