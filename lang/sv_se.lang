@@ -42,3 +42,6 @@ uploader_errors_max_height = Bilden är för hög
 uploader_errors_min_height = Bilden är inte tillräckligt hög
 uploader_errors_abort = Uppladdningen avbröts
 uploader_errors_image_resize = Bildresize misslyckades
+
+perm_general_uploader[] = Uppladdare
+perm_general_uploader[page] = visa uppladdarens sida
