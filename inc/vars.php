@@ -1,5 +1,9 @@
 <?php
-//$allowed_filetypes = implode('|', rex_addon::get('mediapool')->getProperty('allowed_doctypes'));
+$allowed_filetypes = '""';	
+$args = rex_request('args','array');
+if($args) {
+	$allowed_filetypes = "/(\.|\/)(".implode('|',rex_mediapool_getMediaTypeWhitelist($_GET['args'])).")$/i";
+}
 return '
 <script>
 var uploader_options = {
@@ -14,7 +18,7 @@ var uploader_options = {
     loadImageMaxFileSize: '.((int)$this->getConfig('image-max-filesize')*1000000).',
     imageMaxWidth: '.(int)$this->getConfig('image-max-width').',
     imageMaxHeight: '.(int)$this->getConfig('image-max-height').',
-    acceptFileTypes: /\.('.$this->getProperty('allowed_filetypes').')$/i
+    acceptFileTypes: '.$allowed_filetypes.'
 };
 </script>
 ';
