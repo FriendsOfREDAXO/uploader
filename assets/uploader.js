@@ -54,7 +54,8 @@ jQuery(function () {
             disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent),
             imageMaxWidth: uploader_options.imageMaxWidth,
             imageMaxHeight: uploader_options.imageMaxHeight,
-            messages: uploader_options.messages
+            messages: uploader_options.messages,
+            acceptFileTypes: uploader_options.acceptFileTypes
         };
         if (!get_option('resize-images')) {
             delete options.disableImageResize;
