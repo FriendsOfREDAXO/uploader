@@ -42,3 +42,6 @@ uploader_errors_max_height = Image height exceeded
 uploader_errors_min_height = Image height below minimum
 uploader_errors_abort = Upload aborted
 uploader_errors_image_resize = Image resize failed
+
+perm_general_uploader[] = Uploaded
+perm_general_uploader[page] = Show Uploader page
