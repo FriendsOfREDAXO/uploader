@@ -42,3 +42,6 @@ uploader_errors_max_height = Imagen muy alta
 uploader_errors_min_height = La imagen no es lo suficientemente alta
 uploader_errors_abort = Carga abortada
 uploader_errors_image_resize = El tamaño de la imagen falló
+
+perm_general_uploader[] = Cargador
+perm_general_uploader[page] = Página de vista del cargador
