@@ -1,8 +1,8 @@
 <?php
 $allowed_filetypes = '""';	
 $args = rex_request('args','array');
-if($args) {
-	$allowed_filetypes = "/(\.|\/)(".implode('|',rex_mediapool_getMediaTypeWhitelist($_GET['args'])).")$/i";
+if(isset($args['types']) && trim($args['types'])) {
+	$allowed_filetypes = "/(\.|\/)(".implode('|',rex_mediapool_getMediaTypeWhitelist($args)).")$/i";
 }
 return '
 <script>
