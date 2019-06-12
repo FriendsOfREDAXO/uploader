@@ -1,11 +1,10 @@
-Uploader
-========
+# Uploader
 
 Upload mehrerer Dateien gleichzeitig in den Medienpool. Übergroße Bilder können vorher verkleinert werden.
 
 ![Screenshot](https://raw.githubusercontent.com/FriendsOfREDAXO/uploader/assets/uploader_01.jpg)
 
-### Fehlermeldung _Empty file upload result_
+## Fehlermeldung _Empty file upload result_
 
 Wahrscheinlich verhindern serverseitige Limits den Upload - bei PHP sind dies
 
