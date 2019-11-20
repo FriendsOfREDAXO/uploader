@@ -124,10 +124,6 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 // iw patch end
 
                 $file->url = $this->get_download_url($file->name);
-                if ($this->is_valid_image_file($file_path))
-                {
-                    $this->handle_image_file($file_path, $file);
-                }
             }
             else
             {
