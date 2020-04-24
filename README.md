@@ -21,5 +21,12 @@ memory_limit
 
 Bei Mittwald gibt es einen Fehler, wenn PHP als FPM läuft. Wenn eine Umstellung auf CGI nicht möglich ist, gibts in diesem [Issue](https://github.com/FriendsOfREDAXO/uploader/issues/57) noch einen Tipp.
 
+###SyntaxError: JSON.parse: unexpected character at line 2 column 1 of the JSON data
+
+Im Quellcode des Frontend schauen (egal welche Seite), ob vor dem Doctype noch etwas steht, das da nicht hingehört. Mögliche Ursachen:
+* der XOutputfilter, der noch nen Kommentar zu viel ausgibt
+* in der boot.php des Project-Addons ein  <?php , bei dem ein Leerzeichen danach zwingend erforderlich ist
+* ein Addon, das ebenfalls für eine Ausgabe vorab sorgt
+
 Basiert auf [jQuery-File-Upload](https://blueimp.github.io/jQuery-File-Upload/).  
 Erste Version entwickelt von [@IngoWinter](https://github.com/IngoWinter).
