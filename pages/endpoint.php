@@ -8,6 +8,13 @@ $options = [
         ]
     ]
 ];
+$args = rex_request('args','array');
+if(isset($args['types']) && trim($args['types'])) {
+	$options['accept_file_types'] = "/(\.|\/)(".implode('|',rex_mediapool_getMediaTypeWhitelist($args)).")$/i";
+}
+else {
+    $options['accept_file_types'] = "/./i";
+}
 $error_messages = [
         1 => rex_i18n::msg('uploader_errors_1'),
         2 => rex_i18n::msg('uploader_errors_2'),
