@@ -454,8 +454,6 @@ class uploader_upload_handler
             return false;
         }
         if (!preg_match($this->options['accept_file_types'], $file->name)) {
-                                    iwlog($this->options['accept_file_types']);
-                                    iwlog($file->name);
             $file->error = $this->get_error_message('accept_file_types');
             return false;
         }
@@ -484,7 +482,6 @@ class uploader_upload_handler
             return false;
         }
         if (!$content_range && $this->has_image_file_extension($file->name)) {
-            iwlog(__LINE__);
             return $this->validate_image_file($uploaded_file, $file, $error, $index);
         }
         return true;
