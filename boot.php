@@ -74,5 +74,5 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
         }
 
     }
-}, 'LATE');
+}, rex_extension::LATE);
 
