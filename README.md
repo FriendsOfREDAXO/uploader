@@ -17,10 +17,6 @@ max_input_time
 memory_limit
 ```
 
-### Mittwald Special
-
-Bei Mittwald gibt es einen Fehler, wenn PHP als FPM läuft. Wenn eine Umstellung auf CGI nicht möglich ist, gibts in diesem [Issue](https://github.com/FriendsOfREDAXO/uploader/issues/57) noch einen Tipp.
-
 ### SyntaxError: JSON.parse: unexpected character at line 2 column 1 of the JSON data
 
 Im Quellcode des Frontend schauen (egal welche Seite), ob vor dem Doctype noch etwas steht, das da nicht hingehört. Mögliche Ursachen:
