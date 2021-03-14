@@ -2,6 +2,7 @@
 $options = [
     'upload_dir' => rex_path::media(),
     'upload_url' => rex_url::media(),
+    'image_library' => 0,
     'image_versions' => [
         '' => [
             'auto_orient' => true
