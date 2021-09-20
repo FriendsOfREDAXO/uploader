@@ -235,7 +235,7 @@ class uploader_upload_handler
     }
 
     protected function get_user_id() {
-        @session_start();
+        @rex_login::startSession();
         return session_id();
     }
 
