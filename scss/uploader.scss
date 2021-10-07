@@ -122,3 +122,36 @@ $error-color: #a94442;
         }
     }
 }
+
+@mixin _uploader-dark {
+
+    .uploader-dropzone {
+        color: rgba(255, 255, 255, 0.75);
+        background-color: rgba(#202b35, 0.6);
+        border-color: rgba(#1b232c, 0.6);
+        .hint {
+            color: rgba(255, 255, 255, 0.45);
+        }
+    }
+
+    .uploader-queue {
+        li {
+            background-color: rgba(#1b232c, 0.8);
+            border-color: rgba(#151c22, 0.8);
+        }
+        .preview {
+            border-right-color: rgba(#151c22, 0.8);
+        }
+    }
+}
+
+body.rex-theme-dark {
+    @include _uploader-dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not(.rex-theme-light) {
+        @include _uploader-dark;
+    }
+}
+
