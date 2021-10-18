@@ -1,6 +1,13 @@
 # Uploader Changelog
 
 
+## 2.3.0 – 18.10.2021
+
+### Features
+
+* Dressed up for new dark mode (REDAXO 5.13) 🦇
+
+
 ## 2.2.2 – 14.03.2021
 
 ### Bugfixes
