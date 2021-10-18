@@ -16,7 +16,7 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
 {
     if (rex::isBackend() && rex::getUser() && rex::getUser()->hasPerm('uploader[]'))
     {
-        if (false && rex::isDebugMode() && rex_request_method() == 'get')
+        if (rex::isDebugMode() && rex_request_method() == 'get')
         {
             $compiler = new rex_scss_compiler();
             $compiler->setRootDir($this->getPath());
