@@ -7,6 +7,7 @@ $error-color: #a94442;
     padding: 5px;
     position: relative;
     margin: 1em 0;
+
     .hint {
         display: block;
         position: absolute;
@@ -18,15 +19,18 @@ $error-color: #a94442;
         color: $border-grey;
         font-size: 2em;
     }
+
     img {
         max-width: 100%;
         height: auto;
     }
 }
+
 .uploader-queue {
     list-style: none;
     margin: 0;
     padding: 0;
+
     li {
         display: block;
         margin: 0;
@@ -36,20 +40,25 @@ $error-color: #a94442;
         background: #fff;
         min-height: 81px;
         border: 1px solid $border-grey;
+
         & + li {
             border-top: 0;
         }
+
         p {
             margin-bottom: 6px;
         }
+
         .error {
             font-weight: 600;
             color: $error-color;
         }
+
         .warning {
             color: $error-color;
         }
     }
+
     .preview {
         position: absolute;
         left: 0;
@@ -62,41 +71,50 @@ $error-color: #a94442;
         //background: #f3f6fb;
         border-right: 1px solid $border-grey;
     }
+
     .processing .preview {
         background-size: 50% 50%;
     }
+
     .buttons {
         position: absolute;
         right: 0;
         top: 0;
         padding: 10px;
+
         button {
             margin: 0 0 5px 0;
         }
     }
+
     .progress {
         margin: 0;
     }
 }
+
 .fileupload-buttonbar {
     .btn-primary {
         margin-top: 0;
     }
 }
+
 @media (max-width: 767px) {
     .uploader-queue {
         li {
 
             padding: 10px 110px 0 90px;
         }
+
         .name {
             width: auto;
         }
+
         .size {
             display: none;
         }
     }
 }
+
 @media (max-width: 500px) {
     .uploader-queue {
         li {
@@ -104,3 +122,36 @@ $error-color: #a94442;
         }
     }
 }
+
+@mixin _uploader-dark {
+
+    .uploader-dropzone {
+        color: rgba(255, 255, 255, 0.75);
+        background-color: rgba(#202b35, 0.6);
+        border-color: rgba(#1b232c, 0.6);
+        .hint {
+            color: rgba(255, 255, 255, 0.45);
+        }
+    }
+
+    .uploader-queue {
+        li {
+            background-color: rgba(#1b232c, 0.8);
+            border-color: rgba(#151c22, 0.8);
+        }
+        .preview {
+            border-right-color: rgba(#151c22, 0.8);
+        }
+    }
+}
+
+body.rex-theme-dark {
+    @include _uploader-dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) {
+        @include _uploader-dark;
+    }
+}
+
