@@ -150,7 +150,7 @@ body.rex-theme-dark {
 }
 
 @media (prefers-color-scheme: dark) {
-    body:not(.rex-theme-light) {
+    body.rex-has-theme:not(.rex-theme-light) {
         @include _uploader-dark;
     }
 }
