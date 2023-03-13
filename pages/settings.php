@@ -8,7 +8,8 @@ if (rex_post('config-submit', 'boolean')) {
     $this->setConfig(rex_post('settings', [
         ['image-max-width', 'int'],
         ['image-max-height', 'int'],
-        ['image-resize-checked', 'bool']
+        ['image-resize-checked', 'bool'],
+        ['filename-as-title-checked', 'bool']
     ]));
 
     echo rex_view::success($this->i18n('settings_saved'));
@@ -65,6 +66,17 @@ $formElements = [];
 $n = [];
 $n['label'] = '<label for="image-resize-checked">' . $this->i18n('settings_image_resize_checked') . '</label>';
 $n['field'] = '<input type="checkbox" id="image-resize-checked" name="settings[image-resize-checked]" value="1" ' . ($this->getConfig('image-resize-checked') ? ' checked="checked"' : '') . '>';
+$formElements[] = $n;
+
+$fragment = new rex_fragment();
+$fragment->setVar('elements', $formElements, false);
+$content .= $fragment->parse('core/form/checkbox.php');
+
+// use file name as "title" attribute (default: OFF)
+$formElements = [];
+$n = [];
+$n['label'] = '<label for="filename-as-title-checked">' . $this->i18n('uploader_settings_filename_as_title_checked') . '</label>';
+$n['field'] = '<input type="checkbox" id="filename-as-title-checked" name="settings[filename-as-title-checked]" value="1" ' . ($this->getConfig('filename-as-title-checked') ? ' checked="checked"' : '') . '>';
 $formElements[] = $n;
 
 $fragment = new rex_fragment();
