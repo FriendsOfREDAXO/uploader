@@ -154,6 +154,11 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 rename(rex_path::media($old_name), rex_path::media($new_name));
                 $catid   = rex_post('rex_file_category');
                 $title   = rex_post('ftitle', 'string', '');
+
+                if(rex_post("filename-as-title", "int", "") === 1) {
+                    $title = $path_parts['filename'];
+                }
+
                 $success = rex_mediapool_syncFile($file->name, $catid, $title);
                 
                 // metainfos schreiben
