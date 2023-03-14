@@ -98,6 +98,10 @@ $error-color: #a94442;
     }
 }
 
+#uploader-row .fileupload-options label {
+    font-weight: normal;
+}
+
 @media (max-width: 767px) {
     .uploader-queue {
         li {
