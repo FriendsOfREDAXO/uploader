@@ -159,10 +159,10 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                     $title = $path_parts['filename'];
                 }
 
-                $success = rex_mediapool_syncFile($file->name, $catid, $title);
+
                 
                 // metainfos schreiben
-                uploader_meta::save($success);
+
                 
                 // iw patch end
                 
@@ -182,6 +182,26 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 }
             }
             $this->set_additional_file_properties($file);
+            if (in_array($file->type, array('video/mp4', 'video/x-m4v'))) {
+                $inputFile = rex_path::media($file->name);
+                $outputFile = rex_path::media('converted_' . $file->name);
+
+                // FFmpeg command to convert to 720p resolution with H.264 codec (aspect ratio preserved)
+                $ffmpegCommand = "ffmpeg -i \"$inputFile\" -vf \"scale='min(1280,iw)':min'(720,ih)':force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2\" -c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k \"$outputFile\"";
+
+                // Execute FFmpeg command
+                exec($ffmpegCommand);
+
+                if (file_exists($outputFile)) {
+                    $convertedFileSize = filesize($outputFile);
+                    // Replace the original file with the converted one
+                    unlink($inputFile); // Remove the original file
+                    rename($outputFile, $inputFile); // Rename the converted file to original file name
+                    $file->size = $convertedFileSize;
+                }
+            }
+            $success = rex_mediapool_syncFile($file->name, $catid, $title);
+            uploader_meta::save($success);
         }
         return $file;
     }
