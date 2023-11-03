@@ -44,7 +44,7 @@ class uploader_metainfo_handler extends rex_metainfo_handler
         $media->setTable(rex::getTablePrefix() . 'media');
         $media->setWhere('id=:mediaid', ['mediaid' => $params['id']]);
 
-        parent::fetchRequestValues($params, $media, $sqlFields);
+        parent::fetchRequestValues($params, $media, $sqlFields, false);
 
         // do the save only when metafields are defined
         if ($media->hasValues())
