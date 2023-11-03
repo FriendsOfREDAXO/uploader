@@ -160,7 +160,27 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 }
 
                 $success = rex_mediapool_syncFile($file->name, $catid, $title);
-                
+                $mediaFile = rex_media::get($success['filename']);
+
+                $mediaMetaSql = rex_sql::factory();
+                $mediaMetaResult = $mediaMetaSql->getArray('SELECT column_name FROM information_schema.columns WHERE table_name = "rex_media" AND column_name LIKE "med_%"');
+                $metainfos = [];
+
+                if ($mediaMetaSql->getRows() > 0) {
+                    foreach ($mediaMetaResult as $metaField) {
+                        if (!isset($metaField['COLUMN_NAME'])) {
+                            continue;
+                        }
+
+                        $metaName = $metaField['COLUMN_NAME'];
+                        $metainfos[$metaName] = $mediaFile->getValue($metaName);
+                        $_POST[$metaName] = $mediaFile->getValue($metaName);
+                    }
+                }
+
+                // merge metainfos with success array
+                $success = array_merge($success, $metainfos);
+
                 // metainfos schreiben
                 uploader_meta::save($success);
                 
