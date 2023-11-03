@@ -162,6 +162,8 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 $success = rex_mediapool_syncFile($file->name, $catid, $title);
                 $mediaFile = rex_media::get($success['filename']);
 
+                //vorläufiger Bugfix wegen überschriebener Daten aus MEDIA_ADDED / MEDIA_UPDATED
+                //gilt solange, wie der PR 5852 nicht gmerged wurde (https://github.com/redaxo/redaxo/pull/5852)
                 $mediaMetaSql = rex_sql::factory();
                 $mediaMetaResult = $mediaMetaSql->getArray('SELECT column_name FROM information_schema.columns WHERE table_name = "rex_media" AND column_name LIKE "med_%"');
                 $metainfos = [];
@@ -180,7 +182,8 @@ class uploader_iw_upload_handler extends uploader_upload_handler
 
                 // merge metainfos with success array
                 $success = array_merge($success, $metainfos);
-
+                //ENDE vorläufiger Bugfix wegen überschriebener Daten aus MEDIA_ADDED / MEDIA_UPDATED
+                
                 // metainfos schreiben
                 uploader_meta::save($success);
                 

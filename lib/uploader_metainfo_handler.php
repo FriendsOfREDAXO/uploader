@@ -44,7 +44,11 @@ class uploader_metainfo_handler extends rex_metainfo_handler
         $media->setTable(rex::getTablePrefix() . 'media');
         $media->setWhere('id=:mediaid', ['mediaid' => $params['id']]);
 
-        parent::fetchRequestValues($params, $media, $sqlFields, false);
+        //Bugfix: daten werden in Kombination mit gespeicherten Daten in MEDIA_ADDED und MEDIA_UPDATED verloren,
+        //weil die aktuellen POST-Vars hineingeschrieben werden, auch wenn sie leer sind.
+        //Benötigt einen Fix in metainfo, weil es den letzten Parameter nicht gibt (https://github.com/redaxo/redaxo/pull/5852)
+//        parent::fetchRequestValues($params, $media, $sqlFields, false);
+        parent::fetchRequestValues($params, $media, $sqlFields);
 
         // do the save only when metafields are defined
         if ($media->hasValues())
