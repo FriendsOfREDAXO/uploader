@@ -165,16 +165,16 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 //vorläufiger Bugfix wegen überschriebener Daten aus MEDIA_ADDED / MEDIA_UPDATED
                 //gilt solange, wie der PR 5852 nicht gmerged wurde (https://github.com/redaxo/redaxo/pull/5852)
                 $mediaMetaSql = rex_sql::factory();
-                $mediaMetaResult = $mediaMetaSql->getArray('SELECT column_name FROM information_schema.columns WHERE table_name = "rex_media" AND column_name LIKE "med_%"');
+                $mediaMetaResult = $mediaMetaSql->getArray('SELECT column_name AS column_name FROM information_schema.columns WHERE table_name = "rex_media" AND column_name LIKE "med_%"');
                 $metainfos = [];
 
                 if ($mediaMetaSql->getRows() > 0) {
                     foreach ($mediaMetaResult as $metaField) {
-                        if (!isset($metaField['COLUMN_NAME'])) {
+                        if (!isset($metaField['column_name'])) {
                             continue;
                         }
 
-                        $metaName = $metaField['COLUMN_NAME'];
+                        $metaName = $metaField['column_name'];
                         $metainfos[$metaName] = $mediaFile->getValue($metaName);
                         $_POST[$metaName] = $mediaFile->getValue($metaName);
                     }
