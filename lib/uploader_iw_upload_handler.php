@@ -2,7 +2,12 @@
 
 class uploader_iw_upload_handler extends uploader_upload_handler
 {
-   
+    /**
+     * Postvars cache
+     * @var array
+     */
+    private $savedPostVars;
+
     public function generate_response($content, $print_response = true)
     {
         $this->response = $content;
@@ -168,6 +173,10 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 $mediaMetaResult = $mediaMetaSql->getArray('SELECT column_name AS column_name FROM information_schema.columns WHERE table_name = "rex_media" AND column_name LIKE "med_%"');
                 $metainfos = [];
 
+                if(!isset($this->savedPostVars)) {
+                    $this->savedPostVars = $_POST;
+                }
+
                 if ($mediaMetaSql->getRows() > 0) {
                     foreach ($mediaMetaResult as $metaField) {
                         if (!isset($metaField['column_name'])) {
@@ -175,8 +184,14 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                         }
 
                         $metaName = $metaField['column_name'];
-                        $metainfos[$metaName] = $mediaFile->getValue($metaName);
-                        $_POST[$metaName] = $mediaFile->getValue($metaName);
+                        $value = $mediaFile->getValue($metaName); //Bereits erfasster Wert durch MEDIA_ADDED/MEDIA_UPDATED
+                        if(isset($this->savedPostVars[$metaName]) && mb_strlen($this->savedPostVars[$metaName]) > 0) {
+                            //Uploader-Feature: Nutze angegebene Daten für alle Dateien
+                            $value = $this->savedPostVars[$metaName];
+                        }
+
+                        $metainfos[$metaName] = $value;
+                        $_POST[$metaName] = $value;
                     }
                 }
 
