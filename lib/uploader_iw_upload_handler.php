@@ -2,7 +2,12 @@
 
 class uploader_iw_upload_handler extends uploader_upload_handler
 {
-   
+    /**
+     * Postvars cache
+     * @var array
+     */
+    private $savedPostVars;
+
     public function generate_response($content, $print_response = true)
     {
         $this->response = $content;
@@ -160,6 +165,39 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 }
 
                 $success = rex_mediapool_syncFile($file->name, $catid, $title);
+                $mediaFile = rex_media::get($success['filename']);
+
+                //vorläufiger Bugfix wegen überschriebener Daten aus MEDIA_ADDED / MEDIA_UPDATED
+                //gilt solange, wie der PR 5852 nicht gmerged wurde (https://github.com/redaxo/redaxo/pull/5852)
+                $mediaMetaSql = rex_sql::factory();
+                $mediaMetaResult = $mediaMetaSql->getArray('SELECT column_name AS column_name FROM information_schema.columns WHERE table_name = "rex_media" AND column_name LIKE "med_%"');
+                $metainfos = [];
+
+                if(!isset($this->savedPostVars)) {
+                    $this->savedPostVars = $_POST;
+                }
+
+                if ($mediaMetaSql->getRows() > 0) {
+                    foreach ($mediaMetaResult as $metaField) {
+                        if (!isset($metaField['column_name'])) {
+                            continue;
+                        }
+
+                        $metaName = $metaField['column_name'];
+                        $value = $mediaFile->getValue($metaName); //Bereits erfasster Wert durch MEDIA_ADDED/MEDIA_UPDATED
+                        if(isset($this->savedPostVars[$metaName]) && mb_strlen($this->savedPostVars[$metaName]) > 0) {
+                            //Uploader-Feature: Nutze angegebene Daten für alle Dateien
+                            $value = $this->savedPostVars[$metaName];
+                        }
+
+                        $metainfos[$metaName] = $value;
+                        $_POST[$metaName] = $value;
+                    }
+                }
+
+                // merge metainfos with success array
+                $success = array_merge($success, $metainfos);
+                //ENDE vorläufiger Bugfix wegen überschriebener Daten aus MEDIA_ADDED / MEDIA_UPDATED
                 
                 // metainfos schreiben
                 uploader_meta::save($success);
