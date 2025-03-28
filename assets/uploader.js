@@ -1,99 +1,139 @@
-/* globals jQuery,$,selectMedia,selectMediaList,uploader_options */
+/* globals jQuery, $, selectMedia, selectMedialist, uploader_options */
 
-jQuery(function () {
+/**
+ * REDAXO Uploader AddOn - Frontend-Funktionalität
+ */
+jQuery(function ($) {
+    'use strict';
 
-    // https://stackoverflow.com/a/11582513
+    /**
+     * Helper-Funktion zum Auslesen von URL-Parametern
+     * @param {string} name - Name des Parameters
+     * @return {string|null} Wert des Parameters oder null
+     */
     function getURLParameter(name) {
-        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+        const regex = new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)');
+        const matches = regex.exec(location.search);
+        return matches ? decodeURIComponent(matches[1].replace(/\+/g, '%20')) : null;
     }
 
-    function update_metafields(str_html) {
-
-        var $local_parent = $mediacatselect.closest('.form-group').parent(),
-            $ajax_parent = $(str_html).find('#rex-mediapool-category').closest('fieldset'),
-            $meta_to_append;
-
-        // neue metas zusammenstellen
-        $ajax_parent.find('.form-group').each(function () {
-            var $this = $(this),
-                name = $this.find('[name]:eq(0)').attr('name'),
-                $existing_name = $('[name="' + name + '"]'),
-                non_meta_names = ['ftitle', 'rex_file_category', 'file_new'];
-            // nicht metas entfernen
-            if (non_meta_names.indexOf(name) !== -1) {
+    /**
+     * Aktualisiert die Metafelder basierend auf der ausgewählten Kategorie
+     * @param {string} htmlContent - HTML-Inhalt mit den Metafeldern
+     */
+    function updateMetafields(htmlContent) {
+        const $localParent = $mediacatselect.closest('.form-group').parent();
+        const $ajaxParent = $(htmlContent).find('#rex-mediapool-category').closest('fieldset');
+        
+        // Alle Metafelder finden und filtern
+        const nonMetaNames = ['ftitle', 'rex_file_category', 'file_new'];
+        
+        // Neue Metafelder zusammenstellen
+        $ajaxParent.find('.form-group').each(function () {
+            const $this = $(this);
+            const $input = $this.find('[name]:eq(0)');
+            
+            // Wenn kein Input gefunden wurde, überspringen
+            if (!$input.length) return true;
+            
+            const name = $input.attr('name');
+            const $existingInput = $('[name="' + name + '"]');
+            
+            // Keine Metafelder behandeln
+            if (nonMetaNames.includes(name)) {
                 $this.remove();
                 return true;
             }
-            // bereits existierende metas mit werten holen
-            if ($existing_name.length) {
-                $this.after($existing_name.closest('.form-group').clone(1, 1));
+            
+            // Vorhandene Metafelder mit Werten beibehalten
+            if ($existingInput.length) {
+                $this.after($existingInput.closest('.form-group').clone(true, true));
                 $this.remove();
             }
         });
 
-        // alte metas entfernen
-        $local_parent.find('.form-group').not('.preserve').remove();
+        // Alte Metafelder entfernen
+        $localParent.find('.form-group').not('.preserve').remove();
 
-        // neue metas einsetzen
-        $meta_to_append = $ajax_parent.find('.form-group');
-        if ($meta_to_append.length) {
-            $($meta_to_append.get().reverse()).each(function () {
-                $local_parent.find('.append-meta-after').after($(this));
+        // Neue Metafelder einfügen
+        const $metaToAppend = $ajaxParent.find('.form-group');
+        if ($metaToAppend.length) {
+            $($metaToAppend.get().reverse()).each(function () {
+                $localParent.find('.append-meta-after').after($(this));
             });
-            $(document).trigger('rex:ready', [$local_parent]);
+            
+            // REDAXO-Komponenten initialisieren
+            $(document).trigger('rex:ready', [$localParent]);
         }
-
     }
 
-    function get_fileupload_options() {
-        var options = {
+    /**
+     * Gibt die konfigurierten Optionen für den Datei-Upload zurück
+     * @return {Object} Konfigurationsobjekt für jQuery File Upload
+     */
+    function getFileuploadOptions() {
+        const options = {
             dataType: 'json',
             disableImagePreview: true,
-            loadImageMaxFileSize: uploader_options.loadImageMaxFileSize, // 30 mb
-            maxChunkSize: 5000000, // 5 mb
+            loadImageMaxFileSize: uploader_options.loadImageMaxFileSize || 30000000, // 30 MB default
+            maxChunkSize: 5000000, // 5 MB Chunk-Größe
             disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent),
-            imageMaxWidth: uploader_options.imageMaxWidth,
-            imageMaxHeight: uploader_options.imageMaxHeight,
-            messages: uploader_options.messages,
-            acceptFileTypes: uploader_options.acceptFileTypes
+            imageMaxWidth: uploader_options.imageMaxWidth || 4000,
+            imageMaxHeight: uploader_options.imageMaxHeight || 4000,
+            messages: uploader_options.messages || {},
+            acceptFileTypes: uploader_options.acceptFileTypes || null,
+            formData: {
+                _csrf_token: uploader_options.csrf_token || ''
+            }
         };
-        if (!get_option('resize-images')) {
+
+        // Bildverkleinerung nur anwenden, wenn aktiviert
+        if (!getOption('resize-images')) {
             delete options.disableImageResize;
             delete options.imageMaxWidth;
             delete options.imageMaxHeight;
         }
+
         return options;
     }
 
-    function get_option(selector) {
-        var $el = $('#' + selector);
-        if ($el.length) {
-            return $el.is(':checked');
-        }
-        return false;
+    /**
+     * Prüft, ob eine Option aktiviert ist
+     * @param {string} selector - ID des Checkbox-Elements
+     * @return {boolean} true wenn aktiviert, sonst false
+     */
+    function getOption(selector) {
+        const $el = $('#' + selector);
+        return $el.length ? $el.is(':checked') : false;
     }
 
-    function get_mime_icon(filename) {
-        var ext = filename.toLowerCase().split('.').pop();
+    /**
+     * Erzeugt ein Icon-Element für den angegebenen Dateityp
+     * @param {string} filename - Dateiname
+     * @return {string} HTML für das Icon
+     */
+    function getMimeIcon(filename) {
+        const ext = filename.toLowerCase().split('.').pop();
         return '<i class="rex-mime" data-extension="' + ext + '"></i>';
     }
 
-    var $mediacatselect = $('#rex-mediapool-category'),
-        $form = $mediacatselect.closest('form'),
-        $buttonbar = $('#uploader-row'),
-        $buttonbar_wrapper = $('<fieldset></fieldset>'),
-        context = uploader_options.context;
+    // Hauptfunktionalität des Uploaders
+    const $mediacatselect = $('#rex-mediapool-category');
+    const $form = $mediacatselect.closest('form');
+    const $buttonbar = $('#uploader-row');
+    const $buttonbarWrapper = $('<fieldset></fieldset>');
+    const context = uploader_options.context || '';
 
-    // reload per pjax verhindern
+    // Reload per PJAX verhindern
     $('a[href="index.php?page=mediapool/upload"]').attr('data-pjax', 'false');
 
-    // kontextunabhaengig html anpassen
+    // Kategorieauswahl anpassen
     $mediacatselect.prop('onchange', null).off('onchange');
-    $form.attr('action', uploader_options.endpoint);
+    $form.attr('action', uploader_options.endpoint || '');
     $form.find('[name="ftitle"]').closest('.form-group').addClass('preserve append-meta-after');
     $mediacatselect.closest('.form-group').addClass('preserve');
 
-    // erlaubte metafelder bei kategoriewechsel holen
+    // Bei Kategoriewechsel Metafelder aktualisieren
     $mediacatselect.on('change', function () {
         $.ajax({
             url: 'index.php',
@@ -103,59 +143,59 @@ jQuery(function () {
                 rex_file_category: $mediacatselect.val()
             },
             dataType: 'html',
-            success: function (result) {
-                update_metafields(result);
-            }
+            success: updateMetafields
         });
     });
 
-    // kontextabhaengig html anpassen
+    // Kontext-abhängiges Layout
     if (context === 'mediapool_upload') {
+        // Nativen Datei-Upload entfernen und eigenen hinzufügen
         $('#rex-mediapool-choose-file').closest('dl').remove();
         $form.find('footer').remove();
-        $buttonbar_wrapper.append($buttonbar);
-        $form.find('fieldset:last').after($buttonbar_wrapper);
+        $buttonbarWrapper.append($buttonbar);
+        $form.find('fieldset:last').after($buttonbarWrapper);
     }
     else if (context === 'addon_upload') {
-        $buttonbar_wrapper.append($buttonbar);
-        $form.find('fieldset').after($buttonbar_wrapper);
-        // metainfos holen
+        // Im Addon-Kontext einfach an passender Stelle einfügen
+        $buttonbarWrapper.append($buttonbar);
+        $form.find('fieldset').after($buttonbarWrapper);
+        // Initial Metainfos laden
         $mediacatselect.trigger('change');
     }
 
-    $form.fileupload(get_fileupload_options());
+    // jQuery File Upload initialisieren
+    $form.fileupload(getFileuploadOptions());
 
-    $form.bind('fileuploadadded', function (e, data) {
-        $(data.context[0]).find('.preview').append(get_mime_icon(data.files[0].name));
+    // Event-Handler für die Datei-Vorschau
+    $form.on('fileuploadadded', function (e, data) {
+        $(data.context[0]).find('.preview').append(getMimeIcon(data.files[0].name));
     });
 
+    // Resize-Option aktualisieren
     $('#resize-images').on('click', function () {
         $form.fileupload('destroy');
-        $form.fileupload(get_fileupload_options());
+        $form.fileupload(getFileuploadOptions());
     });
 
-    $form.bind('fileuploadcompleted', function (e, data) {
-        if (data.result.files[0].hasOwnProperty('error')) {
-            return true;
-        }
-    });
-
-    $form.bind('fileuploadprocessfail', function (e, data) {
-        var $li = $(data.context[0]);
+    // Fehlerbehandlung für fehlgeschlagene Uploads
+    $form.on('fileuploadprocessfail', function (e, data) {
+        const $li = $(data.context[0]);
         $li.find('.size').remove();
-        $li.find('.preview').addClass('warning').append(get_mime_icon(data.files[0].name));
+        $li.find('.preview').addClass('warning').append(getMimeIcon(data.files[0].name));
     });
 
-    // datei nach upload uebernehmen
+    // Datei nach Upload übernehmen (für Widgets)
     $form.on('click', '.btn-select', function (e) {
-        var opener_input_field = getURLParameter('opener_input_field');
         e.preventDefault();
-        if (opener_input_field.substr(0, 14) === 'REX_MEDIALIST_') {
-            selectMedialist($(this).data('filename'), '');
-        }
-        else {
-            selectMedia($(this).data('filename'), '');
+        const filename = $(this).data('filename');
+        const openerInputField = getURLParameter('opener_input_field');
+        
+        if (openerInputField) {
+            if (openerInputField.substr(0, 14) === 'REX_MEDIALIST_') {
+                selectMedialist(filename, '');
+            } else {
+                selectMedia(filename, '');
+            }
         }
     });
-
 });
