@@ -84,8 +84,8 @@ class uploader_iw_upload_handler extends uploader_upload_handler
             $index, $content_range);
         $file->size = $this->fix_integer_overflow((int)$size);
         $file->type = $type;
+        
         if ($this->validate($uploaded_file, $file, $error, $index, $content_range)) {
-
             $this->handle_form_data($file, $index);
             $upload_dir = $this->get_upload_path();
             
@@ -98,7 +98,7 @@ class uploader_iw_upload_handler extends uploader_upload_handler
             $file_path = $this->get_upload_path($file->name);
             $append_file = $content_range && is_file($file_path) &&
                 $file->size > $this->get_file_size($file_path);
-                
+            
             // Upload-Verzeichnis überprüfen
             if (!rex_dir::isWritable(dirname($file_path))) {
                 $file->error = 'Upload directory is not writable';
@@ -106,6 +106,7 @@ class uploader_iw_upload_handler extends uploader_upload_handler
             }
                 
             // Datei hochladen
+            $upload_success = false;
             if ($uploaded_file && is_uploaded_file($uploaded_file)) {
                 // multipart/formdata uploads (POST method uploads)
                 if ($append_file) {
@@ -114,14 +115,19 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                         return $file;
                     }
                 } else {
-                    if (!move_uploaded_file($uploaded_file, $file_path)) {
+                    // Move the uploaded file directly
+                    if (rex_file::move($uploaded_file, $file_path)) {
+                        $upload_success = true;
+                    } else {
                         $file->error = 'Failed to move uploaded file';
                         return $file;
                     }
                 }
             } else {
                 // Non-multipart uploads (PUT method support)
-                if (!rex_file::put($file_path, file_get_contents($this->options['input_stream']))) {
+                if (rex_file::put($file_path, file_get_contents($this->options['input_stream']))) {
+                    $upload_success = true;
+                } else {
                     $file->error = 'Failed to create file from input stream';
                     return $file;
                 }
@@ -132,10 +138,6 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 // iw patch start
                 $file->upload_complete = 1;
                 $orig_filename = basename($file_path);
-                
-                // Prüfe ob eine Datei mit dem original Namen bereits existiert
-                // Nur wenn die Datei nicht die aktuelle ist, inkrementieren wir
-                $do_subindexing = is_file(rex_path::media($orig_filename)) && $orig_filename !== basename($file_path);
                 
                 // Für Medienpool vorbereiten
                 $catid = rex_post('rex_file_category', 'int', 0);
@@ -157,6 +159,11 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                             'type' => rex_file::mimeType($file_path)
                         ]
                     ];
+                    
+                    // Die Prüfung, ob eine Datei bereits existiert, überlassen wir komplett rex_media_service
+                    // Nur wenn die Datei nicht die aktuelle ist, sollte sie inkrementiert werden
+                    // Der Dateiname wird in der rex_media_service::addMedia() automatisch normalisiert
+                    $do_subindexing = is_file(rex_path::media($orig_filename)) && $orig_filename !== basename($file_path);
                     
                     // Verwende die rex_media_service Klasse für den Upload
                     $result = rex_media_service::addMedia($mediaData, $do_subindexing);
@@ -203,6 +210,7 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                     if (is_file($file_path)) {
                         rex_file::delete($file_path);
                     }
+                    return $file;
                 }
                 // iw patch end
                 
@@ -224,5 +232,40 @@ class uploader_iw_upload_handler extends uploader_upload_handler
             $this->set_additional_file_properties($file);
         }
         return $file;
+    }
+    
+    /**
+     * Überschreiben der Methode, um rex_file::extension zu verwenden
+     */
+    protected function has_image_file_extension($file_path) {
+        return !!preg_match('/\.(gif|jpe?g|png)$/i', rex_file::extension($file_path));
+    }
+    
+    /**
+     * Überschreiben der Methode, um rex_file für Dateioperationen zu verwenden
+     */
+    protected function get_file_size($file_path, $clear_stat_cache = false) {
+        if ($clear_stat_cache) {
+            clearstatcache(true, $file_path);
+        }
+        return $this->fix_integer_overflow(filesize($file_path));
+    }
+    
+    /**
+     * Überschreiben der Methode, um rex_path zu verwenden
+     */
+    protected function get_upload_path($file_name = null, $version = null) {
+        $file_name = $file_name ? $file_name : '';
+        if (empty($version)) {
+            $version_path = '';
+        } else {
+            $version_dir = @$this->options['image_versions'][$version]['upload_dir'];
+            if ($version_dir) {
+                return $version_dir.$this->get_user_path().$file_name;
+            }
+            $version_path = $version.'/';
+        }
+        return $this->options['upload_dir'].$this->get_user_path()
+            .$version_path.$file_name;
     }
 }
