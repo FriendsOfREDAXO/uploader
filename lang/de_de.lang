@@ -3,47 +3,46 @@ uploader_title = Uploader
 uploader_settings = Einstellungen
 uploader_settings_image_section = Bilder
 uploader_settings_image_intro = Bilder können beim Upload automatisch im Browser verkleinert werden, wenn sie größer sind als hier definiert.
-uploader_settings_image_max_width = Maximale Breite
-uploader_settings_image_max_height = Maximale Höhe
-uploader_settings_image_max_filesize = Maximale Dateigröße
-uploader_settings_image_resize_checked = Bildverkleinerung standardmäßig aktiviert
+uploader_settings_image_max_width = Maximale Bildbreite
+uploader_settings_image_max_width_notice = 0 = keine Begrenzung
+uploader_settings_image_max_height = Maximale Bildhöhe
+uploader_settings_image_max_height_notice = 0 = keine Begrenzung
+uploader_settings_image_max_filesize = Maximale Dateigröße (MB)
+uploader_settings_image_max_filesize_notice = Maximale Größe von Dateien die hochgeladen werden können
+uploader_settings_image_resize_checked = Große Bilder automatisch verkleinern
+uploader_settings_image_resize_checked_label = Aktiviert
+uploader_settings_image_resize_checked_notice = Große Bilder werden vor dem Upload clientseitig auf die maximale Größe skaliert
 uploader_settings_filename_as_title_checked = Dateinamen als Medienpool-Titel standardmäßig aktiviert
 uploader_settings_save = Einstellungen speichern
-uploader_settings_saved = Die Einstellungen wurden gespeichert.
+
+uploader_settings_saved = Einstellungen wurden gespeichert
 uploader_settings_error = Es ist ein Fehler aufgetreten.
 
-uploader_filelist_processing = verarbeite...
-uploader_filelist_cancel = entfernen
-uploader_filelist_error = Fehler
-uploader_filelist_add_to_widget = Datei übernehmen
-
-uploader_buttonbar_dropzone = Datei(en) hierhin ziehen
-uploader_buttonbar_resize_image = übergroßes Bild vor Upload verkleinern
-uploader_buttonbar_resize_images = übergroße Bilder vor Upload verkleinern
-uploader_buttonbar_filename_as_title = Dateinamen als Medienpool-Titel benutzen (ohne Dateiendung)
-uploader_buttonbar_add_file = Datei wählen
-uploader_buttonbar_add_files = Datei(en) wählen
-uploader_buttonbar_start_upload = Upload starten
-uploader_buttonbar_cancel = alle entfernen
-
-uploader_errors_1 = Datei zu groß (upload_max_filesize/ php.ini)
-uploader_errors_2 = Datei zu groß (MAX_FILE_SIZE/ Formular)
+uploader_errors_1 = Die hochgeladene Datei überschreitet die in der php.ini festgelegte Größe
+uploader_errors_2 = Die hochgeladene Datei überschreitet die festgelegte Größe
 uploader_errors_3 = Die Datei wurde nur teilweise hochgeladen
 uploader_errors_4 = Es wurde keine Datei hochgeladen
-uploader_errors_6 = Temporäres Verzeichnis fehlt
-uploader_errors_7 = Konnte Datei nicht auf Festplatte schreiben
-uploader_errors_8 = Eine PHP Erweiterung hat das Hochladen verhindert
-uploader_errors_post_max_size = Datei zu groß (post_max_size/ php.ini)
-uploader_errors_max_file_size = Datei zu groß
-uploader_errors_min_file_size = Datei zu klein
-uploader_errors_accept_file_types = Unzulässiger Dateityp
+uploader_errors_6 = Temporärer Ordner fehlt
+uploader_errors_7 = Speichern der Datei fehlgeschlagen
+uploader_errors_8 = Eine PHP Erweiterung hat den Upload gestoppt
+uploader_errors_post_max_size = Die Datei überschreitet die maximal erlaubte Größe
+uploader_errors_max_file_size = Datei ist zu groß
+uploader_errors_min_file_size = Datei ist zu klein
+uploader_errors_accept_file_types = Dateityp nicht erlaubt
 uploader_errors_max_number_of_files = Maximale Anzahl an Dateien überschritten
-uploader_errors_max_width = Bild zu breit
-uploader_errors_min_width = Bild nicht breit genug
-uploader_errors_max_height = Bild zu hoch
-uploader_errors_min_height = Bild nicht hoch genug
-uploader_errors_abort = Hochladen abgebrochen
-uploader_errors_image_resize = Bildresize fehlgeschlagen
+uploader_errors_max_width = Bild überschreitet die maximale Breite
+uploader_errors_min_width = Bild unterschreitet die minimale Breite
+uploader_errors_max_height = Bild überschreitet die maximale Höhe
+uploader_errors_min_height = Bild unterschreitet die minimale Höhe
+uploader_errors_abort = Upload abgebrochen
+uploader_errors_image_resize = Fehler beim Skalieren des Bildes
+uploader_errors_image_processing = Keine Bildverarbeitung verfügbar (weder Imagick noch GD)
 
 perm_general_uploader[] = Uploader
 perm_general_uploader[page] = Uploader Seite anzeigen
+
+buttonbar_dropzone = Dateien zum Hochladen hier ablegen (oder klicken)
+buttonbar_filename_as_title = Dateinamen als Medienpool-Titel verwenden (ohne Dateiendung)
+buttonbar_add_files = Datei(en) auswählen
+buttonbar_start_upload = Upload starten
+buttonbar_cancel = Abbrechen

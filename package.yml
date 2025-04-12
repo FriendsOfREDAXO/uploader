@@ -1,23 +1,24 @@
 package: uploader
-version: '2.5.0'
-author: 'Friends Of REDAXO'
-supportpage: 'https://github.com/FriendsOfREDAXO/uploader'
+version: '3.0.0-dev'
+author: Friends Of REDAXO
+supportpage: https://github.com/FriendsOfREDAXO/uploader
+
+requires:
+    php:
+        version: '>=8.1'
+    redaxo: ^5.18.0
 
 page:
-    title: 'Uploader'
-    icon: rex-icon rex-icon-import
+    title: translate:uploader_title
+    perm: uploader[page]
+    pjax: true
+    icon: rex-icon fa-upload
     subpages:
-        settings:
-            title: 'Settings'
-            perm: admin
-        upload:
-            title: 'Upload'
-        endpoint:
-            title: 'endpoint'
-            hidden: true
-            hasLayout: false
-requires:
-    redaxo: '^5.1.0'
+        upload: {title: translate:uploader_title}
+        settings: {title: translate:settings, perm: admin}
 
-endpoint: 'index.php?page=uploader/endpoint'
+pages:
+    mediapool/upload:
+        title: translate:uploader_title
+        perm: uploader[]
 

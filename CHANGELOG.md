@@ -1,5 +1,27 @@
-# Uploader Changelog
+# Uploader - Changelog
 
+## Version 3.0.0 - XX.XX.2025
+
+### Breaking Changes
+- Minimum PHP Version auf 8.1 angehoben
+- Minimum REDAXO Version auf 5.18 angehoben
+- Komplette Neuimplementierung mit Dropzone.js
+- Entfernung der jQuery-Abhängigkeit
+- Modernisierung des Build-Systems mit Webpack
+
+### Neue Features
+- Modernes Drag & Drop Interface
+- Chunk-Upload für große Dateien
+- Client-seitiges Bildresizing
+- CSS-Variablen für einfache Theme-Anpassung
+- Bootstrap 5 Integration
+- Verbesserte Fehlerbehandlung
+- Responsives Design
+
+### Entfernte Features
+- Alte Upload-Handler entfernt
+- jQuery UI entfernt
+- Legacy Browser Support entfernt
 
 ## 2.3.0 – 18.10.2021
 

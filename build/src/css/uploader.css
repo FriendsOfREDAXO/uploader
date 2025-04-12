@@ -1,0 +1,230 @@
+/* Custom Properties für einfache Theme-Anpassung */
+:root {
+    --uploader-primary: #3bb594;
+    --uploader-danger: #d9534f;
+    --uploader-border: #ced4da;
+    --uploader-bg: #fff;
+    --uploader-text: #333;
+    --uploader-dropzone-height: 200px;
+    --uploader-preview-size: 120px;
+    --uploader-border-radius: 4px;
+}
+
+/* Bootstrap 3.x kompatibler Button-Reset */
+.btn-reset {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    border-radius: 4px;
+    user-select: none;
+}
+
+/* Dropzone Basis-Styling */
+.dropzone {
+    border: 2px dashed var(--uploader-border);
+    border-radius: var(--uploader-border-radius);
+    background: var(--uploader-bg);
+    min-height: var(--uploader-dropzone-height);
+    padding: 20px;
+    position: relative;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+.dropzone:hover,
+.dropzone.dz-drag-hover {
+    border-color: var(--uploader-primary);
+}
+
+.dropzone .dz-message {
+    margin: 2rem 0;
+    color: var(--uploader-text);
+    font-size: 1.2em;
+}
+
+/* Preview Container */
+.dropzone .dz-preview {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    margin: 16px;
+    min-height: var(--uploader-preview-size);
+}
+
+.dropzone .dz-preview .dz-image {
+    border-radius: var(--uploader-border-radius);
+    overflow: hidden;
+    width: var(--uploader-preview-size);
+    height: var(--uploader-preview-size);
+    position: relative;
+    display: block;
+    z-index: 10;
+    border: 1px solid var(--uploader-border);
+}
+
+.dropzone .dz-preview .dz-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Preview Details */
+.dropzone .dz-preview .dz-details {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    text-align: center;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    transition: opacity .2s ease-in-out;
+}
+
+.dropzone .dz-preview:hover .dz-details {
+    opacity: 1;
+}
+
+.dropzone .dz-preview .dz-filename {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+}
+
+.dropzone .dz-preview .dz-size {
+    margin-top: 4px;
+    font-size: 11px;
+}
+
+/* Upload Progress */
+.dropzone .dz-preview .dz-progress {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.dropzone .dz-preview .dz-progress .dz-upload {
+    display: block;
+    position: relative;
+    width: 0;
+    height: 100%;
+    background: var(--uploader-primary);
+    transition: width 300ms ease-in-out;
+    border-radius: 3px;
+}
+
+/* Success/Error States */
+.dropzone .dz-preview.dz-success .dz-success-mark {
+    display: block;
+}
+
+.dropzone .dz-preview.dz-error .dz-error-mark {
+    display: block;
+}
+
+.dropzone .dz-preview .dz-success-mark,
+.dropzone .dz-preview .dz-error-mark {
+    position: absolute;
+    display: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 500;
+}
+
+.dropzone .dz-preview .dz-success-mark span {
+    color: var(--uploader-primary);
+}
+
+.dropzone .dz-preview .dz-error-mark span {
+    color: var(--uploader-danger);
+}
+
+/* Error Message */
+.dropzone .dz-preview .dz-error-message {
+    display: none;
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    background: var(--uploader-danger);
+    color: white;
+    padding: 8px;
+    border-radius: var(--uploader-border-radius);
+    z-index: 1000;
+    font-size: 12px;
+}
+
+.dropzone .dz-preview.dz-error .dz-error-message {
+    display: block;
+}
+
+/* Action Buttons */
+.dropzone .dz-preview .dz-actions {
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    z-index: 1000;
+}
+
+.dropzone .dz-preview .dz-actions button {
+    background: var(--uploader-bg);
+    border: 1px solid var(--uploader-border);
+    color: var(--uploader-danger);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dropzone .dz-preview .dz-actions button:hover {
+    background: var(--uploader-danger);
+    border-color: var(--uploader-danger);
+    color: white;
+}
+
+/* Bootstrap 3.x Icon Compatibility */
+.dropzone .dz-preview .dz-actions button i {
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 767px) {
+    .dropzone {
+        min-height: 150px;
+    }
+    
+    .dropzone .dz-preview {
+        margin: 8px;
+    }
+    
+    .dropzone .dz-message {
+        font-size: 1em;
+        margin: 1rem 0;
+    }
+}
