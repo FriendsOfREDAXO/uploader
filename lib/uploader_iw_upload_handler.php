@@ -138,6 +138,12 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 // iw patch start
                 $file->upload_complete = 1;
                 $orig_filename = basename($file_path);
+                // jfucounter-Platzhalter früh ersetzen
+                $orig_filename = preg_replace_callback(
+                    '/\s*\(jfucounter(\d+)jfucounter\)/',
+                    function($m){ return '_'.$m[1]; },
+                    $orig_filename
+                );
                 
                 // Für Medienpool vorbereiten
                 $catid = rex_post('rex_file_category', 'int', 0);
@@ -155,13 +161,6 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 if (rex_post("filename-as-title", "int", "") === 1) {
                     $title = pathinfo($orig_filename, PATHINFO_FILENAME);
                 }
-                
-                // jfucounter-Platzhalter im Dateinamen ersetzen
-                $orig_filename = preg_replace_callback(
-                    '/\s*\(jfucounter(\d+)jfucounter\)/',
-                    function($m){ return '_'.$m[1]; },
-                    $orig_filename
-                );
                 
                 try {
                     // Vorbereiten der Datei für den Medienpool
