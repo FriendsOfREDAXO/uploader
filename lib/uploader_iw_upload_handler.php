@@ -17,7 +17,7 @@ class uploader_iw_upload_handler extends uploader_upload_handler
             foreach ($content['files'] as $v) {
                 if (isset($v->upload_complete)) {
                     $media = rex_media::get($v->name);
-                    if ($media->isImage()) {
+                    if ($media && $media->isImage()) {
                         $v->thumbnailUrl = 'index.php?rex_media_type=rex_mediapool_preview&rex_media_file=' . $v->name;
                         if (rex_file::extension($v->name) == 'svg') {
                             $v->thumbnailUrl = '/media/' . $v->name;
@@ -141,12 +141,26 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 
                 // Für Medienpool vorbereiten
                 $catid = rex_post('rex_file_category', 'int', 0);
+                // Server-seitige Kontrolle der Kategorie-ID: 0 (Standard) ist erlaubt
+                if ($catid > 0) {
+                    $category = rex_media_category::get($catid);
+                    if (!$category || !rex::getUser()->getComplexPerm('media')->hasCategoryPerm($catid)) {
+                        throw new rex_api_exception('Ungültige Kategorie-ID');
+                    }
+                }
                 $title = rex_post('ftitle', 'string', '');
                 
                 // Use filename as title if option is activated
                 if (rex_post("filename-as-title", "int", "") === 1) {
                     $title = pathinfo($orig_filename, PATHINFO_FILENAME);
                 }
+                
+                // jfucounter-Platzhalter im Dateinamen ersetzen
+                $orig_filename = preg_replace_callback(
+                    '/\s*\(jfucounter(\d+)jfucounter\)/',
+                    function($m){ return '_'.$m[1]; },
+                    $orig_filename
+                );
                 
                 try {
                     // Vorbereiten der Datei für den Medienpool
