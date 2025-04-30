@@ -141,12 +141,13 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 
                 // Für Medienpool vorbereiten
                 $catid = rex_post('rex_file_category', 'int', 0);
-                // Server-seitige Kontrolle der Kategorie-ID: 0 (Standard) ist erlaubt
-                if ($catid > 0) {
-                    $category = rex_media_category::get($catid);
-                    if (!$category || !rex::getUser()->getComplexPerm('media')->hasCategoryPerm($catid)) {
-                        throw new rex_api_exception('Ungültige Kategorie-ID');
-                    }
+                // Server-seitige Kontrolle der Kategorie-ID: Existenz prüfen für >0
+                if ($catid > 0 && !rex_media_category::get($catid)) {
+                    throw new rex_api_exception('Ungültige Kategorie-ID');
+                }
+                // Berechtigung prüfen für alle Kategorien, auch ID 0
+                if (!rex::getUser()->getComplexPerm('media')->hasCategoryPerm($catid)) {
+                    throw new rex_api_exception('Ungültige Kategorie-ID');
                 }
                 $title = rex_post('ftitle', 'string', '');
                 
