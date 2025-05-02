@@ -149,7 +149,12 @@ jQuery(function () {
     });
 
     $form.bind('fileuploadcompleted', function (e, data) {
-        if (data.result.files[0].hasOwnProperty('error')) {
+        var file = data.result.files[0];
+        if (file.hasOwnProperty('error') && file.error) {
+            // HTML-Tags entfernen
+            var cleanError = file.error.replace(/<[^>]*>/g, '');
+            // In der UI aktualisieren
+            data.context.find('.error').text(cleanError);
             return true;
         }
     });
@@ -158,6 +163,12 @@ jQuery(function () {
         var $li = $(data.context[0]);
         $li.find('.size').remove();
         $li.find('.preview').addClass('warning').append(get_mime_icon(data.files[0].name));
+        // Fehlernachricht tagfrei anzeigen
+        var err = data.files[0].error;
+        if (err) {
+            var clean = err.replace(/<[^>]*>/g, '');
+            $li.find('.error').text(clean);
+        }
     });
 
     // datei nach upload uebernehmen

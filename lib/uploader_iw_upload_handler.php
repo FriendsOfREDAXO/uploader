@@ -15,6 +15,10 @@ class uploader_iw_upload_handler extends uploader_upload_handler
             // iw patch redaxo thumbnails laden
             
             foreach ($content['files'] as $v) {
+                // HTML-Tags aus Fehlermeldungen entfernen
+                if (isset($v->error)) {
+                    $v->error = strip_tags($v->error);
+                }
                 if (isset($v->upload_complete)) {
                     $media = rex_media::get($v->name);
                     if ($media && $media->isImage()) {
