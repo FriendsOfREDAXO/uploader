@@ -2,6 +2,9 @@
 
 jQuery(function () {
 
+    // Liste bereits hinzugefügter Dateinamen
+    var uploadedFiles = [];
+
     // https://stackoverflow.com/a/11582513
     function getURLParameter(name) {
         return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
@@ -127,6 +130,17 @@ jQuery(function () {
 
     $form.bind('fileuploadadded', function (e, data) {
         $(data.context[0]).find('.preview').append(get_mime_icon(data.files[0].name));
+    });
+
+    $form.on('fileuploadadd', function (e, data) {
+        var name = data.files[0].name;
+        if (uploadedFiles.indexOf(name) !== -1) {
+            // Duplikat entfernen und Hinweis anzeigen
+            data.context.remove();
+            alert('Datei "' + name + '" wurde bereits hinzugefügt und wird übersprungen.');
+            return false;
+        }
+        uploadedFiles.push(name);
     });
 
     $('#resize-images').on('click', function () {
