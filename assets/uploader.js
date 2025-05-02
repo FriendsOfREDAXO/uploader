@@ -53,7 +53,7 @@ jQuery(function () {
             dataType: 'json',
             disableImagePreview: true,
             loadImageMaxFileSize: uploader_options.loadImageMaxFileSize, // 30 mb
-            maxChunkSize: 1000000, // 5 mb
+            maxChunkSize: 5000000, // 5 mb
             disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent),
             imageMaxWidth: uploader_options.imageMaxWidth,
             imageMaxHeight: uploader_options.imageMaxHeight,
