@@ -61,16 +61,18 @@ class uploader_iw_upload_handler extends uploader_upload_handler
     
     protected function upcount_name_callback($matches)
     {
+        // Erhöhe vorhandenen Zähler oder setze auf 1
         $index = isset($matches[1]) ? ((int)$matches[1]) + 1 : 1;
         $ext   = isset($matches[2]) ? $matches[2] : '';
-        
-        return ' (jfucounter' . $index . 'jfucounter)' . $ext;
+        // Neuer Zähler im Format _Zähler vor der Erweiterung
+        return '_'. $index . $ext;
     }
     
     protected function upcount_name($name)
     {
+        // Suche nach optionalem _Zähler vor der Dateiendung und erhöhe diesen
         return preg_replace_callback(
-            '/(?:(?: \(jfucounter([\d]+)jfucounter\))?(\.[^.]+))?$/',
+            '/(?:_([\d]+))?(\.[^.]+)$/',
             array($this, 'upcount_name_callback'),
             $name,
             1
