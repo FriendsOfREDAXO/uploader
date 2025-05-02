@@ -15,9 +15,13 @@ class uploader_iw_upload_handler extends uploader_upload_handler
             // iw patch redaxo thumbnails laden
             
             foreach ($content['files'] as $v) {
+                // HTML-Tags aus Fehlermeldungen entfernen
+                if (isset($v->error)) {
+                    $v->error = strip_tags($v->error);
+                }
                 if (isset($v->upload_complete)) {
                     $media = rex_media::get($v->name);
-                    if ($media->isImage()) {
+                    if ($media && $media->isImage()) {
                         $v->thumbnailUrl = 'index.php?rex_media_type=rex_mediapool_preview&rex_media_file=' . $v->name;
                         if (rex_file::extension($v->name) == 'svg') {
                             $v->thumbnailUrl = '/media/' . $v->name;
@@ -61,16 +65,18 @@ class uploader_iw_upload_handler extends uploader_upload_handler
     
     protected function upcount_name_callback($matches)
     {
+        // Erhöhe vorhandenen Zähler oder setze auf 1
         $index = isset($matches[1]) ? ((int)$matches[1]) + 1 : 1;
         $ext   = isset($matches[2]) ? $matches[2] : '';
-        
-        return ' (jfucounter' . $index . 'jfucounter)' . $ext;
+        // Neuer Zähler im Format _Zähler vor der Erweiterung
+        return '_'. $index . $ext;
     }
     
     protected function upcount_name($name)
     {
+        // Suche nach optionalem _Zähler vor der Dateiendung und erhöhe diesen
         return preg_replace_callback(
-            '/(?:(?: \(jfucounter([\d]+)jfucounter\))?(\.[^.]+))?$/',
+            '/(?:_([\d]+))?(\.[^.]+)$/',
             array($this, 'upcount_name_callback'),
             $name,
             1
@@ -138,9 +144,23 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                 // iw patch start
                 $file->upload_complete = 1;
                 $orig_filename = basename($file_path);
+                // jfucounter-Platzhalter früh ersetzen
+                $orig_filename = preg_replace_callback(
+                    '/\s*\(jfucounter(\d+)jfucounter\)/',
+                    function($m){ return '_'.$m[1]; },
+                    $orig_filename
+                );
                 
                 // Für Medienpool vorbereiten
                 $catid = rex_post('rex_file_category', 'int', 0);
+                // Server-seitige Kontrolle der Kategorie-ID: Existenz prüfen für >0
+                if ($catid > 0 && !rex_media_category::get($catid)) {
+                    throw new rex_api_exception('Ungültige Kategorie-ID');
+                }
+                // Berechtigung prüfen für alle Kategorien, auch ID 0
+                if (!rex::getUser()->getComplexPerm('media')->hasCategoryPerm($catid)) {
+                    throw new rex_api_exception('Ungültige Kategorie-ID');
+                }
                 $title = rex_post('ftitle', 'string', '');
                 
                 // Use filename as title if option is activated

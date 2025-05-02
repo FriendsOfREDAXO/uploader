@@ -2,6 +2,9 @@
 
 jQuery(function () {
 
+    // Liste bereits hinzugefügter Dateinamen
+    var uploadedFiles = [];
+
     // https://stackoverflow.com/a/11582513
     function getURLParameter(name) {
         return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
@@ -129,13 +132,29 @@ jQuery(function () {
         $(data.context[0]).find('.preview').append(get_mime_icon(data.files[0].name));
     });
 
+    $form.on('fileuploadadd', function (e, data) {
+        var name = data.files[0].name;
+        if (uploadedFiles.indexOf(name) !== -1) {
+            // Duplikat entfernen und Hinweis anzeigen
+            data.context.remove();
+            alert('Datei "' + name + '" wurde bereits hinzugefügt und wird übersprungen.');
+            return false;
+        }
+        uploadedFiles.push(name);
+    });
+
     $('#resize-images').on('click', function () {
         $form.fileupload('destroy');
         $form.fileupload(get_fileupload_options());
     });
 
     $form.bind('fileuploadcompleted', function (e, data) {
-        if (data.result.files[0].hasOwnProperty('error')) {
+        var file = data.result.files[0];
+        if (file.hasOwnProperty('error') && file.error) {
+            // HTML-Tags entfernen
+            var cleanError = file.error.replace(/<[^>]*>/g, '');
+            // In der UI aktualisieren
+            data.context.find('.error').text(cleanError);
             return true;
         }
     });
@@ -144,6 +163,12 @@ jQuery(function () {
         var $li = $(data.context[0]);
         $li.find('.size').remove();
         $li.find('.preview').addClass('warning').append(get_mime_icon(data.files[0].name));
+        // Fehlernachricht tagfrei anzeigen
+        var err = data.files[0].error;
+        if (err) {
+            var clean = err.replace(/<[^>]*>/g, '');
+            $li.find('.error').text(clean);
+        }
     });
 
     // datei nach upload uebernehmen
