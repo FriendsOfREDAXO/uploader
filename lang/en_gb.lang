@@ -1,5 +1,9 @@
 uploader_title = Uploader
 
+uploader_page_settings = Settings
+uploader_page_upload = Upload files
+uploader_page_batch_rework = Rework files
+
 uploader_settings = Settings
 uploader_settings_image_section = Images
 uploader_settings_image_intro = If images exceed the max size, they can be automatically resized by the browser before being uploaded.
@@ -47,3 +51,4 @@ uploader_errors_image_resize = Image resize failed
 
 perm_general_uploader[] = Uploaded
 perm_general_uploader[page] = Show Uploader page
+perm_general_uploader[batch_rework] = Rework files

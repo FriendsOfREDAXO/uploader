@@ -1,5 +1,9 @@
 uploader_title = Cargador
 
+uploader_page_settings = Ajustes
+uploader_page_upload = Subir archivos
+uploader_page_batch_rework = Reprocesar archivos
+
 uploader_settings = Ajustes
 uploader_settings_image_section = Fotos
 uploader_settings_image_intro = Las imágenes se pueden reducir automáticamente en el navegador cuando se cargan, si son más grandes que las definidas aquí.
@@ -45,3 +49,4 @@ uploader_errors_image_resize = El tamaño de la imagen falló
 
 perm_general_uploader[] = Cargador
 perm_general_uploader[page] = Página de vista del cargador
+perm_general_uploader[batch_rework] = Reprocesar archivos

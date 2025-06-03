@@ -1,5 +1,9 @@
 uploader_title = Uploader
 
+uploader_page_settings = Einstellungen
+uploader_page_upload = Dateien hochladen
+uploader_page_batch_rework = Dateien nachträglich optimieren
+
 uploader_settings = Einstellungen
 uploader_settings_image_section = Bilder
 uploader_settings_image_intro = Bilder können beim Upload automatisch im Browser verkleinert werden, wenn sie größer sind als hier definiert.
@@ -47,3 +51,4 @@ uploader_errors_image_resize = Bildresize fehlgeschlagen
 
 perm_general_uploader[] = Uploader
 perm_general_uploader[page] = Uploader Seite anzeigen
+perm_general_uploader[batch_rework] = Dateien nachträglich optimieren

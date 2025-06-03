@@ -8,10 +8,13 @@ page:
     icon: rex-icon rex-icon-import
     subpages:
         settings:
-            title: 'Settings'
+            title: 'translate:page_settings'
             perm: admin
         upload:
-            title: 'Upload'
+            title: 'translate:page_upload'
+        batch_rework:
+            title: 'translate:page_batch_rework'
+            perm: uploader[batch_rework]
         endpoint:
             title: 'endpoint'
             hidden: true
