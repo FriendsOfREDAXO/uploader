@@ -27,6 +27,7 @@ uploader_buttonbar_add_file = Seleccionar archivo
 uploader_buttonbar_add_files = Seleccionar archivo (s)
 uploader_buttonbar_start_upload = Comience a cargar
 uploader_buttonbar_cancel = Eliminar todo
+uploader_mediapool_details_resize_image = Reducir imagen demasiado grande tras la carga
 
 uploader_errors_1 = Archivo demasiado grande (upload_max_filesize / php.ini)
 uploader_errors_2 = Archivo demasiado grande (MAX_FILE_SIZE/ Form)

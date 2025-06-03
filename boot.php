@@ -103,7 +103,7 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
                         $suchmuster = '<input type="file" name="file_new" />';
                         $resize = $addon->getConfig('image-resize-checked') == 'true' ? 'checked' : '';
 
-                        $ersetzen = $suchmuster . '<label style="font-weight: normal;"><input type="checkbox" '.$resize.' id="resize-image" name="resize-image"> ' . $addon->i18n('buttonbar_resize_image') . '</label>';
+                        $ersetzen = $suchmuster . '<label style="font-weight: normal;"><input type="checkbox" '.$resize.' id="resize-image" name="resize-image"> ' . $addon->i18n('mediapool_details_resize_image') . '</label>';
                         $ep->setSubject(str_replace($suchmuster, $ersetzen, $ep->getSubject()));
                     }
                 }

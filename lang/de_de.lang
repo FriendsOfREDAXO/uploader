@@ -29,6 +29,7 @@ uploader_buttonbar_add_file = Datei wählen
 uploader_buttonbar_add_files = Datei(en) wählen
 uploader_buttonbar_start_upload = Upload starten
 uploader_buttonbar_cancel = alle entfernen
+uploader_mediapool_details_resize_image = übergroßes Bild nach Upload verkleinern
 
 uploader_errors_1 = Datei zu groß (upload_max_filesize/ php.ini)
 uploader_errors_2 = Datei zu groß (MAX_FILE_SIZE/ Formular)
