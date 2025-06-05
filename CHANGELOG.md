@@ -1,5 +1,15 @@
 # Uploader Changelog
 
+## 2.6.0 - 06.06.2025
+
+### Features
+
+* Anwendung der Skalierung-Funktion nun auch beim Re-Upload aus der Detailseite im Medienpool verfügbar
+ (selektiv via Checkbox)
+* Neue Subpage im AddOn ermöglicht Stapelbearbeitung von Dateien im Medienpool, deren Abmaße noch oberhalb der in den 
+ Uploader-Settings eingestellten Maximalwerte liegen
+  * z.B. für nachträgliche Installationen des AddOns bei Projekten mit schon befüllten Medienpools
+  * für besseres Handling auf dieser Page pjax eingeschaltet in der package.yml
 
 ## 2.3.0 – 18.10.2021
 

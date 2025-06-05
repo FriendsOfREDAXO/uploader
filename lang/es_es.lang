@@ -2,7 +2,7 @@ uploader_title = Cargador
 
 uploader_page_settings = Ajustes
 uploader_page_upload = Subir archivos
-uploader_page_batch_rework = Reprocesar archivos
+uploader_page_bulk_rework = Reprocesar archivos
 
 uploader_settings = Ajustes
 uploader_settings_image_section = Fotos
@@ -29,6 +29,21 @@ uploader_buttonbar_start_upload = Comience a cargar
 uploader_buttonbar_cancel = Eliminar todo
 uploader_mediapool_details_resize_image = Reducir imagen demasiado grande tras la carga
 
+uploader_bulk_rework_title = Procesamiento por lotes para la optimización de imágenes posterior
+uploader_bulk_rework_current_settings = Configuración actual: ancho máx. = <b>%spx</b> | alto máx. = <b>%spx</b>
+uploader_bulk_rework_table_title = Imágenes en el repositorio que exceden la configuración actual del cargador
+uploader_bulk_rework_table_column_filesize = Tamaño de archivo [kB]
+uploader_bulk_rework_table_column_width = Ancho [px]
+uploader_bulk_rework_table_column_height = Alto [px]
+uploader_bulk_rework_table_no_rows = No se encontraron archivos multimedia que coincidan con los criterios de búsqueda.
+uploader_bulk_rework_table_select_toggle = seleccionar/deseleccionar todas las entradas de la página actual
+uploader_bulk_rework_submit = Procesar %s archivo(s) posteriormente
+uploader_bulk_rework_search_media_category = Categorías de medios
+uploader_bulk_rework_search_media_category_placeholder = individual o separados por comas
+uploader_bulk_rework_search_submit = Buscar
+uploader_bulk_rework_search_reset = Restablecer
+uploader_bulk_rework_success = <b>%s</b> archivo(s) de imagen procesado(s) correctamente.
+
 uploader_errors_1 = Archivo demasiado grande (upload_max_filesize / php.ini)
 uploader_errors_2 = Archivo demasiado grande (MAX_FILE_SIZE/ Form)
 uploader_errors_3 = El archivo solo se subió parcialmente
@@ -50,4 +65,4 @@ uploader_errors_image_resize = El tamaño de la imagen falló
 
 perm_general_uploader[] = Cargador
 perm_general_uploader[page] = Página de vista del cargador
-perm_general_uploader[batch_rework] = Reprocesar archivos
+perm_general_uploader[bulk_rework] = Reprocesar archivos

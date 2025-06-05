@@ -1,11 +1,15 @@
 <?php
+
+use uploader\lib\uploader_bulk_rework;
+use uploader\lib\uploader_bulk_rework_list;
+
 $addon = rex_addon::get('uploader');
 
 if (rex::isBackend() && rex::getUser())
 {
     rex_perm::register('uploader[]');
     rex_perm::register('uploader[page]');
-    rex_perm::register('uploader[batch_rework]');
+    rex_perm::register('uploader[bulk_rework]');
 
     if (!rex::getUser()->hasPerm('uploader[page]'))
     {
@@ -15,7 +19,7 @@ if (rex::isBackend() && rex::getUser())
     }
 }    
 
-rex_extension::register('PACKAGES_INCLUDED', function ()
+rex_extension::register('PACKAGES_INCLUDED', function () use ($addon)
 {
     if (rex::isBackend() && rex::getUser() && rex::getUser()->hasPerm('uploader[]'))
     {
@@ -75,6 +79,28 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
                 $ep->setSubject(str_replace('</head>', $file_list_templates . $vars . '</head>', $ep->getSubject()));
             });
         }
+        elseif(rex_be_controller::getCurrentPage() == $addon->getName() . '/bulk_rework')
+        {
+            rex_view::addCssFile($this->getAssetsUrl('uploader.css'));
+            rex_view::addJsFile($this->getAssetsUrl('uploader_bulk_rework.js'));
+
+            rex_extension::register('REX_LIST_GET', function(rex_extension_point $ep) use ($addon) {
+                /** @var $list uploader_bulk_rework_list */
+                $list = $ep->getSubject();
+                $sql = $list->getSql();
+
+                // get query string
+                $reflection = new ReflectionClass($sql);
+                $sqlProperty = $reflection->getProperty('query');
+                $query = $sqlProperty->getValue($sql);
+
+                if(is_string($query) && preg_match('@ORDER BY `filesize`@', $query))
+                {
+                    $query = preg_replace('@ORDER BY `filesize`@', 'ORDER BY CAST(`filesize` as SIGNED INTEGER)', $query);
+                    $list->setCustomQuery($query);
+                }
+             });
+        }
 
         // add checkbox to allow rescaling on image update/re-upload
         if(
@@ -83,9 +109,8 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
             rex_addon::get('media_manager')->isAvailable()
         )
         {
-            $addon = rex_addon::get('uploader');
-            $maxWidth = (int)$addon->getConfig('image-max-width');
-            $maxHeight = (int)$addon->getConfig('image-max-height');
+            $maxWidth = (int)$addon->getConfig('image-max-width', 0);
+            $maxHeight = (int)$addon->getConfig('image-max-height', 0);
 
             rex_extension::register('OUTPUT_FILTER', function(rex_extension_point $ep) use ($addon, $maxWidth, $maxHeight)
             {
@@ -113,53 +138,10 @@ rex_extension::register('PACKAGES_INCLUDED', function ()
             rex_extension::register('MEDIA_UPDATED', function(rex_extension_point $ep) use ($addon, $maxWidth, $maxHeight)
             {
                 $filename = $ep->getParam('filename', '');
-                $imageSizes = getimagesize(rex_path::media($filename));
-                $media = rex_media::get($filename);
 
-                if(
-                    isset($_FILES['file_new']) &&
-                    rex_request('resize-image', 'string', 'off') === 'on' &&
-                    $media != null &&
-                    $media->isImage() &&
-                    is_array($imageSizes) &&
-                    $imageSizes[0] > 0 &&
-                    $imageSizes[1] > 0 &&
-                    !($maxWidth == 0 && $maxHeight == 0) &&
-                    (($maxWidth == 0 || $imageSizes[0] > $maxWidth) || ($maxHeight == 0 || $imageSizes[1] > $maxHeight))
-                )
+                if(isset($_FILES['file_new']) && rex_request('resize-image', 'string', 'off') === 'on')
                 {
-                    $fileSize = filesize(rex_path::media($filename));
-                    $cachePath = rex_path::addonCache('media_manager');
-
-                    $rexmedia = new rex_managed_media(rex_path::media($filename));
-                    $manager = new rex_media_manager($rexmedia);
-                    $manager->setCachePath($cachePath);
-
-                    $effect = new rex_effect_resize();
-                    $effect->setMedia($rexmedia);
-                    $effect->setParams([
-                        'allow_enlarge' => 'not_enlarge',
-                        'style' => 'maximum',
-                        'width' => $maxWidth,
-                        'height' => $maxHeight,
-                    ]);
-                    $effect->execute();
-                    $rescaledFilesize = rex_string::size($rexmedia->getSource());
-
-                    // replace file in media folder
-                    rex_file::put(rex_path::media($filename), $rexmedia->getSource());
-
-                    // update filesize and dimensions in database
-                    $saveObject = rex_sql::factory();
-                    $saveObject->setTable(rex::getTablePrefix() . 'media');
-                    $saveObject->setWhere(['filename' => $filename]);
-                    $saveObject->setValue('filesize', $rescaledFilesize);
-                    $saveObject->setValue('width', $rexmedia->getWidth());
-                    $saveObject->setValue('height', $rexmedia->getHeight());
-                    $saveObject->update();
-
-                    $ep->setParam('msg', $ep->getParam('msg') . '<br />Die Bilddatei wurde erfolgreich verkleinert. [AddOn: ' . $addon->getName() . ']');
-                    rex_media_cache::delete($filename);
+                    uploader_bulk_rework::reworkFile($filename, $maxWidth, $maxHeight);
                 }
             });
         }

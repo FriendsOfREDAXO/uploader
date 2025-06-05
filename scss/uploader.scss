@@ -159,3 +159,40 @@ body.rex-theme-dark {
     }
 }
 
+.uploader-bulk-rework-table {
+    .column-filesize-bytes {
+        color: #BBB;
+        padding-left: 2px;
+    }
+
+    .column-title-tooltip-hint {
+        color: #00F;
+        margin-right: 5px;
+    }
+
+    .dimension-too-large {
+        width: 12px;
+        height: 12px;
+        background-color: rgba(255,255,255,1);
+        border-radius: 50%;
+        margin-left: 8px;
+        display: inline-block;
+        vertical-align: baseline;
+        border: 1px solid #DDD;
+    }
+
+    .panel.panel-default {
+        margin-bottom: 0;
+    }
+
+    tbody td label {
+        font-weight: normal;
+        margin-bottom: 0;
+    }
+}
+
+.uploader-bulk-rework-current-settings {
+    margin-top: 3px;
+    color: #647f9e !important;
+}
+

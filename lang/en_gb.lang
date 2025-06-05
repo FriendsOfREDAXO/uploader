@@ -2,7 +2,7 @@ uploader_title = Uploader
 
 uploader_page_settings = Settings
 uploader_page_upload = Upload files
-uploader_page_batch_rework = Rework files
+uploader_page_bulk_rework = Rework files
 
 uploader_settings = Settings
 uploader_settings_image_section = Images
@@ -31,6 +31,21 @@ uploader_buttonbar_start_upload = Start upload
 uploader_buttonbar_cancel = Remove all
 uploader_mediapool_details_resize_image = Reduce oversized image after upload
 
+uploader_bulk_rework_title = Batch Processing for Retrospective Image Optimisation
+uploader_bulk_rework_current_settings = Current Settings: max. width = <b>%spx</b> | max. height = <b>%spx</b>
+uploader_bulk_rework_table_title = Images in Media Pool Exceeding Current Uploader Settings
+uploader_bulk_rework_table_column_filesize = File Size [kB]
+uploader_bulk_rework_table_column_width = Width [px]
+uploader_bulk_rework_table_column_height = Height [px]
+uploader_bulk_rework_table_no_rows = No media files found matching the search criteria.
+uploader_bulk_rework_table_select_toggle = Select/deselect all entries on the current page
+uploader_bulk_rework_submit = Retrospectively process %s file(s)
+uploader_bulk_rework_search_media_category = Media Categories
+uploader_bulk_rework_search_media_category_placeholder = single or comma-separated
+uploader_bulk_rework_search_submit = Search
+uploader_bulk_rework_search_reset = Reset
+uploader_bulk_rework_success = <b>%s</b> image file(s) successfully processed.
+
 uploader_errors_1 = File size exceeded (upload_max_filesize/ php.ini)
 uploader_errors_2 = File size exceeded (MAX_FILE_SIZE/ form)
 uploader_errors_3 = File upload incomplete
@@ -52,4 +67,4 @@ uploader_errors_image_resize = Image resize failed
 
 perm_general_uploader[] = Uploaded
 perm_general_uploader[page] = Show Uploader page
-perm_general_uploader[batch_rework] = Rework files
+perm_general_uploader[bulk_rework] = Rework files

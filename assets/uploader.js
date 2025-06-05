@@ -183,4 +183,5 @@ jQuery(function () {
         }
     });
 
+    console.log('uploader.js loaded');
 });
