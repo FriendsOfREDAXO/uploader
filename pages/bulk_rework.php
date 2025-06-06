@@ -77,7 +77,7 @@ $sql = '
         ' . (!empty($search) ? ' AND ' . implode(' AND ', $search) : '') . '
 ';
 
-$list = uploader_bulk_rework_list::factory($sql, 100, '', $listDebug, 1, ['id' => 'desc']);
+$list = uploader_bulk_rework_list::factory($sql, 100, 'uploader-bulk-rework', $listDebug, 1, ['id' => 'desc']);
 $list->addParam('page', rex_be_controller::getCurrentPage());
 $list->addTableAttribute('class', 'table table-striped table-hover uploader-bulk-rework-table');
 $list->addTableAttribute('id', 'uploader-bulk-rework-table');
@@ -307,7 +307,35 @@ $fragment->setVar('body',  $searchFields . '<hr />' . $table, false);
 $fragment->setVar('buttons', $buttons, false);
 $content =  $fragment->parse('core/page/section.php');
 
+// build query var for url params `sort` and `sorttype` to attach to form action
+$query = rex_request('query', 'array', []);
+$query['sort'] = 'id';
+$query['sorttype'] = 'desc';
+$query['page'] = rex_request('page', 'int', 1);
+$query['func'] = 'bulk_rework';
+
+$sort = rex_request('sort', 'string', null);
+$sorttype = rex_request('sorttype', 'string', null);
+$listname = rex_request('list', 'string', null);
+
+$queryParams = [];
+
+if ($sort) {
+    $queryParams['sort'] = $sort;
+}
+if ($sorttype) {
+    $queryParams['sorttype'] = $sorttype;
+}
+if ($listname) {
+    $queryParams['list'] = $listname;
+}
+
+$actionUrl = rex_url::currentBackendPage();
+if (!empty($queryParams)) {
+    $actionUrl .= '&' . http_build_query($queryParams);
+}
+
 echo '
-    <form action="' . rex_url::currentBackendPage() . '" method="post">
+    <form action="' . $actionUrl . '" method="post">
         ' . $content . '
     </form>';
