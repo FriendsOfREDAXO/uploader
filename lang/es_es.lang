@@ -32,7 +32,7 @@ uploader_mediapool_details_resize_image = Reducir imagen demasiado grande tras l
 uploader_bulk_rework_title = Procesamiento por lotes para la optimización de imágenes posterior
 uploader_bulk_rework_current_settings = Configuración actual: ancho máx. = <b>%spx</b> | alto máx. = <b>%spx</b>
 uploader_bulk_rework_table_title = Imágenes en el repositorio que exceden la configuración actual del cargador
-uploader_bulk_rework_table_column_filesize = Tamaño de archivo [kB]
+uploader_bulk_rework_table_column_filesize = Tamaño [kB]
 uploader_bulk_rework_table_column_width = Ancho [px]
 uploader_bulk_rework_table_column_height = Alto [px]
 uploader_bulk_rework_table_no_rows = No se encontraron archivos multimedia que coincidan con los criterios de búsqueda.

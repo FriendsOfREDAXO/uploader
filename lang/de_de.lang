@@ -34,7 +34,7 @@ uploader_mediapool_details_resize_image = übergroßes Bild nach Upload verklein
 uploader_bulk_rework_title = Stapelverarbeitung für nachträgliche Bildoptimierung
 uploader_bulk_rework_current_settings = Aktuelle Einstellungen: max. Breite = <b>%spx</b> | max. Höhe = <b>%spx</b>
 uploader_bulk_rework_table_title = Bilder im Medienpool, deren Bildgröße die aktuellen Uploader-Einstellungen überschreitet
-uploader_bulk_rework_table_column_filesize = Dateigröße [kB]
+uploader_bulk_rework_table_column_filesize = Größe [kB]
 uploader_bulk_rework_table_column_width = Breite [px]
 uploader_bulk_rework_table_column_height = Höhe [px]
 uploader_bulk_rework_table_no_rows = Keine Medien-Dateien gefunden, die den Suchkriterien entsprechen.

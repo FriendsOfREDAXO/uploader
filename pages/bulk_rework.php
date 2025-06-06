@@ -245,45 +245,56 @@ $table = $fragment->parse('core/page/section.php');
 // create search form
 $searchFields = [];
 
-$searchFields['filename'] = '<div class="col-md-3"><div class="form-group">
+$searchFieldsColumns = [
+    'filename' => 'col-lg-2 col-sm-9',
+    'category-id' => 'col-lg-2 col-sm-3',
+    'filesize' => 'col-lg-2 col-sm-3',
+    'width' => 'col-lg-2 col-sm-3',
+    'height' => 'col-lg-2 col-sm-3',
+    'submit' => 'col-lg-2 col-sm-3',
+];
+
+$searchFields['filename'] = '<div class="' . $searchFieldsColumns['filename'] . '"><div class="form-group">
     <label for="search-filename">' . rex_i18n::msg('pool_filename') . '</label>
     <input class="form-control" type="text" id="search-filename" name="rework-files-search-filename" value="' .
         rex_request('rework-files-search-filename', 'string', '') . '">
 </div></div>';
 
-$searchFields['category-id'] = '<div class="col-md-2"><div class="form-group">
+$searchFields['category-id'] = '<div class="' . $searchFieldsColumns['category-id'] . '"><div class="form-group">
     <label for="search-media-category">' . $addon->i18n('bulk_rework_search_media_category') . '</label>
     <input class="form-control" type="text" id="search-media-category" name="rework-files-search-media-category" value="' .
         rex_request('rework-files-search-media-category', 'string', '') . '" placeholder="' .
         $addon->i18n('bulk_rework_search_media_category_placeholder', ', ') . '">
 </div></div>';
 
-$searchFields['filesize'] = '<div class="col-md-2"><div class="form-group">
+$searchFields['filesize'] = '<div class="' . $searchFieldsColumns['filesize'] . '"><div class="form-group">
     <label for="search-min-filesize">min. ' . $addon->i18n('bulk_rework_table_column_filesize') . '</label>
     <input class="form-control" type="number" id="search-min-filesize" name="rework-files-search-min-filesize" value="' .
         rex_request('rework-files-search-min-filesize', 'int', 0) . '" min="0">
 </div></div>';
 
-$searchFields['width'] = '<div class="col-md-2"><div class="form-group">
+$searchFields['width'] = '<div class="' . $searchFieldsColumns['width'] . '"><div class="form-group">
     <label for="search-min-width">min. ' . $addon->i18n('bulk_rework_table_column_width') . '</label>
     <input class="form-control" type="number" id="search-min-width" name="rework-files-search-min-width" value="' .
         rex_request('rework-files-search-min-width', 'int', 0) . '" min="0">
 </div></div>';
 
-$searchFields['height'] = '<div class="col-md-2"><div class="form-group">
+$searchFields['height'] = '<div class="' . $searchFieldsColumns['height'] . '"><div class="form-group">
     <label for="search-min-height">min. ' . $addon->i18n('bulk_rework_table_column_height') . '</label>
     <input class="form-control" type="number" id="search-min-height" name="rework-files-search-min-height" value="' .
         rex_request('rework-files-search-min-height', 'int', 0) . '" min="0">
 </div></div>';
 
-$searchFields['submit'] = '<div class="col-md-1"><div class="form-group">
+$searchFields['submit'] = '<div class="' . $searchFieldsColumns['submit'] . '"><div class="form-group">
     <label style="display: block;">&nbsp;</label>
-    <button class="btn btn-primary pull-right" type="submit" name="rework-files-search-submit" value="1" data-toggle="tooltip" data-placement="top" title="' . $addon->i18n('bulk_rework_search_submit', '') . '">
-        <i class="rex-icon rex-icon-search"></i>
-    </button> 
-    <button class="btn btn-delete pull-right" style="margin: 0 5px;" type="submit" name="rework-files-search-reset" value="1" data-toggle="tooltip" data-placement="top" title="' . $addon->i18n('bulk_rework_search_reset', '') . '">
-        <i class="rex-icon fa-arrow-rotate-left"></i>
-    </button>
+    <div style="white-space: nowrap;" class=" pull-right">
+        <button class="btn btn-primary" type="submit" name="rework-files-search-submit" value="1" data-toggle="tooltip" data-placement="top" title="' . $addon->i18n('bulk_rework_search_submit', '') . '">
+            <i class="rex-icon rex-icon-search"></i>
+        </button> 
+        <button class="btn btn-delete" style="margin: 0 5px;" type="submit" name="rework-files-search-reset" value="1" data-toggle="tooltip" data-placement="top" title="' . $addon->i18n('bulk_rework_search_reset', '') . '">
+            <i class="rex-icon fa-arrow-rotate-left"></i>
+        </button>
+    </div>
 </div></div>';
 
 $searchFields = '<div class="row rework-files-search">' . implode('', $searchFields) . '</div>';

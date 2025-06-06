@@ -93,6 +93,8 @@ class uploader_bulk_rework
         $saveObject->setValue('filesize', $rescaledFilesize);
         $saveObject->setValue('width', $rexmedia->getWidth());
         $saveObject->setValue('height', $rexmedia->getHeight());
+        $saveObject->setValue('updateuser', rex::getUser()->getLogin());
+        $saveObject->setDateTimeValue('updatedate', time());
         $saveObject->update();
 
         rex_media_cache::delete($filename);
