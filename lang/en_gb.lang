@@ -29,11 +29,12 @@ uploader_buttonbar_add_file = Add file
 uploader_buttonbar_add_files = Add files
 uploader_buttonbar_start_upload = Start upload
 uploader_buttonbar_cancel = Remove all
-uploader_mediapool_details_resize_image = Reduce oversized image after upload
+uploader_mediapool_details_resize_image = Reduce oversized image
 
 uploader_bulk_rework_title = Batch Processing for Retrospective Image Optimisation
 uploader_bulk_rework_current_settings = Current Settings: max. width = <b>%spx</b> | max. height = <b>%spx</b>
 uploader_bulk_rework_table_title = Images in Media Pool Exceeding Current Uploader Settings
+uploader_bulk_rework_table_hits = Search results
 uploader_bulk_rework_table_column_filesize = Size [kB]
 uploader_bulk_rework_table_column_width = Width [px]
 uploader_bulk_rework_table_column_height = Height [px]

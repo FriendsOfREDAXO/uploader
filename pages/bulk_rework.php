@@ -13,7 +13,10 @@ $maxWidth = (int) $addon->getConfig('image-max-width', 0);
 $maxHeight = (int) $addon->getConfig('image-max-height', 0);
 
 // rework selected files
-if(count($filesToRework = rex_request('rework-file', 'array', [])) > 0)
+if(
+    count($filesToRework = rex_request('rework-file', 'array', [])) > 0 &&
+    !rex_request('rework-files-search-submit', 'int', 0)
+)
 {
     $reworked = 0;
 
@@ -65,6 +68,7 @@ if ($searchMinHeight > 0)
     $search[] = 'height >= ' . $searchMinHeight;
 }
 
+// build query
 $sql = '
     SELECT
         *
@@ -235,7 +239,8 @@ $buttons = $fragment->parse('core/form/submit.php');
 $fragment = new rex_fragment();
 $fragment->setVar('title',
     $addon->i18n('bulk_rework_table_title') .
-           '<div class="small uploader-bulk-rework-current-settings">' . sprintf($addon->i18n('bulk_rework_current_settings'), $maxWidth, $maxHeight) . '</div>',
+           '<div class="small uploader-bulk-rework-current-settings">' . sprintf($addon->i18n('bulk_rework_current_settings'), $maxWidth, $maxHeight) . '</div>'.
+           '<div class="small uploader-bulk-rework-hits">' . $list->getRows() . ' ' . $addon->i18n('bulk_rework_table_hits') . '</div>',
     false
 );
 $fragment->setVar('options', preg_replace('@(btn btn-save)@', '$1 btn-xs', $submitButton), false);

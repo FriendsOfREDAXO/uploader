@@ -27,11 +27,12 @@ uploader_buttonbar_add_file = Välj fil
 uploader_buttonbar_add_files = Välj fil(er)
 uploader_buttonbar_start_upload = Starta uppladdning
 uploader_buttonbar_cancel = Radera alla
-uploader_mediapool_details_resize_image = Förminska för stor bild efter uppladdning
+uploader_mediapool_details_resize_image = Förminska för stor bild
 
 uploader_bulk_rework_title = Batchbearbetning för efterhandsoptimering av bilder
 uploader_bulk_rework_current_settings = Aktuella inställningar: max. bredd = <b>%spx</b> | max. höjd = <b>%spx</b>
 uploader_bulk_rework_table_title = Bilder i mediebiblioteket som överskrider aktuella uppladdningsinställningar
+uploader_bulk_rework_table_hits = Sökresultat
 uploader_bulk_rework_table_column_filesize = Storlek [kB]
 uploader_bulk_rework_table_column_width = Bredd [px]
 uploader_bulk_rework_table_column_height = Höjd [px]

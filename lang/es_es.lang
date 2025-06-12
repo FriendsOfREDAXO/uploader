@@ -27,11 +27,12 @@ uploader_buttonbar_add_file = Seleccionar archivo
 uploader_buttonbar_add_files = Seleccionar archivo (s)
 uploader_buttonbar_start_upload = Comience a cargar
 uploader_buttonbar_cancel = Eliminar todo
-uploader_mediapool_details_resize_image = Reducir imagen demasiado grande tras la carga
+uploader_mediapool_details_resize_image = Reducir imagen demasiado grande
 
 uploader_bulk_rework_title = Procesamiento por lotes para la optimización de imágenes posterior
 uploader_bulk_rework_current_settings = Configuración actual: ancho máx. = <b>%spx</b> | alto máx. = <b>%spx</b>
 uploader_bulk_rework_table_title = Imágenes en el repositorio que exceden la configuración actual del cargador
+uploader_bulk_rework_table_hits = Resultados de búsqueda
 uploader_bulk_rework_table_column_filesize = Tamaño [kB]
 uploader_bulk_rework_table_column_width = Ancho [px]
 uploader_bulk_rework_table_column_height = Alto [px]
