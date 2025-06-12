@@ -118,10 +118,10 @@ rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
 
                         $ersetzen = $suchmuster . '<label style="font-weight: normal;"><input type="checkbox" ' . $resize . ' id="resize-image" name="resize-image"> ' . $addon->i18n('mediapool_details_resize_image') . '</label>' .
                             '<div class="alert alert-info" hidden data-new-size-wrap>' .
-                            'Berechnete Grösse: <span data-new-size></span><br />' .
-                            'Original: <span data-old-size></span>' .
+                            rex_i18n::msg('uploader_resizer_standalone_calculated_size') . ': <span data-new-size></span><br />' .
+                            rex_i18n::msg('uploader_resizer_standalone_original_size') . ': <span data-old-size></span>' .
                             '</div>' .
-                            '<div class="alert alert-danger" hidden data-new-size-error>' . rex_i18n::msg('uploader_errors_image_resize') . '</div>';
+                            '<div class="alert alert-danger" hidden data-new-size-error>' . rex_i18n::msg('uploader_resizer_standalone_error') . '</div>';
                         $ep->setSubject(str_replace($suchmuster, $ersetzen, $ep->getSubject()));
                     }
                 }
