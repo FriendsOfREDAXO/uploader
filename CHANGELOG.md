@@ -4,10 +4,10 @@
 
 ### Features
 
-* Anwendung der Skalierung-Funktion nun auch beim Re-Upload aus der Detailseite im Medienpool verfügbar
+* Anwendung der Skalierungsfunktion nun auch beim Re-Upload auf der Detailseite im Medienpool verfügbar
  (selektiv via Checkbox)
   * es wird zunächst eine browserseitige Verkleinerung versucht
-  * ... falls diese fehlschlägt, passiert die Umsetzung serverseitig (MM, gd) 
+  * ... falls diese fehlschlägt, passiert die Umsetzung serverseitig (MediaManager, gd) 
 * Neue Subpage im AddOn ermöglicht Stapelbearbeitung von Dateien im Medienpool, deren Abmaße noch oberhalb der in den 
  Uploader-Settings eingestellten Maximalwerte liegen
   * z.B. für nachträgliche Installationen des AddOns bei Projekten mit schon befüllten Medienpools oder Uploads über FTP/SSH
