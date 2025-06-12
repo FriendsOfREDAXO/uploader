@@ -306,7 +306,7 @@ $searchFields = '<div class="row rework-files-search">' . implode('', $searchFie
 
 // bring it all together
 $fragment = new rex_fragment();
-$fragment->setVar('class', 'edit');
+$fragment->setVar('class', 'edit uploader-bulk-rework-wrapper', false);;
 $fragment->setVar('title', $addon->i18n('bulk_rework_title'));
 $fragment->setVar('body',  $searchFields . '<hr />' . $table, false);
 $fragment->setVar('buttons', $buttons, false);
