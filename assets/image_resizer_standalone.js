@@ -130,8 +130,8 @@ class uploader_resizer_standalone {
           self.#showSizeInfo.call(self)
           data = await self.#deleteImageReferences.call(self, data)
           self.#data = data
+          data = null
           self.#log('Image references deleted', { ...data })
-          return data
         })
         .catch((error) => console.error('Image processing error:', error))
     }
@@ -323,9 +323,10 @@ class uploader_resizer_standalone {
     const self = this
     self.#log('deleteImageReferences')
     if (!self.#options.disabled) {
-      delete data.img
       delete data.canvas
       delete data.imageHead
+      delete self.#data.canvas
+      delete self.#data.imageHead
     }
     return data
   }
