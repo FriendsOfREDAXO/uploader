@@ -49,7 +49,7 @@ uploader_bulk_rework_success = <b>%s</b> image file(s) successfully processed.
 
 uploader_resizer_standalone_calculated_size = Calculate dimensions
 uploader_resizer_standalone_original_size = Original dimensions
-uploader_resizer_standalone_error = Client side resize failed, resizing on the server
+uploader_resizer_standalone_error = Browser-based image resizing failed.<br />Image resizing will now be performed on the server.
 
 uploader_errors_1 = File size exceeded (upload_max_filesize/ php.ini)
 uploader_errors_2 = File size exceeded (MAX_FILE_SIZE/ form)

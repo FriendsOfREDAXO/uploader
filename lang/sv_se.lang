@@ -47,7 +47,7 @@ uploader_bulk_rework_success = <b>%s</b> bildfil(er) har bearbetats framgångsri
 
 uploader_resizer_standalone_calculated_size = Beräknade mått
 uploader_resizer_standalone_original_size = Ursprungliga mått
-uploader_resizer_standalone_error = Bildstorleksändring på klientsidan misslyckades, bildstorleksändringen sker på servern
+uploader_resizer_standalone_error = Bildförminskning i webbläsaren misslyckades.<br />Bildförminskningen kommer nu att ske på servern.
 
 uploader_errors_1 = Filen är för stor (upload_max_filesize / php.ini)
 uploader_errors_2 = Filen är för stor (MAX_FILE_SIZE / form)
