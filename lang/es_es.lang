@@ -45,6 +45,10 @@ uploader_bulk_rework_search_submit = Buscar
 uploader_bulk_rework_search_reset = Restablecer
 uploader_bulk_rework_success = <b>%s</b> archivo(s) de imagen procesado(s) correctamente.
 
+uploader_resizer_standalone_calculated_size = Dimensiones calculadas
+uploader_resizer_standalone_original_size = Dimensiones originales
+uploader_resizer_standalone_error = Error en el redimensionado de la imagen en el cliente, el redimensionado de la imagen se realiza en el servidor.
+
 uploader_errors_1 = Archivo demasiado grande (upload_max_filesize / php.ini)
 uploader_errors_2 = Archivo demasiado grande (MAX_FILE_SIZE/ Form)
 uploader_errors_3 = El archivo solo se subió parcialmente
