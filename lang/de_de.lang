@@ -1,5 +1,9 @@
 uploader_title = Uploader
 
+uploader_page_settings = Einstellungen
+uploader_page_upload = Dateien hochladen
+uploader_page_bulk_rework = Dateien nachträglich optimieren
+
 uploader_settings = Einstellungen
 uploader_settings_image_section = Bilder
 uploader_settings_image_intro = Bilder können beim Upload automatisch im Browser verkleinert werden, wenn sie größer sind als hier definiert.
@@ -25,6 +29,27 @@ uploader_buttonbar_add_file = Datei wählen
 uploader_buttonbar_add_files = Datei(en) wählen
 uploader_buttonbar_start_upload = Upload starten
 uploader_buttonbar_cancel = alle entfernen
+uploader_mediapool_details_resize_image = übergroßes Bild verkleinern
+
+uploader_bulk_rework_title = Stapelverarbeitung für nachträgliche Bildoptimierung
+uploader_bulk_rework_current_settings = Aktuelle Einstellungen: max. Breite = <b>%spx</b> | max. Höhe = <b>%spx</b>
+uploader_bulk_rework_table_title = Bilder im Medienpool, deren Bildgröße die aktuellen Uploader-Einstellungen überschreitet
+uploader_bulk_rework_table_hits = Suchtreffer
+uploader_bulk_rework_table_column_filesize = Größe [kB]
+uploader_bulk_rework_table_column_width = Breite [px]
+uploader_bulk_rework_table_column_height = Höhe [px]
+uploader_bulk_rework_table_no_rows = Keine Medien-Dateien gefunden, die den Suchkriterien entsprechen.
+uploader_bulk_rework_table_select_toggle = alle Einträge der aktuellen Seite auswählen/abwählen
+uploader_bulk_rework_submit = %s Datei(en) nachträglich bearbeiten
+uploader_bulk_rework_search_media_category = Medienkategorien
+uploader_bulk_rework_search_media_category_placeholder = einzeln oder Komma-getrennt
+uploader_bulk_rework_search_submit = Suchen
+uploader_bulk_rework_search_reset = Zurücksetzen
+uploader_bulk_rework_success = <b>%s</b> Bilddatei(en) wurden erfolgreich angepasst.
+
+uploader_resizer_standalone_calculated_size = Berechnete Dimensionen
+uploader_resizer_standalone_original_size = Originaldimensionen
+uploader_resizer_standalone_error = Die Browser-seitige Bildverkleinerung ist fehlgeschlagen.<br />Die Bildverkleinerung erfolgt nun auf dem Server.
 
 uploader_errors_1 = Datei zu groß (upload_max_filesize/ php.ini)
 uploader_errors_2 = Datei zu groß (MAX_FILE_SIZE/ Formular)
@@ -47,3 +72,4 @@ uploader_errors_image_resize = Bildresize fehlgeschlagen
 
 perm_general_uploader[] = Uploader
 perm_general_uploader[page] = Uploader Seite anzeigen
+perm_general_uploader[bulk_rework] = Dateien nachträglich optimieren

@@ -1,5 +1,9 @@
 uploader_title = Uploader
 
+uploader_page_settings = Settings
+uploader_page_upload = Upload files
+uploader_page_bulk_rework = Rework files
+
 uploader_settings = Settings
 uploader_settings_image_section = Images
 uploader_settings_image_intro = If images exceed the max size, they can be automatically resized by the browser before being uploaded.
@@ -25,6 +29,27 @@ uploader_buttonbar_add_file = Add file
 uploader_buttonbar_add_files = Add files
 uploader_buttonbar_start_upload = Start upload
 uploader_buttonbar_cancel = Remove all
+uploader_mediapool_details_resize_image = Reduce oversized image
+
+uploader_bulk_rework_title = Batch Processing for Retrospective Image Optimisation
+uploader_bulk_rework_current_settings = Current Settings: max. width = <b>%spx</b> | max. height = <b>%spx</b>
+uploader_bulk_rework_table_title = Images in Media Pool Exceeding Current Uploader Settings
+uploader_bulk_rework_table_hits = Search results
+uploader_bulk_rework_table_column_filesize = Size [kB]
+uploader_bulk_rework_table_column_width = Width [px]
+uploader_bulk_rework_table_column_height = Height [px]
+uploader_bulk_rework_table_no_rows = No media files found matching the search criteria.
+uploader_bulk_rework_table_select_toggle = Select/deselect all entries on the current page
+uploader_bulk_rework_submit = Retrospectively process %s file(s)
+uploader_bulk_rework_search_media_category = Media Categories
+uploader_bulk_rework_search_media_category_placeholder = single or comma-separated
+uploader_bulk_rework_search_submit = Search
+uploader_bulk_rework_search_reset = Reset
+uploader_bulk_rework_success = <b>%s</b> image file(s) successfully processed.
+
+uploader_resizer_standalone_calculated_size = Calculate dimensions
+uploader_resizer_standalone_original_size = Original dimensions
+uploader_resizer_standalone_error = Browser-based image resizing failed.<br />Image resizing will now be performed on the server.
 
 uploader_errors_1 = File size exceeded (upload_max_filesize/ php.ini)
 uploader_errors_2 = File size exceeded (MAX_FILE_SIZE/ form)
@@ -47,3 +72,4 @@ uploader_errors_image_resize = Image resize failed
 
 perm_general_uploader[] = Uploaded
 perm_general_uploader[page] = Show Uploader page
+perm_general_uploader[bulk_rework] = Rework files

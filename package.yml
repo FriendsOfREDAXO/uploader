@@ -1,17 +1,21 @@
 package: uploader
-version: '2.5.1'
+version: '2.6.0'
 author: 'Friends Of REDAXO'
 supportpage: 'https://github.com/FriendsOfREDAXO/uploader'
 
 page:
     title: 'Uploader'
     icon: rex-icon rex-icon-import
+    pjax: true
     subpages:
         settings:
-            title: 'Settings'
+            title: 'translate:page_settings'
             perm: admin
         upload:
-            title: 'Upload'
+            title: 'translate:page_upload'
+        bulk_rework:
+            title: 'translate:page_bulk_rework'
+            perm: uploader[bulk_rework]
         endpoint:
             title: 'endpoint'
             hidden: true

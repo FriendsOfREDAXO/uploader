@@ -159,3 +159,62 @@ body.rex-theme-dark {
     }
 }
 
+.uploader-bulk-rework-wrapper {
+    section.rex-page-section {
+        .panel-default {
+            overflow-x: auto;
+
+            > .panel-heading {
+                position: sticky;
+                left: 0;
+                top: 0;
+                right: 0;
+            }
+        }
+    }
+
+    .uploader-bulk-rework-current-settings {
+        margin-top: 3px;
+        color: #647f9e !important;
+    }
+
+    .uploader-bulk-rework-hits {
+        background-color: #00000015;
+        color: #555 !important;
+        font-weight: bold;
+        padding: 5px 15px;
+        margin: 7px -15px -10px;
+    }
+
+    .uploader-bulk-rework-table {
+        .column-filesize-bytes {
+            color: #BBB;
+            padding-left: 2px;
+        }
+
+        .column-title-tooltip-hint {
+            color: #00F;
+            margin-right: 5px;
+        }
+
+        .dimension-too-large {
+            width: 12px;
+            height: 12px;
+            background-color: rgba(255,255,255,1);
+            border-radius: 50%;
+            margin-left: 8px;
+            display: inline-block;
+            vertical-align: baseline;
+            border: 1px solid #DDD;
+        }
+
+        .panel.panel-default {
+            margin-bottom: 0;
+        }
+
+        tbody td label {
+            font-weight: normal;
+            margin-bottom: 0;
+        }
+    }
+}
