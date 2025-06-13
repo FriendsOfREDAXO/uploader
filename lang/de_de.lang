@@ -48,7 +48,7 @@ uploader_bulk_rework_search_reset = Zurücksetzen
 uploader_bulk_rework_success = <b>%s</b> Bilddatei(en) wurden erfolgreich angepasst.
 
 uploader_resizer_standalone_calculated_size = Berechnete Dimensionen
-uploader_resizer_standalone_original_size = Originalgrösse
+uploader_resizer_standalone_original_size = Originaldimensionen
 uploader_resizer_standalone_error = Die Browser-seitige Bildverkleinerung ist fehlgeschlagen.<br />Die Bildverkleinerung erfolgt nun auf dem Server.
 
 uploader_errors_1 = Datei zu groß (upload_max_filesize/ php.ini)
