@@ -50,6 +50,7 @@ class uploader_resizer_standalone {
       self.#shouldResize = self.#shouldResizeInput.checked
       if (self.#shouldResize && self.#data.files.length) {
         self.#log('shouldResizeInput change: true: showing new size info')
+        self.#updateFileInput(self.#data.files[0])
         self.#updateSizeInfo.call(self)
         self.#showSizeInfo.call(self)
       } else if (
