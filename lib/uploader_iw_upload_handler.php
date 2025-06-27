@@ -223,6 +223,7 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                     
                     // metainfos schreiben
                     uploader_meta::save($result);
+                    rex_media_cache::delete($file->name);
                     
                 } catch (Exception $e) {
                     $file->error = $e->getMessage();
