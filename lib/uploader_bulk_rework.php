@@ -1,6 +1,6 @@
 <?php
 
-namespace uploader\lib;
+namespace FriendsOfRedaxo\Uploader;
 
 use rex;
 use rex_addon;
@@ -15,14 +15,14 @@ use rex_sql;
 use rex_string;
 
 /**
- * Class uploader_bulk_rework
+ * Class BulkRework
  *
  * @category
  * @package uploader\lib
  * @author Peter Schulze | p.schulze[at]bitshifters.de
  * @created 05.06.2025
  */
-class uploader_bulk_rework
+class BulkRework
 {
     /**
      * rework image file with uploader addon max size settings

@@ -1,7 +1,7 @@
 <?php
 
-use uploader\lib\uploader_bulk_rework;
-use uploader\lib\uploader_bulk_rework_list;
+use FriendsOfRedaxo\Uploader\BulkRework;
+use FriendsOfRedaxo\Uploader\BulkReworkList;
 
 $addon = rex_addon::get('uploader');
 
@@ -77,7 +77,7 @@ rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
             rex_view::addJsFile($this->getAssetsUrl('uploader_bulk_rework.js'));
 
             rex_extension::register('REX_LIST_GET', function (rex_extension_point $ep) use ($addon) {
-                /** @var uploader_bulk_rework_list $list  */
+                /** @var BulkReworkList $list  */
                 $list = $ep->getSubject();
                 $sql = $list->getSql();
 
@@ -132,7 +132,7 @@ rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
                 $filename = $ep->getParam('filename', '');
 
                 if (isset($_FILES['file_new']) && rex_request('resize-image', 'string', 'off') === 'on') {
-                    uploader_bulk_rework::reworkFile($filename, $maxWidth, $maxHeight);
+                    BulkRework::reworkFile($filename, $maxWidth, $maxHeight);
                 }
             });
         }
