@@ -2,8 +2,8 @@
 
 /** @var rex_addon $this */
 
-use uploader\lib\uploader_bulk_rework;
-use uploader\lib\uploader_bulk_rework_list;
+use FriendsOfRedaxo\Uploader\BulkRework;
+use FriendsOfRedaxo\Uploader\BulkReworkList;
 
 echo rex_view::title($this->i18n('title'));
 
@@ -22,7 +22,7 @@ if(
 
     foreach ($filesToRework as $filename)
     {
-        $reworked += (int) uploader_bulk_rework::reworkFile($filename, $maxWidth, $maxHeight);
+        $reworked += (int) BulkRework::reworkFile($filename, $maxWidth, $maxHeight);
     }
 
     echo rex_view::success(sprintf($addon->i18n('bulk_rework_success'), $reworked));
@@ -81,7 +81,7 @@ $sql = '
         ' . (!empty($search) ? ' AND ' . implode(' AND ', $search) : '') . '
 ';
 
-$list = uploader_bulk_rework_list::factory($sql, 100, 'uploader-bulk-rework', $listDebug, 1, ['id' => 'desc']);
+$list = BulkReworkList::factory($sql, 100, 'uploader-bulk-rework', $listDebug, 1, ['id' => 'desc']);
 $list->addParam('page', rex_be_controller::getCurrentPage());
 $list->addTableAttribute('class', 'table table-striped table-hover uploader-bulk-rework-table');
 $list->addTableAttribute('id', 'uploader-bulk-rework-table');
@@ -160,7 +160,7 @@ $list->setColumnFormat('width', 'custom', static function ($params) use ($maxWid
 
         return $params['subject'] .
             '<span class="dimension-too-large" style="background-color: ' .
-                uploader_bulk_rework::lightenColor('FF0000', $factor) .
+                BulkRework::lightenColor('FF0000', $factor) .
             ';" data-toggle="tooltip" data-placement="top" title="+ ' . $percentPlus . '%"></span>';
     }
 
@@ -183,7 +183,7 @@ $list->setColumnFormat('height', 'custom', static function ($params) use ($maxHe
 
         return $params['subject'] .
             '<span class="dimension-too-large" style="background-color: ' .
-                uploader_bulk_rework::lightenColor('FF0000', $factor) .
+                BulkRework::lightenColor('FF0000', $factor) .
             ';" data-toggle="tooltip" data-placement="top" title="+ ' . $percentPlus . '%"></span>';
     }
 

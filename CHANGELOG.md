@@ -1,5 +1,11 @@
 # Uploader Changelog
 
+## x.x.x - xx.xx.20xx
+
+* Namespace changed from `uploader` to `FriendsOfRedaxo\Uploader`
+  - class `uploader\lib\uploader_bulk_rework` renamed to `FriendsOfRedaxo\Uploader\BulkRework`
+  - class `uploader\lib\uploader_bulk_rework_list` renamed to `FriendsOfRedaxo\Uploader\BulkReworkList`
+
 ## 2.6.0 - 13.06.2025
 
 ### Features

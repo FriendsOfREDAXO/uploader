@@ -1,16 +1,16 @@
 <?php
 
-namespace uploader\lib;
+namespace FriendsOfRedaxo\Uploader;
 
 /**
- * Class uploader_bulk_rework_list
+ * Class BulkReworkList
  *
  * @category
  * @package uploader\lib
  * @author Peter Schulze | p.schulze[at]bitshifters.de
  * @created 05.06.2025
  */
-class uploader_bulk_rework_list extends \rex_list
+class BulkReworkList extends \rex_list
 {
     /**
      * getting current sql query
