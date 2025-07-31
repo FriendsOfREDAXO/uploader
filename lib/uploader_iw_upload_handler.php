@@ -216,7 +216,7 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                                     $value = $postValue;
                                 } elseif (is_array($postValue) && !empty($postValue)) {
                                     //Handle array values (e.g., from multi-select fields)
-                                    $value = implode(',', array_filter($postValue));
+                                    $value = implode(',', array_filter($postValue, 'strlen'));
                                 }
                             }
 
