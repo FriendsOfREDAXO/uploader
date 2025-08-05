@@ -12,8 +12,6 @@ use rex_response;
  */
 class ApiBulkProcess extends rex_api_function
 {
-    protected $published = true;
-
     public function execute()
     {
         rex_response::cleanOutputBuffers();
