@@ -347,6 +347,14 @@ $(document).on('rex:ready', function (event, element) {
                 success: (response) => {
                     if (response.success) {
                         this.status = response.data.batch;
+                        
+                        // Verwende activeFiles aus der Response für aktuellen Fortschritt
+                        if (response.data.activeFiles && response.data.activeFiles.length > 0) {
+                            this.status.currentFiles = response.data.activeFiles;
+                        } else {
+                            this.status.currentFiles = [];
+                        }
+                        
                         updateProgressModal(this.status);
 
                         if (this.status.status === 'completed') {
@@ -354,10 +362,10 @@ $(document).on('rex:ready', function (event, element) {
                         } else if (this.status.status === 'cancelled') {
                             this.running = false;
                         } else if (this.status.status === 'cancelling') {
-                            // Beim Abbrechen weiter abfragen bis 'cancelled' Status erreicht wird
+                            // Beim Abbrechen läuft weiter bis cancelled erreicht wird
                             this.processInterval = setTimeout(() => {
                                 this.processNext();
-                            }, 500); // Kürzere Pause da Abbruch jetzt sofort erfolgt
+                            }, 300); // Schnellere Abfrage für responsives Feedback
                         } else if (response.data.status === 'processing') {
                             // Weiter verarbeiten nach kurzer Pause
                             this.processInterval = setTimeout(() => {

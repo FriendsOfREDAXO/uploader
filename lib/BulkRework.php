@@ -248,19 +248,13 @@ class BulkRework
         
         // Prüfe auf Abbruch-Status
         if ($batchStatus['status'] === 'cancelling') {
-            // Beim Abbrechen: Prüfe ob noch laufende Verarbeitungen existieren
-            if (empty($batchStatus['currentFiles'])) {
-                // Keine aktuelle Verarbeitung - kann sofort abbrechen
-                self::updateBatchStatus($batchId, [
-                    'status' => 'cancelled',
-                    'endTime' => time(),
-                    'currentFiles' => []
-                ]);
-                return ['status' => 'cancelled', 'batch' => self::getBatchStatus($batchId)];
-            } else {
-                // Noch Dateien in Verarbeitung - warte bis diese fertig sind
-                return ['status' => 'cancelling', 'batch' => $batchStatus, 'message' => 'Warte auf Beendigung laufender Verarbeitungen...'];
-            }
+            // Bei Cancellation: Direkt abbrechen ohne weitere Verarbeitung
+            self::updateBatchStatus($batchId, [
+                'status' => 'cancelled',
+                'endTime' => time(),
+                'currentFiles' => []
+            ]);
+            return ['status' => 'cancelled', 'batch' => self::getBatchStatus($batchId)];
         }
         
         // Normale Verarbeitung - sammle neue Dateien
@@ -291,7 +285,7 @@ class BulkRework
             }
         }
         
-        // Status für aktuell verarbeitete Dateien aktualisieren
+        // Status für aktuell verarbeitete Dateien aktualisieren (VOR der Verarbeitung)
         self::updateBatchStatus($batchId, [
             'currentFiles' => $currentFiles
         ]);
@@ -300,6 +294,7 @@ class BulkRework
         $successful = 0;
         $errors = $batchStatus['errors'];
         $skipped = $batchStatus['skipped'];
+        $results = []; // Variable initialisieren
         
         foreach ($currentFiles as $currentFilename) {
             $result = self::reworkFileWithFallback(
@@ -320,7 +315,7 @@ class BulkRework
             }
         }
         
-        // Batch-Status aktualisieren
+        // Batch-Status aktualisieren (NACH der Verarbeitung)
         $processed = $batchStatus['processed'];
         $filesToProcess = count($currentFiles);
         
@@ -329,12 +324,12 @@ class BulkRework
             'successful' => $batchStatus['successful'] + $successful,
             'errors' => $errors,
             'skipped' => $skipped,
-            'currentFiles' => [] // Wichtig: Nach Verarbeitung leeren für Cancel-Logik
+            'currentFiles' => [] // Nach Verarbeitung leeren - nur in activeFiles sichtbar
         ];
         
         self::updateBatchStatus($batchId, $updates);
         
-        // Return status basiert auf aktuellem Batch-Status
+        // Return status basiert auf aktuellem Batch-Status  
         $finalBatchStatus = self::getBatchStatus($batchId);
         $returnStatus = $finalBatchStatus['status'] === 'cancelling' ? 'cancelling' : 'processing';
         
@@ -342,7 +337,8 @@ class BulkRework
             'status' => $returnStatus,
             'batch' => $finalBatchStatus,
             'results' => $results,
-            'processedCount' => $filesToProcess
+            'processedCount' => $filesToProcess,
+            'activeFiles' => $currentFiles // Zusätzlich die aktuell verarbeiteten Dateien
         ];
     }
     
