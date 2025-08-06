@@ -33,6 +33,7 @@ uploader_bulk_rework_title = Batchbearbetning för efterhandsoptimering av bilde
 uploader_bulk_rework_current_settings = Aktuella inställningar: max. bredd = <b>%spx</b> | max. höjd = <b>%spx</b>
 uploader_bulk_rework_table_title = Bilder i mediebiblioteket som överskrider aktuella uppladdningsinställningar
 uploader_bulk_rework_table_hits = Sökresultat
+uploader_bulk_rework_table_num_hits_per_page = Träffar per sida
 uploader_bulk_rework_table_column_filesize = Storlek [kB]
 uploader_bulk_rework_table_column_width = Bredd [px]
 uploader_bulk_rework_table_column_height = Höjd [px]
