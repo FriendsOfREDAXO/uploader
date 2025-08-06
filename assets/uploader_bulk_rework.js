@@ -179,9 +179,15 @@ $(document).on('rex:ready', function (event, element) {
             $('#current-file').text('-');
         }
         
-        // Zeige Parallelverarbeitungsinfo
-        if (parallelCount > 1 && batchStatus.status === 'running') {
-            $('#batch-status-text').text(`Läuft... (${parallelCount} parallel)`);
+        // Zeige Parallelverarbeitungsinfo mit besseren Status-Texten
+        if (batchStatus.status === 'running') {
+            if (batchStatus.processed === 0) {
+                $('#batch-status-text').text(parallelCount > 1 ? 'Bereite Verarbeitung vor...' : 'Warten...');
+            } else if (parallelCount > 1) {
+                $('#batch-status-text').text(`Verarbeitung läuft... (${parallelCount} parallel)`);
+            } else {
+                $('#batch-status-text').text('Verarbeitung läuft...');
+            }
         } else if (batchStatus.status === 'completed') {
             $('#batch-status-text').text('Abgeschlossen');
             $('.progress-bar').removeClass('active');
@@ -228,8 +234,6 @@ $(document).on('rex:ready', function (event, element) {
                 </div>
             `;
             $('#batch-details').html(summary);
-        } else if (batchStatus.status === 'running') {
-            $('#batch-status-text').text('Läuft...');
         }
     }
 
@@ -243,17 +247,28 @@ $(document).on('rex:ready', function (event, element) {
         for (let i = 0; i < parallelCount; i++) {
             let fileName = currentFiles[i] || '';
             let isActive = i < currentFiles.length;
-            let barClass = isActive ? 'progress-bar-info progress-bar-striped active' : 'progress-bar-default';
+            
+            // Status bestimmen
+            let statusText, barClass, progressWidth;
+            if (isActive) {
+                statusText = `<span class="text-info">verarbeite...</span>`;
+                barClass = 'progress-bar-info progress-bar-striped active';
+                progressWidth = '100%';
+            } else {
+                statusText = '<i class="text-muted">wartend...</i>';
+                barClass = 'progress-bar-default';
+                progressWidth = '0%';
+            }
             
             let progressBar = `
                 <div class="parallel-progress-item" style="margin-bottom: 5px;">
                     <div class="small" style="margin-bottom: 2px;">
                         <strong>Slot ${i + 1}:</strong> 
-                        <span class="parallel-file-name">${fileName || '<i>wartend...</i>'}</span>
+                        <span class="parallel-file-name">${fileName ? fileName + ' - ' + statusText : statusText}</span>
                     </div>
-                    <div class="progress" style="height: 6px;">
+                    <div class="progress" style="height: 8px;">
                         <div class="progress-bar ${barClass}" role="progressbar" 
-                             style="width: ${isActive ? '100%' : '0%'}">
+                             style="width: ${progressWidth}">
                         </div>
                     </div>
                 </div>
@@ -296,11 +311,20 @@ $(document).on('rex:ready', function (event, element) {
                 },
                 success: (response) => {
                     if (response.success) {
-                        this.status = response.data.status;
+                        // Update Status vom Server
+                        this.status = response.data.batch;
                         updateProgressModal(this.status);
-                        this.running = false;
+                        
+                        // Weiter abfragen bis wirklich cancelled
+                        if (this.status.status === 'cancelling') {
+                            this.processInterval = setTimeout(() => {
+                                this.processNext();
+                            }, 500);
+                        } else {
+                            this.running = false;
+                        }
                     } else {
-                        this.handleError('Fehler beim Abbrechen: ' + (response.data ? response.data.message : 'Unbekannter Fehler'));
+                        this.handleError('Fehler beim Abbrechen: ' + (response.data ? response.data.message || response.data.error : 'Unbekannter Fehler'));
                     }
                 },
                 error: (xhr, status, error) => {

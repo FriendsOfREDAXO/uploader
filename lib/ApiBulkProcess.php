@@ -101,9 +101,12 @@ class ApiBulkProcess extends rex_api_function
             return ['error' => 'Batch not found or already completed'];
         }
 
+        // Gib den aktualisierten Batch-Status zurück
+        $batchStatus = BulkRework::getBatchStatus($batchId);
+        
         return [
-            'cancelled' => true,
-            'status' => BulkRework::getBatchStatus($batchId)
+            'message' => 'Batch cancellation initiated',
+            'batch' => $batchStatus
         ];
     }
 
