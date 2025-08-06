@@ -363,6 +363,10 @@ $(document).on('rex:ready', function (event, element) {
     // Close modal
     $(document).on('click', '#close-modal', function() {
         hideProgressModal();
+        // Seite neu laden nach dem Schließen
+        setTimeout(() => {
+            location.reload();
+        }, 600);
     });
     
     // Add CSS animations dynamically
