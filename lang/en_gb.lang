@@ -35,6 +35,7 @@ uploader_bulk_rework_title = Batch Processing for Retrospective Image Optimisati
 uploader_bulk_rework_current_settings = Current Settings: max. width = <b>%spx</b> | max. height = <b>%spx</b>
 uploader_bulk_rework_table_title = Images in Media Pool Exceeding Current Uploader Settings
 uploader_bulk_rework_table_hits = Search results
+uploader_bulk_rework_table_num_hits_per_page = Hits per page
 uploader_bulk_rework_table_column_filesize = Size [kB]
 uploader_bulk_rework_table_column_width = Width [px]
 uploader_bulk_rework_table_column_height = Height [px]

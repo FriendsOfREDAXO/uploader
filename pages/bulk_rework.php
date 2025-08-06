@@ -12,6 +12,12 @@ $addon = rex_addon::get('uploader');
 $maxWidth = (int) $addon->getConfig('image-max-width', 0);
 $maxHeight = (int) $addon->getConfig('image-max-height', 0);
 
+if (rex_request('formsubmit', 'string') == 'set-num-hits-per-page') {
+    $setHitsPerPage = rex_request('rework-files-num-hits-per-page', 'int', 0);
+    $this->setConfig('uploader-bulk-rework-hits-per-page', $setHitsPerPage ? $setHitsPerPage : 200);
+}
+$hitsPerPage = $this->getConfig('uploader-bulk-rework-hits-per-page', 200);
+
 // Zeige Informationen über verfügbare Bildverarbeitungsbibliotheken
 $imageLibInfo = [];
 if (BulkRework::hasGD()) {
@@ -88,7 +94,7 @@ $sql = '
         ' . (!empty($search) ? ' AND ' . implode(' AND ', $search) : '') . '
 ';
 
-$list = BulkReworkList::factory($sql, 100, 'uploader-bulk-rework', $listDebug, 1, ['id' => 'desc']);
+$list = BulkReworkList::factory($sql, $hitsPerPage, 'uploader-bulk-rework', $listDebug, 1, ['id' => 'desc']);
 $list->addParam('page', rex_be_controller::getCurrentPage());
 $list->addTableAttribute('class', 'table table-striped table-hover uploader-bulk-rework-table');
 $list->addTableAttribute('id', 'uploader-bulk-rework-table');
@@ -233,7 +239,7 @@ $listContent = $list->get();
 
 // buttons
 $formElements = $n = [];
-$n['field'] = $submitButton = '<button class="btn btn-save pull-right" type="submit" name="rework-files-submit" value="1">' .
+$n['field'] = $submitButton = '<button class="pull-right btn btn-save" type="submit" name="rework-files-submit" value="1">' .
                                     sprintf($addon->i18n('bulk_rework_submit'), '<span class="number">0</span>') .
                               '</button>';
 $formElements[] = $n;
@@ -247,7 +253,20 @@ $fragment = new rex_fragment();
 $fragment->setVar('title',
     $addon->i18n('bulk_rework_table_title') .
            '<div class="small uploader-bulk-rework-current-settings">' . sprintf($addon->i18n('bulk_rework_current_settings'), $maxWidth, $maxHeight) . '</div>'.
-           '<div class="small uploader-bulk-rework-hits">' . $list->getRows() . ' ' . $addon->i18n('bulk_rework_table_hits') . '</div>',
+           '<div class="small uploader-bulk-rework-hits">' . $list->getRows() . ' ' . $addon->i18n('bulk_rework_table_hits') . '</div>'.
+           '<div class="small uploader-bulk-rework-num-hits-per-page">
+           <form class="uploader-bulk-rework-num-hits-per-page" action="' . rex_url::currentBackendPage() . '" method="post">
+                <div class="form-group form-group-sm rex-form-group-nowrap">
+                    <label for="num-hits-per-page">' . $addon->i18n('uploader_bulk_rework_table_num_hits_per_page') . '</label>
+                    <input class="form-control form-control-sm" type="number" id="num-hits-per-page" name="rework-files-num-hits-per-page" value="' .
+                    $hitsPerPage . '" placeholder="200">
+                </div>
+                <button class="btn btn-sm btn-primary" type="submit">
+                    OK
+                </button>                
+                <input type="hidden" name="formsubmit" value="set-num-hits-per-page" />
+           </form>
+           </div>',
     false
 );
 $fragment->setVar('options', preg_replace('@(btn btn-save)@', '$1 btn-xs', $submitButton), false);
@@ -299,12 +318,12 @@ $searchFields['height'] = '<div class="' . $searchFieldsColumns['height'] . '"><
 
 $searchFields['submit'] = '<div class="' . $searchFieldsColumns['submit'] . '"><div class="form-group">
     <label style="display: block;">&nbsp;</label>
-    <div style="white-space: nowrap;" class=" pull-right">
+    <div style="white-space: nowrap;" class="pull-right">
         <button class="btn btn-primary" type="submit" name="rework-files-search-submit" value="1" data-toggle="tooltip" data-placement="top" title="' . $addon->i18n('bulk_rework_search_submit', '') . '">
             <i class="rex-icon rex-icon-search"></i>
         </button> 
         <button class="btn btn-delete" style="margin: 0 5px;" type="submit" name="rework-files-search-reset" value="1" data-toggle="tooltip" data-placement="top" title="' . $addon->i18n('bulk_rework_search_reset', '') . '">
-            <i class="rex-icon fa-arrow-rotate-left"></i>
+            <i class="fa-arrow-rotate-left rex-icon"></i>
         </button>
     </div>
 </div></div>';

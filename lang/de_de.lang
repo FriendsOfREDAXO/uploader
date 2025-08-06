@@ -35,6 +35,7 @@ uploader_bulk_rework_title = Stapelverarbeitung für nachträgliche Bildoptimier
 uploader_bulk_rework_current_settings = Aktuelle Einstellungen: max. Breite = <b>%spx</b> | max. Höhe = <b>%spx</b>
 uploader_bulk_rework_table_title = Bilder im Medienpool, deren Bildgröße die aktuellen Uploader-Einstellungen überschreitet
 uploader_bulk_rework_table_hits = Suchtreffer
+uploader_bulk_rework_table_num_hits_per_page = Treffer pro Seite
 uploader_bulk_rework_table_column_filesize = Größe [kB]
 uploader_bulk_rework_table_column_width = Breite [px]
 uploader_bulk_rework_table_column_height = Höhe [px]

@@ -160,6 +160,9 @@ body.rex-theme-dark {
 }
 
 .uploader-bulk-rework-wrapper {
+    .panel-title {
+        position: relative;
+    }
     section.rex-page-section {
         .panel-default {
             overflow-x: auto;
@@ -184,6 +187,29 @@ body.rex-theme-dark {
         font-weight: bold;
         padding: 5px 15px;
         margin: 7px -15px -10px;
+    }
+
+    .uploader-bulk-rework-num-hits-per-page {
+        position: absolute;
+        right: 0;
+        bottom: 15px;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin: 0;
+            gap: 15px;
+        }
+        label {
+            margin: 0;
+            font-weight: normal;
+        }
+        .form-control {
+            width: 100px;
+            border: 1px solid #{$border-grey}
+        }
     }
 
     .uploader-bulk-rework-table {
