@@ -77,7 +77,8 @@ class ApiBulkProcess extends rex_api_function
             return ['error' => 'No batch ID provided'];
         }
 
-        $result = BulkRework::processNextBatchItem($batchId);
+        // Verwende die neue parallele Verarbeitungsmethode
+        $result = BulkRework::processNextBatchItems($batchId);
         
         return $result;
     }
@@ -90,7 +91,8 @@ class ApiBulkProcess extends rex_api_function
             return ['error' => 'No batch ID provided'];
         }
 
-        $status = BulkRework::getBatchStatus($batchId);
+        // Verwende erweiterten Status für detailliertere Informationen
+        $status = BulkRework::getBatchStatusExtended($batchId);
         
         if (!$status) {
             return ['error' => 'Batch not found'];
