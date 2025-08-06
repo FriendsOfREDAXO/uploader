@@ -31,9 +31,14 @@ class BulkRework
         'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'
     ];
     
-    // Problematische Formate die nur mit ImageMagick funktionieren
-    const IMAGEMAGICK_ONLY_FORMATS = [
+    // Problematische Formate die standardmäßig übersprungen werden
+    const SKIPPED_FORMATS = [
         'tif', 'tiff', 'psd', 'svg'
+    ];
+    
+    // Formate die nur mit ImageMagick konvertiert werden können (optional)
+    const CONVERTIBLE_FORMATS = [
+        'tif', 'tiff'
     ];
     
     // Batch processing status cache key
@@ -43,27 +48,32 @@ class BulkRework
      * Prüft ob ein Bildformat verarbeitet werden kann
      *
      * @param string $filename
+     * @param bool $allowConversion Ob TIF-Konvertierung erlaubt ist
      * @return array ['canProcess' => bool, 'needsImageMagick' => bool, 'format' => string]
      */
-    public static function canProcessImage(string $filename): array
+    public static function canProcessImage(string $filename, bool $allowConversion = false): array
     {
         $extension = strtolower(rex_file::extension($filename));
         
         $result = [
             'canProcess' => false,
             'needsImageMagick' => false,
+            'needsConversion' => false,
             'format' => $extension,
             'reason' => ''
         ];
         
         if (in_array($extension, self::SUPPORTED_FORMATS)) {
             $result['canProcess'] = true;
-        } elseif (in_array($extension, self::IMAGEMAGICK_ONLY_FORMATS)) {
-            if (self::hasImageMagick()) {
+        } elseif (in_array($extension, self::SKIPPED_FORMATS)) {
+            if ($allowConversion && in_array($extension, self::CONVERTIBLE_FORMATS) && self::hasImageMagick()) {
                 $result['canProcess'] = true;
                 $result['needsImageMagick'] = true;
+                $result['needsConversion'] = true;
             } else {
-                $result['reason'] = 'Format benötigt ImageMagick';
+                $result['reason'] = $allowConversion 
+                    ? 'Format benötigt ImageMagick für Konvertierung' 
+                    : 'Format wird standardmäßig übersprungen (TIF/TIFF)';
             }
         } else {
             $result['reason'] = 'Nicht unterstütztes Format';
@@ -87,7 +97,7 @@ class BulkRework
      *
      * @return string
      */
-    private static function getConvertPath(): string
+    public static function getConvertPath(): string
     {
         $path = '';
 
@@ -119,24 +129,32 @@ class BulkRework
      * @param array $filenames
      * @param int|null $maxWidth
      * @param int|null $maxHeight
+     * @param bool $allowTifConversion
+     * @param int $parallelProcessing Anzahl parallel zu verarbeitender Dateien (1-5)
      * @return string Batch-ID
      */
-    public static function startBatchProcessing(array $filenames, ?int $maxWidth = null, ?int $maxHeight = null): string
+    public static function startBatchProcessing(array $filenames, ?int $maxWidth = null, ?int $maxHeight = null, bool $allowTifConversion = false, int $parallelProcessing = 1): string
     {
         $batchId = uniqid('batch_', true);
+        
+        // Parallel Processing auf 1-5 begrenzen
+        $parallelProcessing = max(1, min(5, $parallelProcessing));
         
         $batchData = [
             'id' => $batchId,
             'filenames' => $filenames,
             'maxWidth' => $maxWidth,
             'maxHeight' => $maxHeight,
+            'allowTifConversion' => $allowTifConversion,
+            'parallelProcessing' => $parallelProcessing,
             'total' => count($filenames),
             'processed' => 0,
             'successful' => 0,
             'errors' => [],
             'skipped' => [],
             'status' => 'running',
-            'currentFile' => null,
+            'currentFiles' => [], // Array statt einzelne Datei
+            'processingQueue' => [], // Queue für parallele Verarbeitung
             'startTime' => time()
         ];
         
@@ -192,7 +210,30 @@ class BulkRework
     }
     
     /**
-     * Verarbeitet das nächste Bild in einem Batch
+     * Bricht einen Batch-Vorgang ab (Graceful Cancellation)
+     *
+     * @param string $batchId
+     * @return bool
+     */
+    public static function cancelBatch(string $batchId): bool
+    {
+        $batchStatus = self::getBatchStatus($batchId);
+        
+        if (!$batchStatus) {
+            return false;
+        }
+        
+        // Setze Status auf "cancelling" - laufende Verarbeitungen werden beendet
+        self::updateBatchStatus($batchId, [
+            'status' => 'cancelling',
+            'cancelTime' => time()
+        ]);
+        
+        return true;
+    }
+    
+    /**
+     * Verarbeitet die nächsten Bilder in einem Batch (parallel)
      *
      * @param string $batchId
      * @return array Status-Update
@@ -201,52 +242,96 @@ class BulkRework
     {
         $batchStatus = self::getBatchStatus($batchId);
         
-        if (!$batchStatus || $batchStatus['status'] !== 'running') {
-            return ['status' => 'error', 'message' => 'Batch nicht gefunden oder bereits beendet'];
+        if (!$batchStatus) {
+            return ['status' => 'error', 'message' => 'Batch nicht gefunden'];
+        }
+        
+        // Prüfe auf Abbruch-Status
+        if ($batchStatus['status'] === 'cancelling') {
+            self::updateBatchStatus($batchId, [
+                'status' => 'cancelled',
+                'endTime' => time(),
+                'currentFiles' => []
+            ]);
+            return ['status' => 'cancelled', 'batch' => self::getBatchStatus($batchId)];
+        }
+        
+        if ($batchStatus['status'] !== 'running') {
+            return ['status' => 'error', 'message' => 'Batch bereits beendet'];
         }
         
         $processed = $batchStatus['processed'];
         $filenames = $batchStatus['filenames'];
+        $parallelProcessing = $batchStatus['parallelProcessing'] ?? 1;
         
         if ($processed >= count($filenames)) {
             self::updateBatchStatus($batchId, [
                 'status' => 'completed',
-                'endTime' => time()
+                'endTime' => time(),
+                'currentFiles' => []
             ]);
             return ['status' => 'completed', 'batch' => self::getBatchStatus($batchId)];
         }
         
-        $currentFilename = $filenames[$processed];
+        // Bestimme wie viele Dateien parallel verarbeitet werden sollen
+        $remainingFiles = count($filenames) - $processed;
+        $filesToProcess = min($parallelProcessing, $remainingFiles);
         
-        // Status für aktuell verarbeitete Datei aktualisieren (aber processed noch nicht erhöhen)
+        $currentFiles = [];
+        $results = [];
+        
+        // Sammle Dateien für parallele Verarbeitung
+        for ($i = 0; $i < $filesToProcess; $i++) {
+            $fileIndex = $processed + $i;
+            if ($fileIndex < count($filenames)) {
+                $currentFiles[] = $filenames[$fileIndex];
+            }
+        }
+        
+        // Status für aktuell verarbeitete Dateien aktualisieren
         self::updateBatchStatus($batchId, [
-            'currentFile' => $currentFilename
+            'currentFiles' => $currentFiles
         ]);
         
-        $result = self::reworkFileWithFallback(
-            $currentFilename, 
-            $batchStatus['maxWidth'], 
-            $batchStatus['maxHeight']
-        );
+        // Verarbeite alle Dateien parallel
+        $successful = 0;
+        $errors = $batchStatus['errors'];
+        $skipped = $batchStatus['skipped'];
         
-        $updates = [
-            'processed' => $processed + 1 // Jetzt erst processed erhöhen nach der Verarbeitung
-        ];
-        
-        if ($result['success']) {
-            $updates['successful'] = $batchStatus['successful'] + 1;
-        } elseif ($result['skipped']) {
-            $updates['skipped'] = array_merge($batchStatus['skipped'], [$currentFilename => $result['reason']]);
-        } else {
-            $updates['errors'] = array_merge($batchStatus['errors'], [$currentFilename => $result['error']]);
+        foreach ($currentFiles as $currentFilename) {
+            $result = self::reworkFileWithFallback(
+                $currentFilename, 
+                $batchStatus['maxWidth'], 
+                $batchStatus['maxHeight'],
+                $batchStatus['allowTifConversion'] ?? false
+            );
+            
+            $results[] = $result;
+            
+            if ($result['success']) {
+                $successful++;
+            } elseif ($result['skipped']) {
+                $skipped[$currentFilename] = $result['reason'];
+            } else {
+                $errors[$currentFilename] = $result['error'];
+            }
         }
+        
+        // Batch-Status aktualisieren
+        $updates = [
+            'processed' => $processed + $filesToProcess,
+            'successful' => $batchStatus['successful'] + $successful,
+            'errors' => $errors,
+            'skipped' => $skipped
+        ];
         
         self::updateBatchStatus($batchId, $updates);
         
         return [
             'status' => 'processing',
             'batch' => self::getBatchStatus($batchId),
-            'result' => $result
+            'results' => $results,
+            'processedCount' => $filesToProcess
         ];
     }
     
@@ -256,13 +341,14 @@ class BulkRework
      * @param string $filename
      * @param int|null $maxWidth
      * @param int|null $maxHeight
+     * @param bool $allowConversion Ob TIF-Konvertierung erlaubt ist
      * @return array
      */
-    public static function reworkFileWithFallback(string $filename, ?int $maxWidth = null, ?int $maxHeight = null): array
+    public static function reworkFileWithFallback(string $filename, ?int $maxWidth = null, ?int $maxHeight = null, bool $allowConversion = false): array
     {
         try {
             // Prüfe ob Datei verarbeitet werden kann
-            $canProcess = self::canProcessImage($filename);
+            $canProcess = self::canProcessImage($filename, $allowConversion);
             
             if (!$canProcess['canProcess']) {
                 return [
@@ -275,14 +361,14 @@ class BulkRework
             
             // Versuche Verarbeitung mit bevorzugter Methode
             if ($canProcess['needsImageMagick'] && self::hasImageMagick()) {
-                $result = self::reworkFileWithImageMagick($filename, $maxWidth, $maxHeight);
+                $result = self::reworkFileWithImageMagick($filename, $maxWidth, $maxHeight, $canProcess['needsConversion']);
                 if ($result) {
                     return ['success' => true, 'skipped' => false, 'method' => 'ImageMagick', 'filename' => $filename];
                 }
             }
             
-            // Fallback zu Media Manager (GD)
-            if (self::hasGD()) {
+            // Fallback zu Media Manager (GD) - aber nicht für Konvertierungsformate
+            if (self::hasGD() && !$canProcess['needsConversion']) {
                 $result = self::reworkFile($filename, $maxWidth, $maxHeight);
                 if ($result) {
                     return ['success' => true, 'skipped' => false, 'method' => 'GD/MediaManager', 'filename' => $filename];
@@ -313,9 +399,10 @@ class BulkRework
      * @param string $filename
      * @param int|null $maxWidth
      * @param int|null $maxHeight
+     * @param bool $convertFormat Ob das Format konvertiert werden soll (TIF->JPEG)
      * @return bool
      */
-    public static function reworkFileWithImageMagick(string $filename, ?int $maxWidth = null, ?int $maxHeight = null): bool
+    public static function reworkFileWithImageMagick(string $filename, ?int $maxWidth = null, ?int $maxHeight = null, bool $convertFormat = false): bool
     {
         if (!self::hasImageMagick()) {
             return false;
@@ -349,9 +436,9 @@ class BulkRework
         
         try {
             if (class_exists('Imagick')) {
-                return self::processWithImagickExtension($filename, $maxWidth, $maxHeight, $imagePath);
+                return self::processWithImagickExtension($filename, $maxWidth, $maxHeight, $imagePath, $convertFormat);
             } else {
-                return self::processWithImageMagickBinary($filename, $maxWidth, $maxHeight, $imagePath);
+                return self::processWithImageMagickBinary($filename, $maxWidth, $maxHeight, $imagePath, $convertFormat);
             }
         } catch (Exception $e) {
             rex_logger::logException($e);
@@ -362,7 +449,7 @@ class BulkRework
     /**
      * Verarbeitung mit Imagick PHP Extension
      */
-    private static function processWithImagickExtension(string $filename, int $maxWidth, int $maxHeight, string $imagePath): bool
+    private static function processWithImagickExtension(string $filename, int $maxWidth, int $maxHeight, string $imagePath, bool $convertFormat = false): bool
     {
         if (!class_exists('Imagick')) {
             return false;
@@ -370,29 +457,68 @@ class BulkRework
         
         try {
             $imagick = new \Imagick($imagePath);
+            $extension = strtolower(rex_file::extension($filename));
             
-            // Auto-orientierung
-            $imagick->autoOrientImage();
-            
-            // Größe anpassen
-            $imagick->resizeImage($maxWidth, $maxHeight, \Imagick::FILTER_LANCZOS, 1, true);
-            
-            // Kompression für JPEG
-            if ($imagick->getImageFormat() === 'JPEG') {
-                $imagick->setImageCompressionQuality(85);
-            }
-            
-            // Datei speichern
-            $imagick->writeImage($imagePath);
-            
-            // Datenbankupdate
-            $newSize = $imagick->getImageGeometry();
-            $fileSize = filesize($imagePath);
+            // Konvertierung nur wenn explizit erlaubt
+            if ($convertFormat && in_array($extension, ['tif', 'tiff'])) {
+                // TIF zu JPEG konvertieren
+                $imagick->setImageFormat('JPEG');
+                $imagick->setImageCompressionQuality(90);
+                
+                // Neuen Dateinamen mit .jpg Extension erstellen
+                $newFilename = rex_file::nameOutput($filename, 'jpg');
+                $newImagePath = rex_path::media($newFilename);
+                
+                // Auto-orientierung und Größe anpassen
+                $imagick->autoOrientImage();
+                $imagick->resizeImage($maxWidth, $maxHeight, \Imagick::FILTER_LANCZOS, 1, true);
+                
+                // Als JPEG speichern
+                $imagick->writeImage($newImagePath);
+                
+                // Originaldatei löschen
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+                
+                // Datenbankupdate mit neuem Dateinamen
+                $newSize = $imagick->getImageGeometry();
+                $fileSize = filesize($newImagePath);
+                
+                $sql = rex_sql::factory();
+                $sql->setTable(rex::getTablePrefix() . 'media');
+                $sql->setWhere(['filename' => $filename]);
+                $sql->setValue('filename', $newFilename);
+                $sql->setValue('filetype', 'image/jpeg');
+                $sql->setValue('filesize', $fileSize);
+                $sql->setValue('width', $newSize['width']);
+                $sql->setValue('height', $newSize['height']);
+                $sql->update();
+                
+                rex_media_cache::delete($filename);
+                rex_media_cache::delete($newFilename);
+                
+            } else {
+                // Normale Verarbeitung ohne Formatwechsel
+                $imagick->autoOrientImage();
+                $imagick->resizeImage($maxWidth, $maxHeight, \Imagick::FILTER_LANCZOS, 1, true);
+                
+                // Kompression für JPEG
+                if ($imagick->getImageFormat() === 'JPEG') {
+                    $imagick->setImageCompressionQuality(85);
+                }
+                
+                // Datei speichern
+                $imagick->writeImage($imagePath);
+                
+                // Datenbankupdate
+                $newSize = $imagick->getImageGeometry();
+                $fileSize = filesize($imagePath);
 
-            self::updateMediaAndDeleteCache($filename, $fileSize, $newSize['width'], $newSize['height']);
+                self::updateMediaAndDeleteCache($filename, $fileSize, $newSize['width'], $newSize['height']);
+            }
 
             $imagick->clear();
-            
             return true;
             
         } catch (Exception $e) {
@@ -404,41 +530,114 @@ class BulkRework
     /**
      * Verarbeitung mit ImageMagick Binary
      */
-    private static function processWithImageMagickBinary(string $filename, int $maxWidth, int $maxHeight, string $imagePath): bool
+    private static function processWithImageMagickBinary(string $filename, int $maxWidth, int $maxHeight, string $imagePath, bool $convertFormat = false): bool
     {
+        $convertPath = self::getConvertPath();
+        if (empty($convertPath)) {
+            return false;
+        }
+        
+        $extension = strtolower(rex_file::extension($filename));
         $tempPath = $imagePath . '.tmp';
-        $convertCmd = sprintf(
-            'convert %s -auto-orient -resize %dx%d> -quality 85 %s',
-            escapeshellarg($imagePath),
-            $maxWidth,
-            $maxHeight,
-            escapeshellarg($tempPath)
-        );
         
-        exec($convertCmd . ' 2>&1', $output, $returnVar);
-        
-        if ($returnVar !== 0 || !file_exists($tempPath)) {
+        try {
+            if ($convertFormat && in_array($extension, ['tif', 'tiff'])) {
+                // TIF zu JPEG konvertieren
+                $newFilename = rex_file::nameOutput($filename, 'jpg');
+                $newImagePath = rex_path::media($newFilename);
+                
+                $convertCmd = sprintf(
+                    '%s %s -auto-orient -resize %dx%d> -quality 90 -format JPEG %s',
+                    escapeshellarg($convertPath),
+                    escapeshellarg($imagePath),
+                    $maxWidth,
+                    $maxHeight,
+                    escapeshellarg($tempPath)
+                );
+                
+                $output = [];
+                $returnVar = 0;
+                exec($convertCmd . ' 2>&1', $output, $returnVar);
+                
+                if ($returnVar !== 0 || !file_exists($tempPath)) {
+                    if (file_exists($tempPath)) {
+                        unlink($tempPath);
+                    }
+                    return false;
+                }
+                
+                // Ersetze Original mit konvertierter Datei
+                if (!rename($tempPath, $newImagePath)) {
+                    unlink($tempPath);
+                    return false;
+                }
+                
+                // Originaldatei löschen
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+                
+                // Update DB record to new filename and format
+                $newImageSizes = getimagesize($newImagePath);
+                $fileSize = filesize($newImagePath);
+                
+                $sql = rex_sql::factory();
+                $sql->setTable(rex::getTablePrefix() . 'media');
+                $sql->setWhere(['filename' => $filename]);
+                $sql->setValue('filename', $newFilename);
+                $sql->setValue('filetype', 'image/jpeg');
+                $sql->setValue('filesize', $fileSize);
+                $sql->setValue('width', $newImageSizes[0]);
+                $sql->setValue('height', $newImageSizes[1]);
+                $sql->update();
+                
+                rex_media_cache::delete($filename);
+                rex_media_cache::delete($newFilename);
+                
+            } else {
+                // Normale Verarbeitung ohne Formatwechsel
+                $convertCmd = sprintf(
+                    '%s %s -auto-orient -resize %dx%d> -quality 85 %s',
+                    escapeshellarg($convertPath),
+                    escapeshellarg($imagePath),
+                    $maxWidth,
+                    $maxHeight,
+                    escapeshellarg($tempPath)
+                );
+                
+                $output = [];
+                $returnVar = 0;
+                exec($convertCmd . ' 2>&1', $output, $returnVar);
+                
+                if ($returnVar !== 0 || !file_exists($tempPath)) {
+                    if (file_exists($tempPath)) {
+                        unlink($tempPath);
+                    }
+                    return false;
+                }
+                
+                // Ersetze Original
+                if (!rename($tempPath, $imagePath)) {
+                    unlink($tempPath);
+                    return false;
+                }
+                
+                // Update Datenbank
+                $newImageSizes = getimagesize($imagePath);
+                $fileSize = filesize($imagePath);
+                
+                self::updateMediaAndDeleteCache($filename, $fileSize, $newImageSizes[0], $newImageSizes[1]);
+            }
+            
+            return true;
+            
+        } catch (Exception $e) {
             if (file_exists($tempPath)) {
                 unlink($tempPath);
             }
+            rex_logger::logException($e);
             return false;
         }
-        
-        // Ersetze Original
-        if (!rename($tempPath, $imagePath)) {
-            unlink($tempPath);
-            return false;
-        }
-        
-        // Update Datenbank
-        $newImageSizes = getimagesize($imagePath);
-        $fileSize = filesize($imagePath);
-        
-        self::updateMediaAndDeleteCache($filename, $fileSize, $newImageSizes[0], $newImageSizes[1]);
-        
-        rex_media_cache::delete($filename);
-        
-        return true;
     }
     
     /**

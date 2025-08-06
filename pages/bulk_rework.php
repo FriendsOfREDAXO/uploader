@@ -239,6 +239,35 @@ $listContent = $list->get();
 
 // buttons
 $formElements = $n = [];
+
+// Parallele Verarbeitung Auswahl
+$n['field'] = '<div class="form-group" style="margin-bottom: 10px;">
+    <label for="parallel-processing">' . $addon->i18n('bulk_rework_parallel_processing', 'Parallele Verarbeitung') . '</label>
+    <select class="form-control" name="parallel-processing" id="parallel-processing" style="width: auto; display: inline-block;">
+        <option value="1">1 ' . $addon->i18n('bulk_rework_file_at_once', 'Datei gleichzeitig') . '</option>
+        <option value="2">2 ' . $addon->i18n('bulk_rework_files_at_once', 'Dateien gleichzeitig') . '</option>
+        <option value="3" selected>3 ' . $addon->i18n('bulk_rework_files_at_once', 'Dateien gleichzeitig') . ' (' . $addon->i18n('bulk_rework_recommended', 'empfohlen') . ')</option>
+        <option value="4">4 ' . $addon->i18n('bulk_rework_files_at_once', 'Dateien gleichzeitig') . '</option>
+        <option value="5">5 ' . $addon->i18n('bulk_rework_files_at_once', 'Dateien gleichzeitig') . '</option>
+    </select>
+    <small class="help-block">' . $addon->i18n('bulk_rework_parallel_help', 'Mehr parallele Verarbeitung = schneller, aber höhere Serverlast') . '</small>
+</div>';
+$formElements[] = $n;
+$n = [];
+
+// TIF-Konvertierungs-Checkbox
+if (BulkRework::hasImageMagick()) {
+    $n['field'] = '<div class="form-group" style="margin-bottom: 10px;">
+        <label class="control-label">
+            <input type="checkbox" name="allow-tif-conversion" id="allow-tif-conversion" value="1"> 
+            ' . $addon->i18n('bulk_rework_allow_tif_conversion', 'TIF/TIFF-Dateien zu JPEG konvertieren (experimentell)') . '
+            <small class="help-block">' . $addon->i18n('bulk_rework_tif_conversion_help', 'TIF-Dateien werden automatisch zu JPEG konvertiert und verkleinert') . '</small>
+        </label>
+    </div>';
+    $formElements[] = $n;
+    $n = [];
+}
+
 $n['field'] = $submitButton = '<button class="pull-right btn btn-save" type="submit" name="rework-files-submit" value="1">' .
                                     sprintf($addon->i18n('bulk_rework_submit'), '<span class="number">0</span>') .
                               '</button>';

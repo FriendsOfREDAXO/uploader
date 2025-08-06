@@ -30,6 +30,9 @@ class ApiBulkProcess extends rex_api_function
             case 'process':
                 $this->sendJsonResponse(true, $this->processNext());
                 break;
+            case 'cancel':
+                $this->sendJsonResponse(true, $this->cancelBatch());
+                break;
             case 'status':
                 $this->sendJsonResponse(true, $this->getStatus());
                 break;
@@ -53,6 +56,8 @@ class ApiBulkProcess extends rex_api_function
         $filenames = rex_request('filenames', 'array', []);
         $maxWidth = rex_request('maxWidth', 'int', null);
         $maxHeight = rex_request('maxHeight', 'int', null);
+        $allowTifConversion = rex_request('allowTifConversion', 'bool', false);
+        $parallelProcessing = rex_request('parallelProcessing', 'int', 3); // Standard: 3 parallel
 
         if (empty($filenames)) {
             return ['error' => 'No files provided'];
@@ -61,7 +66,7 @@ class ApiBulkProcess extends rex_api_function
         // Bereinige alte Batches
         BulkRework::cleanupOldBatches();
 
-        $batchId = BulkRework::startBatchProcessing($filenames, $maxWidth, $maxHeight);
+        $batchId = BulkRework::startBatchProcessing($filenames, $maxWidth, $maxHeight, $allowTifConversion, $parallelProcessing);
         
         return [
             'batchId' => $batchId,
@@ -80,6 +85,26 @@ class ApiBulkProcess extends rex_api_function
         $result = BulkRework::processNextBatchItem($batchId);
         
         return $result;
+    }
+
+    private function cancelBatch()
+    {
+        $batchId = rex_request('batchId', 'string');
+        
+        if (!$batchId) {
+            return ['error' => 'No batch ID provided'];
+        }
+
+        $success = BulkRework::cancelBatch($batchId);
+        
+        if (!$success) {
+            return ['error' => 'Batch not found or already completed'];
+        }
+
+        return [
+            'cancelled' => true,
+            'status' => BulkRework::getBatchStatus($batchId)
+        ];
     }
 
     private function getStatus()
