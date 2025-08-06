@@ -113,6 +113,9 @@ $(document).on('rex:ready', function (event, element) {
                                     <span class="sr-only">0% Complete</span>
                                 </div>
                             </div>
+                            <div id="parallel-progress-bars" style="margin-bottom: 15px; display: none;">
+                                <!-- Parallele Progress-Balken werden hier eingefügt -->
+                            </div>
                             <div class="batch-status">
                                 <div><strong>Status:</strong> <span id="batch-status-text">Wird gestartet...</span></div>
                                 <div><strong>Fortschritt:</strong> <span id="batch-progress-text">0 von 0</span></div>
@@ -156,8 +159,17 @@ $(document).on('rex:ready', function (event, element) {
         $('#batch-skipped-count').text(Object.keys(batchStatus.skipped || {}).length);
         $('#batch-error-count').text(Object.keys(batchStatus.errors || {}).length);
         
-        // Zeige aktuell verarbeitete Dateien (parallel)
+        // Parallele Progress-Balken verwalten
         let currentFiles = batchStatus.currentFiles || [];
+        let parallelCount = batchStatus.parallelProcessing || 1;
+        
+        if (parallelCount > 1 && batchStatus.status === 'running' && currentFiles.length > 0) {
+            updateParallelProgressBars(currentFiles, parallelCount);
+        } else {
+            $('#parallel-progress-bars').hide();
+        }
+        
+        // Zeige aktuell verarbeitete Dateien (parallel)
         if (currentFiles.length > 0) {
             let filesList = currentFiles.length > 3 
                 ? currentFiles.slice(0, 3).join(', ') + ' und ' + (currentFiles.length - 3) + ' weitere...'
@@ -168,7 +180,6 @@ $(document).on('rex:ready', function (event, element) {
         }
         
         // Zeige Parallelverarbeitungsinfo
-        let parallelCount = batchStatus.parallelProcessing || 1;
         if (parallelCount > 1 && batchStatus.status === 'running') {
             $('#batch-status-text').text(`Läuft... (${parallelCount} parallel)`);
         } else if (batchStatus.status === 'completed') {
@@ -176,6 +187,7 @@ $(document).on('rex:ready', function (event, element) {
             $('.progress-bar').removeClass('active');
             $('#cancel-batch').hide();
             $('#close-modal').show();
+            $('#parallel-progress-bars').hide();
             
             // Zeige Zusammenfassung
             let summary = `
@@ -197,11 +209,13 @@ $(document).on('rex:ready', function (event, element) {
             $('#batch-status-text').text('Wird abgebrochen... (laufende Verarbeitungen werden beendet)');
             $('.progress-bar').addClass('progress-bar-warning').removeClass('progress-bar-striped active');
             $('#cancel-batch').prop('disabled', true).text('Wird abgebrochen...');
+            $('#parallel-progress-bars').hide();
         } else if (batchStatus.status === 'cancelled') {
             $('#batch-status-text').text('Abgebrochen');
             $('.progress-bar').addClass('progress-bar-warning').removeClass('progress-bar-striped active');
             $('#cancel-batch').hide();
             $('#close-modal').show();
+            $('#parallel-progress-bars').hide();
             
             // Zeige Abbruch-Zusammenfassung
             let summary = `
@@ -216,6 +230,35 @@ $(document).on('rex:ready', function (event, element) {
             $('#batch-details').html(summary);
         } else if (batchStatus.status === 'running') {
             $('#batch-status-text').text('Läuft...');
+        }
+    }
+
+    function updateParallelProgressBars(currentFiles, parallelCount) {
+        let container = $('#parallel-progress-bars');
+        container.empty().show();
+        
+        // Titel hinzufügen
+        container.append('<div class="small text-muted" style="margin-bottom: 5px;"><strong>Parallele Verarbeitung:</strong></div>');
+        
+        for (let i = 0; i < parallelCount; i++) {
+            let fileName = currentFiles[i] || '';
+            let isActive = i < currentFiles.length;
+            let barClass = isActive ? 'progress-bar-info progress-bar-striped active' : 'progress-bar-default';
+            
+            let progressBar = `
+                <div class="parallel-progress-item" style="margin-bottom: 5px;">
+                    <div class="small" style="margin-bottom: 2px;">
+                        <strong>Slot ${i + 1}:</strong> 
+                        <span class="parallel-file-name">${fileName || '<i>wartend...</i>'}</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar ${barClass}" role="progressbar" 
+                             style="width: ${isActive ? '100%' : '0%'}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.append(progressBar);
         }
     }
 
@@ -286,6 +329,9 @@ $(document).on('rex:ready', function (event, element) {
                             this.running = false;
                         } else if (this.status.status === 'cancelled') {
                             this.running = false;
+                        } else if (this.status.status === 'cancelling') {
+                            this.running = false;
+                            // Status wird durch updateProgressModal behandelt
                         } else if (response.data.status === 'processing') {
                             // Weiter verarbeiten nach kurzer Pause
                             this.processInterval = setTimeout(() => {
