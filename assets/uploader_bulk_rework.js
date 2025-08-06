@@ -100,72 +100,74 @@ $(document).on('rex:ready', function (event, element) {
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
-                            <h4 class="modal-title"><i class="fa fa-cogs"></i> Bilder werden verarbeitet...</h4>
+                            <h4 class="modal-title"><i class="fa fa-cogs"></i> Bilder werden verarbeitet</h4>
                         </div>
-                        <div class="modal-body" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
-                            <!-- Main Progress Bar -->
-                            <div class="progress" style="margin-bottom: 20px; height: 25px; border-radius: 12px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                        <div class="modal-body" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 30px;">
+                            
+                            <!-- Hauptfortschrittsbalken -->
+                            <div class="progress" style="height: 30px; margin-bottom: 25px; border-radius: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;">
                                 <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     style="background: linear-gradient(45deg, #667eea 0%, #764ba2 100%); 
+                                            font-size: 16px; 
+                                            font-weight: bold; 
+                                            line-height: 30px;
+                                            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+                                            transition: width 0.6s ease;" 
                                      role="progressbar" 
-                                     style="background: linear-gradient(45deg, #667eea 0%, #764ba2 100%); transition: width 0.6s ease;" 
                                      aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                    <span class="progress-text" style="font-weight: bold; line-height: 25px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);"></span>
+                                    <span class="progress-text">0%</span>
                                 </div>
                             </div>
                             
-                            <!-- Status Cards -->
-                            <div class="row" style="margin-bottom: 20px;">
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="status-card" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #28a745;">
-                                        <div class="status-value" style="font-size: 24px; font-weight: bold; color: #28a745;" id="batch-success-count">0</div>
-                                        <div style="color: #666; font-size: 12px;">ERFOLGREICH</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="status-card" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #ffc107;">
-                                        <div class="status-value" style="font-size: 24px; font-weight: bold; color: #ffc107;" id="batch-skipped-count">0</div>
-                                        <div style="color: #666; font-size: 12px;">ÜBERSPRUNGEN</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="status-card" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #dc3545;">
-                                        <div class="status-value" style="font-size: 24px; font-weight: bold; color: #dc3545;" id="batch-error-count">0</div>
-                                        <div style="color: #666; font-size: 12px;">FEHLER</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="status-card" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #17a2b8;">
-                                        <div class="status-value" style="font-size: 24px; font-weight: bold; color: #17a2b8;" id="active-processes-count">0</div>
-                                        <div style="color: #666; font-size: 12px;">AKTIV</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Processing Details -->
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="processing-panel" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                                        <h5 style="margin: 0 0 10px 0; color: #495057;"><i class="fa fa-tasks"></i> Aktuell verarbeitet</h5>
-                                        <div id="current-files-list" style="min-height: 60px;">
-                                            <div class="text-muted text-center" style="padding: 20px;"><i class="fa fa-hourglass-start"></i> Bereit zum Start...</div>
+                            <!-- Status Info -->
+                            <div class="row" style="margin-bottom: 25px;">
+                                <div class="col-md-6">
+                                    <div style="background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                        <h5 style="margin: 0 0 15px 0; color: #495057;"><i class="fa fa-list"></i> Fortschritt</h5>
+                                        <div style="font-size: 18px; margin-bottom: 10px;">
+                                            <span id="batch-progress-text" style="font-weight: bold; color: #667eea;">0 von 0</span> Dateien
+                                        </div>
+                                        <div style="font-size: 14px; color: #666;">
+                                            Status: <span id="batch-status-text" class="badge badge-primary">Wird gestartet...</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="info-panel" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                                        <h5 style="margin: 0 0 10px 0; color: #495057;"><i class="fa fa-info-circle"></i> Status</h5>
-                                        <div style="font-size: 14px; line-height: 1.6;">
-                                            <div><strong>Status:</strong> <span id="batch-status-text" class="badge badge-info">Wird gestartet...</span></div>
-                                            <div style="margin-top: 8px;"><strong>Fortschritt:</strong> <span id="batch-progress-text">0 von 0</span></div>
-                                            <div style="margin-top: 8px;"><strong>Warteschlange:</strong> <span id="queue-length">0</span></div>
-                                            <div id="remaining-time-info" style="margin-top: 10px; font-size: 13px; color: #666;"></div>
+                                <div class="col-md-6">
+                                    <div style="background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                        <h5 style="margin: 0 0 15px 0; color: #495057;"><i class="fa fa-file-image-o"></i> Aktuell</h5>
+                                        <div id="current-file-display" style="font-size: 14px; word-break: break-word; min-height: 40px; display: flex; align-items: center;">
+                                            <div class="text-muted"><i class="fa fa-hourglass-start"></i> Bereit zum Start...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Ergebnisse (nur anzeigen wenn es welche gibt) -->
+                            <div id="results-section" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div style="background: #d4edda; border-radius: 8px; padding: 15px; text-align: center; border: 1px solid #c3e6cb;">
+                                            <div style="font-size: 24px; font-weight: bold; color: #155724;" id="successful-count">0</div>
+                                            <div style="font-size: 12px; color: #155724;">ERFOLGREICH</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div style="background: #fff3cd; border-radius: 8px; padding: 15px; text-align: center; border: 1px solid #ffeaa7;">
+                                            <div style="font-size: 24px; font-weight: bold; color: #856404;" id="skipped-count">0</div>
+                                            <div style="font-size: 12px; color: #856404;">ÜBERSPRUNGEN</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div style="background: #f8d7da; border-radius: 8px; padding: 15px; text-align: center; border: 1px solid #f5c6cb;">
+                                            <div style="font-size: 24px; font-weight: bold; color: #721c24;" id="error-count">0</div>
+                                            <div style="font-size: 12px; color: #721c24;">FEHLER</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
                             <div id="batch-details" style="margin-top: 20px;">
-                                <!-- Batch details will be shown here -->
+                                <!-- Details werden hier angezeigt -->
                             </div>
                         </div>
                         <div class="modal-footer" style="background: #f8f9fa;">

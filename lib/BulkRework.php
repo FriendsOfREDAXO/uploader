@@ -193,7 +193,7 @@ class BulkRework
     }
     
     /**
-     * Holt erweiterten Status eines Batch-Vorgangs mit zusätzlichen Informationen für die UI
+     * Holt erweiterten Status eines Batch-Vorgangs mit zusätzlichen Informationen für die UI (vereinfacht)
      *
      * @param string $batchId
      * @return array|null
@@ -206,11 +206,20 @@ class BulkRework
             return null;
         }
         
+        // Sicherstellen, dass alle benötigten Felder existieren
+        $status['processed'] = $status['processed'] ?? 0;
+        $status['total'] = $status['total'] ?? 0;
+        $status['successful'] = $status['successful'] ?? 0;
+        $status['errors'] = $status['errors'] ?? [];
+        $status['skipped'] = $status['skipped'] ?? [];
+        $status['currentFiles'] = $status['currentFiles'] ?? [];
+        $status['processQueue'] = $status['processQueue'] ?? [];
+        
         // Berechne Fortschritt
         $progress = $status['total'] > 0 ? round(($status['processed'] / $status['total']) * 100, 1) : 0;
         
         // Berechne geschätzte verbleibende Zeit
-        $elapsed = time() - $status['startTime'];
+        $elapsed = time() - ($status['startTime'] ?? time());
         $remainingTime = null;
         
         if ($status['processed'] > 0 && $elapsed > 0) {
@@ -219,30 +228,18 @@ class BulkRework
             $remainingTime = round($avgTimePerFile * $remaining);
         }
         
-        // Aktuell verarbeitete Dateien - prüfe ob currentFiles existiert
+        // Aktuell verarbeitete Dateien - vereinfacht für bessere Stabilität
         $currentlyProcessing = [];
-        if (isset($status['currentFiles']) && is_array($status['currentFiles'])) {
+        if (!empty($status['currentFiles']) && is_array($status['currentFiles'])) {
             foreach ($status['currentFiles'] as $process) {
-                if (isset($process['filename']) && isset($process['startTime'])) {
+                if (is_array($process) && isset($process['filename'])) {
                     $currentlyProcessing[] = [
                         'filename' => $process['filename'],
-                        'duration' => round(microtime(true) - $process['startTime'], 1)
+                        'duration' => isset($process['startTime']) ? 
+                            round(microtime(true) - $process['startTime'], 1) : 0
                     ];
                 }
             }
-        }
-        
-        // Debug: Logge den Status für Debugging
-        if (function_exists('rex_logger')) {
-            rex_logger::factory()->log('debug', 'Batch Status Extended Debug', [
-                'batchId' => $batchId,
-                'processed' => $status['processed'],
-                'total' => $status['total'],
-                'progress' => $progress,
-                'currentFiles' => count($status['currentFiles'] ?? []),
-                'processQueue' => count($status['processQueue'] ?? []),
-                'currentlyProcessing' => count($currentlyProcessing)
-            ]);
         }
         
         return array_merge($status, [
@@ -250,8 +247,8 @@ class BulkRework
             'remainingTime' => $remainingTime,
             'elapsedTime' => $elapsed,
             'currentlyProcessing' => $currentlyProcessing,
-            'queueLength' => count($status['processQueue'] ?? []),
-            'activeProcesses' => count($status['currentFiles'] ?? [])
+            'queueLength' => count($status['processQueue']),
+            'activeProcesses' => count($status['currentFiles'])
         ]);
     }
     
@@ -280,7 +277,7 @@ class BulkRework
     }
     
     /**
-     * Verarbeitet die nächsten Bilder in einem Batch (simuliert parallele Verarbeitung für bessere UX)
+     * Verarbeitet die nächsten Bilder in einem Batch (vereinfacht für bessere Stabilität)
      *
      * @param string $batchId
      * @return array Status-Update
@@ -305,70 +302,66 @@ class BulkRework
             return ['status' => 'completed', 'batch' => self::getBatchStatusExtended($batchId)];
         }
         
-        // Nimm bis zu maxParallel Dateien zur Verarbeitung
-        $maxParallel = self::getMaxParallelProcesses();
-        $filesToProcess = array_slice($processQueue, 0, $maxParallel);
-        $remainingQueue = array_slice($processQueue, $maxParallel);
+        // Nimm nur EINE Datei zur Verarbeitung (einfacher und stabiler)
+        $filename = array_shift($processQueue);
+        $remainingQueue = $processQueue;
         
-        // Simuliere "parallele" Verarbeitung durch Setzen der currentFiles
-        $currentFiles = [];
-        foreach ($filesToProcess as $index => $filename) {
-            $processId = uniqid('process_', true);
-            $currentFiles[$processId] = [
-                'filename' => $filename,
-                'startTime' => microtime(true),
-                'status' => 'processing'
-            ];
-        }
+        // Setze aktuelle Datei für Frontend
+        $currentFiles = [[
+            'filename' => $filename,
+            'startTime' => microtime(true),
+            'status' => 'processing'
+        ]];
         
-        // Aktualisiere Status mit aktuell verarbeiteten Dateien für Frontend
+        // Aktualisiere Status sofort für Frontend-Feedback
         self::updateBatchStatus($batchId, [
             'processQueue' => $remainingQueue,
             'currentFiles' => $currentFiles
         ]);
         
-        // Gib sofort Status zurück, damit Frontend die "parallel" verarbeiteten Dateien sieht
-        $currentBatchStatus = self::getBatchStatusExtended($batchId);
+        // Verarbeite die Datei
+        $result = self::reworkFileWithFallback(
+            $filename, 
+            $batchStatus['maxWidth'], 
+            $batchStatus['maxHeight']
+        );
         
-        // Jetzt verarbeite die Dateien tatsächlich
-        $results = [];
-        foreach ($filesToProcess as $filename) {
-            $result = self::reworkFileWithFallback(
-                $filename, 
-                $batchStatus['maxWidth'], 
-                $batchStatus['maxHeight']
-            );
-            $results[] = $result;
+        // Debug-Ausgabe
+        if (function_exists('rex_logger')) {
+            rex_logger::factory()->log('debug', 'File processing result', [
+                'filename' => $filename,
+                'result' => $result
+            ]);
         }
         
         // Aktualisiere finale Statistiken
         $updates = [
             'processQueue' => $remainingQueue,
             'currentFiles' => [], // Verarbeitung abgeschlossen
-            'processed' => $batchStatus['processed'] + count($results)
+            'processed' => $batchStatus['processed'] + 1
         ];
         
-        foreach ($results as $result) {
-            if ($result['success']) {
-                $updates['successful'] = ($batchStatus['successful'] ?? 0) + 1;
-            } elseif ($result['skipped']) {
-                $updates['skipped'] = array_merge(
-                    $batchStatus['skipped'] ?? [], 
-                    [$result['filename'] => $result['reason']]
-                );
-            } else {
-                $updates['errors'] = array_merge(
-                    $batchStatus['errors'] ?? [], 
-                    [$result['filename'] => $result['error'] ?? 'Unbekannter Fehler']
-                );
-            }
+        if ($result['success']) {
+            $updates['successful'] = ($batchStatus['successful'] ?? 0) + 1;
+        } elseif ($result['skipped']) {
+            // Überspringe Dateien ohne Fehler zu melden
+            $updates['skipped'] = array_merge(
+                $batchStatus['skipped'] ?? [], 
+                [$filename => $result['reason']]
+            );
+        } else {
+            // Fehler loggen aber weiterverarbeiten
+            $updates['errors'] = array_merge(
+                $batchStatus['errors'] ?? [], 
+                [$filename => $result['error'] ?? 'Unbekannter Fehler']
+            );
         }
         
         self::updateBatchStatus($batchId, $updates);
         
         // Prüfe erneut ob fertig nach der Verarbeitung
         $finalStatus = self::getBatchStatusExtended($batchId);
-        if (empty($finalStatus['processQueue']) && empty($finalStatus['currentFiles'])) {
+        if (empty($finalStatus['processQueue'])) {
             self::updateBatchStatus($batchId, [
                 'status' => 'completed',
                 'endTime' => time()
@@ -380,8 +373,8 @@ class BulkRework
         return [
             'status' => 'processing',
             'batch' => $finalStatus,
-            'results' => $results,
-            'processedInThisStep' => count($results)
+            'result' => $result,
+            'processedFile' => $filename
         ];
     }
     
