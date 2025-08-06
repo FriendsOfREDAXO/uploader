@@ -248,60 +248,40 @@ class BulkRework
         
         // Prüfe auf Abbruch-Status
         if ($batchStatus['status'] === 'cancelling') {
-            // Wenn alle aktuellen Dateien verarbeitet wurden, kann abgebrochen werden
-            if (empty($batchStatus['currentFiles']) || $batchStatus['processed'] >= count($batchStatus['filenames'])) {
-                self::updateBatchStatus($batchId, [
-                    'status' => 'cancelled',
-                    'endTime' => time(),
-                    'currentFiles' => []
-                ]);
-                return ['status' => 'cancelled', 'batch' => self::getBatchStatus($batchId)];
-            } else {
-                // Laufende Verarbeitungen noch nicht abgeschlossen
-                // Fortsetzung der Verarbeitung der aktuellen Dateien, aber keine neuen starten
-                $remainingFiles = array_slice($batchStatus['filenames'], $batchStatus['processed']);
-                $filesToProcess = min(count($batchStatus['currentFiles']), count($remainingFiles));
-                
-                if ($filesToProcess === 0) {
-                    // Keine Dateien mehr zu verarbeiten
-                    self::updateBatchStatus($batchId, [
-                        'status' => 'cancelled',
-                        'endTime' => time(),
-                        'currentFiles' => []
-                    ]);
-                    return ['status' => 'cancelled', 'batch' => self::getBatchStatus($batchId)];
-                }
-                
-                // Verarbeite die aktuellen Dateien zu Ende
-                $currentFiles = array_slice($remainingFiles, 0, $filesToProcess);
-            }
-        } else {
-            // Normale Verarbeitung - sammle neue Dateien
-            $processed = $batchStatus['processed'];
-            $filenames = $batchStatus['filenames'];
-            $parallelProcessing = $batchStatus['parallelProcessing'] ?? 1;
-            
-            if ($processed >= count($filenames)) {
-                self::updateBatchStatus($batchId, [
-                    'status' => 'completed',
-                    'endTime' => time(),
-                    'currentFiles' => []
-                ]);
-                return ['status' => 'completed', 'batch' => self::getBatchStatus($batchId)];
-            }
-            
-            // Bestimme wie viele Dateien parallel verarbeitet werden sollen
-            $remainingFiles = count($filenames) - $processed;
-            $filesToProcess = min($parallelProcessing, $remainingFiles);
-            
-            $currentFiles = [];
-            
-            // Sammle Dateien für parallele Verarbeitung
-            for ($i = 0; $i < $filesToProcess; $i++) {
-                $fileIndex = $processed + $i;
-                if ($fileIndex < count($filenames)) {
-                    $currentFiles[] = $filenames[$fileIndex];
-                }
+            // Bei Abbruch sofort auf 'cancelled' setzen - keine weitere Verarbeitung
+            self::updateBatchStatus($batchId, [
+                'status' => 'cancelled',
+                'endTime' => time(),
+                'currentFiles' => []
+            ]);
+            return ['status' => 'cancelled', 'batch' => self::getBatchStatus($batchId)];
+        }
+        
+        // Normale Verarbeitung - sammle neue Dateien
+        $processed = $batchStatus['processed'];
+        $filenames = $batchStatus['filenames'];
+        $parallelProcessing = $batchStatus['parallelProcessing'] ?? 1;
+        
+        if ($processed >= count($filenames)) {
+            self::updateBatchStatus($batchId, [
+                'status' => 'completed',
+                'endTime' => time(),
+                'currentFiles' => []
+            ]);
+            return ['status' => 'completed', 'batch' => self::getBatchStatus($batchId)];
+        }
+        
+        // Bestimme wie viele Dateien parallel verarbeitet werden sollen
+        $remainingFiles = count($filenames) - $processed;
+        $filesToProcess = min($parallelProcessing, $remainingFiles);
+        
+        $currentFiles = [];
+        
+        // Sammle Dateien für parallele Verarbeitung
+        for ($i = 0; $i < $filesToProcess; $i++) {
+            $fileIndex = $processed + $i;
+            if ($fileIndex < count($filenames)) {
+                $currentFiles[] = $filenames[$fileIndex];
             }
         }
         

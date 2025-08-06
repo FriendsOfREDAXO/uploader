@@ -333,8 +333,8 @@ $(document).on('rex:ready', function (event, element) {
                             // Beim Abbrechen weiter abfragen bis 'cancelled' Status erreicht wird
                             this.processInterval = setTimeout(() => {
                                 this.processNext();
-                            }, 1000); // Längere Pause beim Abbrechen
-                        } else if (response.data.status === 'processing' || response.data.status === 'cancelling') {
+                            }, 500); // Kürzere Pause da Abbruch jetzt sofort erfolgt
+                        } else if (response.data.status === 'processing') {
                             // Weiter verarbeiten nach kurzer Pause
                             this.processInterval = setTimeout(() => {
                                 this.processNext();
