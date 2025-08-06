@@ -160,6 +160,10 @@ body.rex-theme-dark {
 }
 
 .uploader-bulk-rework-wrapper {
+    .rex-panel-options {
+        z-index: 1;
+        position: relative;
+    }
     .panel-title {
         position: relative;
     }
