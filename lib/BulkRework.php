@@ -388,18 +388,9 @@ class BulkRework
             // Datenbankupdate
             $newSize = $imagick->getImageGeometry();
             $fileSize = filesize($imagePath);
-            
-            $saveObject = rex_sql::factory();
-            $saveObject->setTable(rex::getTablePrefix() . 'media');
-            $saveObject->setWhere(['filename' => $filename]);
-            $saveObject->setValue('filesize', $fileSize);
-            $saveObject->setValue('width', $newSize['width']);
-            $saveObject->setValue('height', $newSize['height']);
-            $saveObject->setValue('updateuser', rex::getUser()->getLogin());
-            $saveObject->setDateTimeValue('updatedate', time());
-            $saveObject->update();
-            
-            rex_media_cache::delete($filename);
+
+            self::updateMediaAndDeleteCache($filename, $fileSize, $newSize['width'], $newSize['height']);
+
             $imagick->clear();
             
             return true;
@@ -443,15 +434,7 @@ class BulkRework
         $newImageSizes = getimagesize($imagePath);
         $fileSize = filesize($imagePath);
         
-        $saveObject = rex_sql::factory();
-        $saveObject->setTable(rex::getTablePrefix() . 'media');
-        $saveObject->setWhere(['filename' => $filename]);
-        $saveObject->setValue('filesize', $fileSize);
-        $saveObject->setValue('width', $newImageSizes[0]);
-        $saveObject->setValue('height', $newImageSizes[1]);
-        $saveObject->setValue('updateuser', rex::getUser()->getLogin());
-        $saveObject->setDateTimeValue('updatedate', time());
-        $saveObject->update();
+        self::updateMediaAndDeleteCache($filename, $fileSize, $newImageSizes[0], $newImageSizes[1]);
         
         rex_media_cache::delete($filename);
         
@@ -529,24 +512,30 @@ class BulkRework
             'height' => $maxHeight,
         ]);
         $effect->execute();
-        $rescaledFilesize = rex_string::size($rexmedia->getSource());
+        $rescaledFilesize = (int)rex_string::size($rexmedia->getSource());
 
         // replace file in media folder
         rex_file::put(rex_path::media($filename), $rexmedia->getSource());
 
-        // update filesize and dimensions in database
+        self::updateMediaAndDeleteCache($filename, $rescaledFilesize, $rexmedia->getWidth(), $rexmedia->getHeight());
+
+        return true;
+    }
+
+    /**
+     * Aktualisiert die Datenbank und löscht den Cache für ein Medium 
+     */
+    public static function updateMediaAndDeleteCache(string $filename, int $filesize = 0, int $width = 0, int $height = 0): void 
+    {
         $saveObject = rex_sql::factory();
         $saveObject->setTable(rex::getTablePrefix() . 'media');
         $saveObject->setWhere(['filename' => $filename]);
-        $saveObject->setValue('filesize', $rescaledFilesize);
-        $saveObject->setValue('width', $rexmedia->getWidth());
-        $saveObject->setValue('height', $rexmedia->getHeight());
-        $saveObject->setValue('updateuser', rex::getUser()->getLogin());
-        $saveObject->setDateTimeValue('updatedate', time());
+        $saveObject->setValue('filesize', $filesize);
+        $saveObject->setValue('width', $width);
+        $saveObject->setValue('height', $height);
         $saveObject->update();
-
+        
         rex_media_cache::delete($filename);
-        return true;
     }
 
     /**
