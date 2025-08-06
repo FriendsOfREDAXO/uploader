@@ -193,6 +193,9 @@ $(document).on('rex:ready', function (event, element) {
     }
 
     function updateProgressModal(batchStatus) {
+        // Debug: Logge den Status
+        console.log('Updating progress modal with:', batchStatus);
+        
         let progressPercent = batchStatus.progress || 0;
         
         // Update main progress bar
@@ -205,7 +208,7 @@ $(document).on('rex:ready', function (event, element) {
         animateCounter('#batch-error-count', Object.keys(batchStatus.errors || {}).length);
         animateCounter('#active-processes-count', batchStatus.activeProcesses || 0);
         
-        $('#batch-progress-text').text(batchStatus.processed + ' von ' + batchStatus.total);
+        $('#batch-progress-text').text((batchStatus.processed || 0) + ' von ' + (batchStatus.total || 0));
         $('#queue-length').text(batchStatus.queueLength || 0);
         
         // Update status badge
@@ -216,6 +219,7 @@ $(document).on('rex:ready', function (event, element) {
         // Aktuell verarbeitete Dateien mit cooler Animation
         let currentFilesHtml = '';
         if (batchStatus.currentlyProcessing && batchStatus.currentlyProcessing.length > 0) {
+            console.log('Currently processing files:', batchStatus.currentlyProcessing);
             currentFilesHtml = batchStatus.currentlyProcessing.map((file, index) => {
                 let filename = typeof file === 'string' ? file : file.filename;
                 let duration = typeof file === 'object' && file.duration ? ` (${file.duration}s)` : '';
@@ -252,10 +256,17 @@ $(document).on('rex:ready', function (event, element) {
                 `;
             }).join('');
         } else {
+            // Zeige Informationen auch wenn keine Dateien aktiv verarbeitet werden
+            let message = 'Keine Dateien in Verarbeitung';
+            if (batchStatus.processed && batchStatus.total) {
+                if (batchStatus.processed < batchStatus.total) {
+                    message = 'Bereit für nächste Dateien...';
+                }
+            }
             currentFilesHtml = `
                 <div class="text-center" style="padding: 30px; color: #6c757d;">
                     <i class="fa fa-clock-o" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
-                    <div>Keine Dateien in Verarbeitung</div>
+                    <div>${message}</div>
                 </div>
             `;
         }
@@ -387,18 +398,22 @@ $(document).on('rex:ready', function (event, element) {
                 },
                 success: (response) => {
                     if (response.success) {
-                        this.status = response.data.batch;
+                        // Debug: Logge die Antwort
+                        console.log('Batch response:', response.data);
+                        
+                        // Verwende die korrekten Daten
+                        this.status = response.data.batch || response.data;
                         updateProgressModal(this.status);
 
                         if (this.status.status === 'completed') {
                             this.running = false;
-                        } else if (response.data.status === 'processing') {
+                        } else if (response.data.status === 'processing' || this.status.status === 'running') {
                             // Schnelleres Polling für parallele Verarbeitung (200ms statt 500ms)
                             this.processInterval = setTimeout(() => {
                                 this.processNext();
                             }, 200);
                         } else {
-                            this.handleError('Unerwarteter Status: ' + response.data.status);
+                            this.handleError('Unerwarteter Status: ' + (response.data.status || this.status.status));
                         }
                     } else {
                         this.handleError('Verarbeitungsfehler: ' + (response.data ? response.data.message : 'Unbekannter Fehler'));
