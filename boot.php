@@ -77,7 +77,7 @@ rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
             });
         } elseif (rex_be_controller::getCurrentPage() == $addon->getName() . '/bulk_rework') {
             rex_view::addCssFile($this->getAssetsUrl('uploader.css'));
-            rex_view::addJsFile($this->getAssetsUrl('uploader_bulk_rework_simple.js'));
+            rex_view::addJsFile($this->getAssetsUrl('uploader_bulk_rework.js'));
 
             rex_extension::register('REX_LIST_GET', function (rex_extension_point $ep) use ($addon) {
                 /** @var BulkReworkList $list  */

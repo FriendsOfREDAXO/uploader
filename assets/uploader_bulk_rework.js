@@ -194,163 +194,17 @@ $(document).on('rex:ready', function (event, element) {
         }, 500);
     }
 
-    function updateProgressModal(batchStatus) {
-        // Debug: Logge den Status
-        console.log('Updating progress modal with:', batchStatus);
+        function updateProgressModal(batchStatus) {
+        if (!batchStatus) {
+            return;
+        }
+        
+        console.log('Updating modal with batch status:', batchStatus);
+        console.log('currentlyProcessing from batchStatus:', batchStatus.currentlyProcessing);
+        console.log('activeProcesses from batchStatus:', batchStatus.activeProcesses);
+        console.log('currentFiles from batchStatus:', batchStatus.currentFiles);
         
         let progressPercent = batchStatus.progress || 0;
-        
-        // Update main progress bar
-        $('.progress-bar').css('width', progressPercent + '%').attr('aria-valuenow', progressPercent);
-        $('.progress-text').text(Math.round(progressPercent) + '%');
-        
-        // Update status cards with animation
-        animateCounter('#batch-success-count', batchStatus.successful || 0);
-        animateCounter('#batch-skipped-count', Object.keys(batchStatus.skipped || {}).length);
-        animateCounter('#batch-error-count', Object.keys(batchStatus.errors || {}).length);
-        animateCounter('#active-processes-count', batchStatus.activeProcesses || 0);
-        
-        $('#batch-progress-text').text((batchStatus.processed || 0) + ' von ' + (batchStatus.total || 0));
-        $('#queue-length').text(batchStatus.queueLength || 0);
-        
-        // Update status badge
-        if (batchStatus.status === 'running') {
-            $('#batch-status-text').removeClass().addClass('badge badge-primary pulse').html('<i class="fa fa-spinner fa-spin"></i> Läuft...');
-        }
-        
-        // Aktuell verarbeitete Dateien mit cooler Animation
-        let currentFilesHtml = '';
-        if (batchStatus.currentlyProcessing && batchStatus.currentlyProcessing.length > 0) {
-            console.log('Currently processing files:', batchStatus.currentlyProcessing);
-            currentFilesHtml = batchStatus.currentlyProcessing.map((file, index) => {
-                let filename = typeof file === 'string' ? file : file.filename;
-                let duration = typeof file === 'object' && file.duration ? ` (${file.duration}s)` : '';
-                let colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
-                let color = colors[index % colors.length];
-                
-                return `
-                    <div class="processing-file" style="
-                        background: linear-gradient(135deg, ${color}22 0%, ${color}44 100%);
-                        border: 1px solid ${color}66;
-                        border-radius: 6px;
-                        padding: 8px 12px;
-                        margin-bottom: 6px;
-                        animation: pulse-file 2s infinite;
-                        display: flex;
-                        align-items: center;
-                        font-size: 13px;
-                    ">
-                        <div class="spinner" style="
-                            width: 16px;
-                            height: 16px;
-                            border: 2px solid ${color}44;
-                            border-top: 2px solid ${color};
-                            border-radius: 50%;
-                            animation: spin 1s linear infinite;
-                            margin-right: 8px;
-                            flex-shrink: 0;
-                        "></div>
-                        <div style="flex-grow: 1; font-weight: 500; color: #495057;">
-                            ${filename.length > 30 ? '...' + filename.slice(-30) : filename}
-                        </div>
-                        ${duration ? `<div style="color: ${color}; font-size: 11px; margin-left: 8px;">${duration}</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        } else {
-            // Zeige Informationen auch wenn keine Dateien aktiv verarbeitet werden
-            let message = 'Keine Dateien in Verarbeitung';
-            if (batchStatus.processed && batchStatus.total) {
-                if (batchStatus.processed < batchStatus.total) {
-                    message = 'Bereit für nächste Dateien...';
-                }
-            }
-            currentFilesHtml = `
-                <div class="text-center" style="padding: 30px; color: #6c757d;">
-                    <i class="fa fa-clock-o" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
-                    <div>${message}</div>
-                </div>
-            `;
-        }
-        $('#current-files-list').html(currentFilesHtml);
-        
-        // Zeitschätzung mit Icon
-        if (batchStatus.remainingTime) {
-            let minutes = Math.floor(batchStatus.remainingTime / 60);
-            let seconds = batchStatus.remainingTime % 60;
-            let timeStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
-            $('#remaining-time-info').html(`
-                <div style="color: #17a2b8;">
-                    <i class="fa fa-clock-o"></i> Restzeit: <strong>${timeStr}</strong>
-                </div>
-            `);
-        } else {
-            $('#remaining-time-info').html('');
-        }
-        
-        if (batchStatus.status === 'completed') {
-            $('#batch-status-text').removeClass().addClass('badge badge-success').html('<i class="fa fa-check"></i> Abgeschlossen');
-            $('.progress-bar').removeClass('progress-bar-animated');
-            $('#cancel-batch').hide();
-            $('#close-modal').show();
-            $('#current-files-list').html(`
-                <div class="text-center" style="padding: 30px; color: #28a745;">
-                    <i class="fa fa-check-circle" style="font-size: 36px; margin-bottom: 10px;"></i>
-                    <div><strong>Alle Dateien verarbeitet!</strong></div>
-                </div>
-            `);
-            $('#remaining-time-info').html('');
-            
-            // Animiere den Erfolg
-            $('.progress-bar').css('background', 'linear-gradient(45deg, #28a745 0%, #20c997 100%)');
-            
-            // Zeige detaillierte Zusammenfassung
-            let summary = `
-                <div class="alert alert-success" style="border-radius: 8px; border: none; box-shadow: 0 2px 10px rgba(40,167,69,0.2);">
-                    <h5><i class="fa fa-check-circle"></i> Verarbeitung abgeschlossen!</h5>
-                    <div class="row text-center" style="margin-top: 15px;">
-                        <div class="col-4">
-                            <div style="font-size: 24px; font-weight: bold; color: #28a745;">${batchStatus.successful || 0}</div>
-                            <small>Erfolgreich</small>
-                        </div>
-                        <div class="col-4">
-                            <div style="font-size: 24px; font-weight: bold; color: #ffc107;">${Object.keys(batchStatus.skipped || {}).length}</div>
-                            <small>Übersprungen</small>
-                        </div>
-                        <div class="col-4">
-                            <div style="font-size: 24px; font-weight: bold; color: #dc3545;">${Object.keys(batchStatus.errors || {}).length}</div>
-                            <small>Fehler</small>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Zeige Details zu übersprungenen und fehlerhaften Dateien
-            let details = '';
-            if (Object.keys(batchStatus.skipped || {}).length > 0) {
-                details += '<div class="alert alert-warning" style="border-radius: 8px;"><strong><i class="fa fa-exclamation-triangle"></i> Übersprungene Dateien:</strong><ul style="margin-top: 10px; margin-bottom: 0;">';
-                Object.entries(batchStatus.skipped).forEach(([file, reason]) => {
-                    details += `<li>${file}: <em>${reason}</em></li>`;
-                });
-                details += '</ul></div>';
-            }
-            
-            if (Object.keys(batchStatus.errors || {}).length > 0) {
-                details += '<div class="alert alert-danger" style="border-radius: 8px;"><strong><i class="fa fa-times-circle"></i> Fehlerhafte Dateien:</strong><ul style="margin-top: 10px; margin-bottom: 0;">';
-                Object.entries(batchStatus.errors).forEach(([file, error]) => {
-                    details += `<li>${file}: <em>${error}</em></li>`;
-                });
-                details += '</ul></div>';
-            }
-            
-            $('#batch-details').html(summary + details);
-            
-            // Nach erfolgreicher Verarbeitung Seite neu laden
-            setTimeout(() => {
-                location.reload();
-            }, 3000);
-        }
-    }
     
     // Animation helper function
     function animateCounter(selector, targetValue) {

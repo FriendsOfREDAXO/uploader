@@ -277,7 +277,7 @@ class BulkRework
     }
     
     /**
-     * Verarbeitet die nächsten Bilder in einem Batch (vereinfacht für bessere Stabilität)
+     * Verarbeitet die nächsten Bilder in einem Batch (mit 3 parallelen Prozessen)
      *
      * @param string $batchId
      * @return array Status-Update
@@ -302,16 +302,21 @@ class BulkRework
             return ['status' => 'completed', 'batch' => self::getBatchStatusExtended($batchId)];
         }
         
-        // Nimm nur EINE Datei zur Verarbeitung (einfacher und stabiler)
-        $filename = array_shift($processQueue);
-        $remainingQueue = $processQueue;
+        // Nimm bis zu 3 Dateien zur parallelen Verarbeitung
+        $maxParallel = self::getMaxParallelProcesses();
+        $filesToProcess = array_slice($processQueue, 0, $maxParallel);
+        $remainingQueue = array_slice($processQueue, $maxParallel);
         
-        // Setze aktuelle Datei für Frontend
-        $currentFiles = [[
-            'filename' => $filename,
-            'startTime' => microtime(true),
-            'status' => 'processing'
-        ]];
+        // Setze aktuelle Dateien für Frontend-Anzeige
+        $currentFiles = [];
+        foreach ($filesToProcess as $index => $filename) {
+            $processId = uniqid('process_', true);
+            $currentFiles[$processId] = [
+                'filename' => $filename,
+                'startTime' => microtime(true),
+                'status' => 'processing'
+            ];
+        }
         
         // Aktualisiere Status sofort für Frontend-Feedback
         self::updateBatchStatus($batchId, [
@@ -319,42 +324,40 @@ class BulkRework
             'currentFiles' => $currentFiles
         ]);
         
-        // Verarbeite die Datei
-        $result = self::reworkFileWithFallback(
-            $filename, 
-            $batchStatus['maxWidth'], 
-            $batchStatus['maxHeight']
-        );
-        
-        // Debug-Ausgabe
-        if (function_exists('rex_logger')) {
-            rex_logger::factory()->log('debug', 'File processing result', [
-                'filename' => $filename,
-                'result' => $result
-            ]);
+        // Verarbeite alle Dateien in diesem Batch
+        $results = [];
+        foreach ($filesToProcess as $filename) {
+            $result = self::reworkFileWithFallback(
+                $filename, 
+                $batchStatus['maxWidth'], 
+                $batchStatus['maxHeight']
+            );
+            $results[] = $result;
         }
         
         // Aktualisiere finale Statistiken
         $updates = [
             'processQueue' => $remainingQueue,
             'currentFiles' => [], // Verarbeitung abgeschlossen
-            'processed' => $batchStatus['processed'] + 1
+            'processed' => $batchStatus['processed'] + count($results)
         ];
         
-        if ($result['success']) {
-            $updates['successful'] = ($batchStatus['successful'] ?? 0) + 1;
-        } elseif ($result['skipped']) {
-            // Überspringe Dateien ohne Fehler zu melden
-            $updates['skipped'] = array_merge(
-                $batchStatus['skipped'] ?? [], 
-                [$filename => $result['reason']]
-            );
-        } else {
-            // Fehler loggen aber weiterverarbeiten
-            $updates['errors'] = array_merge(
-                $batchStatus['errors'] ?? [], 
-                [$filename => $result['error'] ?? 'Unbekannter Fehler']
-            );
+        foreach ($results as $result) {
+            if ($result['success']) {
+                $updates['successful'] = ($batchStatus['successful'] ?? 0) + 1;
+            } elseif ($result['skipped']) {
+                // Überspringe Dateien ohne Fehler zu melden
+                $updates['skipped'] = array_merge(
+                    $batchStatus['skipped'] ?? [], 
+                    [$result['filename'] => $result['reason']]
+                );
+            } else {
+                // Fehler loggen aber weiterverarbeiten
+                $updates['errors'] = array_merge(
+                    $batchStatus['errors'] ?? [], 
+                    [$result['filename'] => $result['error'] ?? 'Unbekannter Fehler']
+                );
+            }
         }
         
         self::updateBatchStatus($batchId, $updates);
@@ -373,8 +376,8 @@ class BulkRework
         return [
             'status' => 'processing',
             'batch' => $finalStatus,
-            'result' => $result,
-            'processedFile' => $filename
+            'results' => $results,
+            'processedInThisStep' => count($results)
         ];
     }
     
