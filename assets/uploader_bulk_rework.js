@@ -194,19 +194,15 @@ $(document).on('rex:ready', function (event, element) {
         }, 500);
     }
 
-        function updateProgressModal(batchStatus) {
+    function updateProgressModal(batchStatus) {
         if (!batchStatus) {
             return;
         }
         
         console.log('Updating modal with batch status:', batchStatus);
-        console.log('currentlyProcessing from batchStatus:', batchStatus.currentlyProcessing);
-        console.log('activeProcesses from batchStatus:', batchStatus.activeProcesses);
-        console.log('currentFiles from batchStatus:', batchStatus.currentFiles);
-        
-        let progressPercent = batchStatus.progress || 0;
-    
-    // Animation helper function
+        console.log('currentlyProcessing:', batchStatus.currentlyProcessing);
+        console.log('activeProcesses:', batchStatus.activeProcesses);
+        console.log('currentFiles:', batchStatus.currentFiles);    // Animation helper function
     function animateCounter(selector, targetValue) {
         let $element = $(selector);
         let currentValue = parseInt($element.text()) || 0;
