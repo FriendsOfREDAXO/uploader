@@ -202,7 +202,74 @@ $(document).on('rex:ready', function (event, element) {
         console.log('Updating modal with batch status:', batchStatus);
         console.log('currentlyProcessing:', batchStatus.currentlyProcessing);
         console.log('activeProcesses:', batchStatus.activeProcesses);
-        console.log('currentFiles:', batchStatus.currentFiles);    // Animation helper function
+        console.log('currentFiles:', batchStatus.currentFiles);
+        
+        let progressPercent = batchStatus.progress || 0;
+        
+        // Update main progress bar
+        $('.progress-bar').css('width', progressPercent + '%').attr('aria-valuenow', progressPercent);
+        $('.progress-text').text(Math.round(progressPercent) + '%');
+        
+        // Update status info
+        $('#batch-progress-text').text((batchStatus.processed || 0) + ' von ' + (batchStatus.total || 0));
+        
+        // Update status badge
+        if (batchStatus.status === 'running') {
+            $('#batch-status-text').removeClass().addClass('badge badge-primary').text('Läuft...');
+        } else if (batchStatus.status === 'completed') {
+            $('#batch-status-text').removeClass().addClass('badge badge-success').text('Abgeschlossen');
+        }
+
+        // Update currently processing files
+        const $currentFileDisplay = $('#current-file-display');
+        
+        if (batchStatus.currentlyProcessing && batchStatus.currentlyProcessing.length > 0) {
+            let filesHtml = '';
+            batchStatus.currentlyProcessing.forEach((file, index) => {
+                const filename = typeof file === 'string' ? file : file.filename;
+                const duration = (typeof file === 'object' && file.duration) ? file.duration : 0;
+                
+                filesHtml += `
+                    <div style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border-left: 3px solid #007bff;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="spinner-border spinner-border-sm text-primary" style="margin-right: 8px; width: 16px; height: 16px;"></div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 13px;">${filename}</div>
+                                <div style="font-size: 11px; color: #666;">seit ${duration}s</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            $currentFileDisplay.html(filesHtml);
+        } else if (batchStatus.status === 'completed') {
+            $currentFileDisplay.html('<div class="text-success"><i class="fa fa-check-circle"></i> Alle Dateien verarbeitet</div>');
+        } else {
+            $currentFileDisplay.html('<div class="text-muted"><i class="fa fa-clock-o"></i> Warten auf nächste Datei...</div>');
+        }
+
+        // Show results if any files processed
+        if ((batchStatus.processed || 0) > 0) {
+            $('#results-section').show();
+            
+            const successful = batchStatus.successful || 0;
+            const skipped = batchStatus.skipped ? Object.keys(batchStatus.skipped).length : 0;
+            const errors = batchStatus.errors ? Object.keys(batchStatus.errors).length : 0;
+            
+            $('#successful-count').text(successful);
+            $('#skipped-count').text(skipped);
+            $('#error-count').text(errors);
+        }
+
+        // Update modal buttons
+        if (batchStatus.status === 'completed') {
+            $('#cancel-batch').hide();
+            $('#close-modal').show();
+            $('.progress-bar').removeClass('progress-bar-animated');
+        }
+    }
+
+    // Animation helper function
     function animateCounter(selector, targetValue) {
         let $element = $(selector);
         let currentValue = parseInt($element.text()) || 0;
