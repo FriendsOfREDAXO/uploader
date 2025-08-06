@@ -12,21 +12,28 @@ $addon = rex_addon::get('uploader');
 $maxWidth = (int) $addon->getConfig('image-max-width', 0);
 $maxHeight = (int) $addon->getConfig('image-max-height', 0);
 
-// rework selected files
-if(
-    count($filesToRework = rex_request('rework-file', 'array', [])) > 0 &&
-    !rex_request('rework-files-search-submit', 'int', 0)
-)
-{
-    $reworked = 0;
-
-    foreach ($filesToRework as $filename)
-    {
-        $reworked += (int) BulkRework::reworkFile($filename, $maxWidth, $maxHeight);
-    }
-
-    echo rex_view::success(sprintf($addon->i18n('bulk_rework_success'), $reworked));
+// Zeige Informationen über verfügbare Bildverarbeitungsbibliotheken
+$imageLibInfo = [];
+if (BulkRework::hasGD()) {
+    $imageLibInfo[] = '<span class="text-success"><i class="rex-icon fa-check"></i> GD verfügbar</span>';
 }
+if (BulkRework::hasImageMagick()) {
+    if (class_exists('Imagick')) {
+        $imageLibInfo[] = '<span class="text-success"><i class="rex-icon fa-check"></i> ImageMagick (PHP Extension) verfügbar</span>';
+    } else {
+        $imageLibInfo[] = '<span class="text-success"><i class="rex-icon fa-check"></i> ImageMagick (Binary) verfügbar</span>';
+    }
+}
+
+if (!empty($imageLibInfo)) {
+    echo rex_view::info('Verfügbare Bildverarbeitungsbibliotheken: ' . implode(', ', $imageLibInfo));
+}
+
+// Alte synchrone Verarbeitung entfernt - nur noch async
+// if(count($filesToRework = rex_request('rework-file', 'array', [])) > 0 && ...)
+
+// Bereinige alte Batch-Dateien
+BulkRework::cleanupOldBatches();
 
 // apply searches to query
 $search = [];

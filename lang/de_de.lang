@@ -46,6 +46,11 @@ uploader_bulk_rework_search_media_category_placeholder = einzeln oder Komma-getr
 uploader_bulk_rework_search_submit = Suchen
 uploader_bulk_rework_search_reset = Zurücksetzen
 uploader_bulk_rework_success = <b>%s</b> Bilddatei(en) wurden erfolgreich angepasst.
+uploader_bulk_rework_async_processing = Verarbeitung läuft asynchron im Hintergrund
+uploader_bulk_rework_format_not_supported = Format wird nicht unterstützt
+uploader_bulk_rework_format_needs_imagemagick = Format benötigt ImageMagick
+uploader_bulk_rework_processing_completed = Verarbeitung abgeschlossen
+uploader_bulk_rework_processing_error = Verarbeitungsfehler
 
 uploader_resizer_standalone_calculated_size = Berechnete Dimensionen
 uploader_resizer_standalone_original_size = Originaldimensionen

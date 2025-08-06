@@ -13,6 +13,8 @@ use rex_media_manager;
 use rex_path;
 use rex_sql;
 use rex_string;
+use rex_logger;
+use Exception;
 
 /**
  * Class BulkRework
@@ -24,6 +26,435 @@ use rex_string;
  */
 class BulkRework
 {
+    // Unterstützte Bildformate
+    const SUPPORTED_FORMATS = [
+        'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'
+    ];
+    
+    // Problematische Formate die nur mit ImageMagick funktionieren
+    const IMAGEMAGICK_ONLY_FORMATS = [
+        'tif', 'tiff', 'psd', 'svg'
+    ];
+    
+    // Batch processing status cache key
+    const BATCH_CACHE_KEY = 'uploader_bulk_batch_';
+    
+    /**
+     * Prüft ob ein Bildformat verarbeitet werden kann
+     *
+     * @param string $filename
+     * @return array ['canProcess' => bool, 'needsImageMagick' => bool, 'format' => string]
+     */
+    public static function canProcessImage(string $filename): array
+    {
+        $extension = strtolower(rex_file::extension($filename));
+        
+        $result = [
+            'canProcess' => false,
+            'needsImageMagick' => false,
+            'format' => $extension,
+            'reason' => ''
+        ];
+        
+        if (in_array($extension, self::SUPPORTED_FORMATS)) {
+            $result['canProcess'] = true;
+        } elseif (in_array($extension, self::IMAGEMAGICK_ONLY_FORMATS)) {
+            if (self::hasImageMagick()) {
+                $result['canProcess'] = true;
+                $result['needsImageMagick'] = true;
+            } else {
+                $result['reason'] = 'Format benötigt ImageMagick';
+            }
+        } else {
+            $result['reason'] = 'Nicht unterstütztes Format';
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Prüft ob ImageMagick verfügbar ist
+     *
+     * @return bool
+     */
+    public static function hasImageMagick(): bool
+    {
+        return class_exists('Imagick') || !empty(self::getConvertPath());
+    }
+    
+    /**
+     * Ermittelt den Pfad zum ImageMagick convert Binary
+     *
+     * @return string
+     */
+    private static function getConvertPath(): string
+    {
+        $path = '';
+
+        if (function_exists('exec')) {
+            $out = [];
+            $cmd = 'command -v convert || which convert';
+            exec($cmd, $out, $ret);
+
+            if (0 === $ret && !empty($out[0])) {
+                $path = (string) $out[0];
+            }
+        }
+        return $path;
+    }
+    
+    /**
+     * Prüft ob GD verfügbar ist
+     *
+     * @return bool
+     */
+    public static function hasGD(): bool
+    {
+        return extension_loaded('gd');
+    }
+    
+    /**
+     * Startet einen Batch-Verarbeitungsvorgang
+     *
+     * @param array $filenames
+     * @param int|null $maxWidth
+     * @param int|null $maxHeight
+     * @return string Batch-ID
+     */
+    public static function startBatchProcessing(array $filenames, ?int $maxWidth = null, ?int $maxHeight = null): string
+    {
+        $batchId = uniqid('batch_', true);
+        
+        $batchData = [
+            'id' => $batchId,
+            'filenames' => $filenames,
+            'maxWidth' => $maxWidth,
+            'maxHeight' => $maxHeight,
+            'total' => count($filenames),
+            'processed' => 0,
+            'successful' => 0,
+            'errors' => [],
+            'skipped' => [],
+            'status' => 'running',
+            'currentFile' => null,
+            'startTime' => time()
+        ];
+        
+        // Status in Cache speichern
+        rex_file::put(
+            rex_path::addonCache('uploader', self::BATCH_CACHE_KEY . $batchId . '.json'),
+            json_encode($batchData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+        );
+        
+        return $batchId;
+    }
+    
+    /**
+     * Holt den Status eines Batch-Vorgangs
+     *
+     * @param string $batchId
+     * @return array|null
+     */
+    public static function getBatchStatus(string $batchId): ?array
+    {
+        $cacheFile = rex_path::addonCache('uploader', self::BATCH_CACHE_KEY . $batchId . '.json');
+        
+        if (!file_exists($cacheFile)) {
+            return null;
+        }
+        
+        $content = rex_file::get($cacheFile);
+        return json_decode($content, true);
+    }
+    
+    /**
+     * Aktualisiert den Status eines Batch-Vorgangs
+     *
+     * @param string $batchId
+     * @param array $updates
+     * @return bool
+     */
+    private static function updateBatchStatus(string $batchId, array $updates): bool
+    {
+        $status = self::getBatchStatus($batchId);
+        if (!$status) {
+            return false;
+        }
+        
+        $status = array_merge($status, $updates);
+        
+        rex_file::put(
+            rex_path::addonCache('uploader', self::BATCH_CACHE_KEY . $batchId . '.json'),
+            json_encode($status, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+        );
+        
+        return true;
+    }
+    
+    /**
+     * Verarbeitet das nächste Bild in einem Batch
+     *
+     * @param string $batchId
+     * @return array Status-Update
+     */
+    public static function processNextBatchItem(string $batchId): array
+    {
+        $batchStatus = self::getBatchStatus($batchId);
+        
+        if (!$batchStatus || $batchStatus['status'] !== 'running') {
+            return ['status' => 'error', 'message' => 'Batch nicht gefunden oder bereits beendet'];
+        }
+        
+        $processed = $batchStatus['processed'];
+        $filenames = $batchStatus['filenames'];
+        
+        if ($processed >= count($filenames)) {
+            self::updateBatchStatus($batchId, [
+                'status' => 'completed',
+                'endTime' => time()
+            ]);
+            return ['status' => 'completed', 'batch' => self::getBatchStatus($batchId)];
+        }
+        
+        $currentFilename = $filenames[$processed];
+        
+        // Status für aktuell verarbeitete Datei aktualisieren (aber processed noch nicht erhöhen)
+        self::updateBatchStatus($batchId, [
+            'currentFile' => $currentFilename
+        ]);
+        
+        $result = self::reworkFileWithFallback(
+            $currentFilename, 
+            $batchStatus['maxWidth'], 
+            $batchStatus['maxHeight']
+        );
+        
+        $updates = [
+            'processed' => $processed + 1 // Jetzt erst processed erhöhen nach der Verarbeitung
+        ];
+        
+        if ($result['success']) {
+            $updates['successful'] = $batchStatus['successful'] + 1;
+        } elseif ($result['skipped']) {
+            $updates['skipped'] = array_merge($batchStatus['skipped'], [$currentFilename => $result['reason']]);
+        } else {
+            $updates['errors'] = array_merge($batchStatus['errors'], [$currentFilename => $result['error']]);
+        }
+        
+        self::updateBatchStatus($batchId, $updates);
+        
+        return [
+            'status' => 'processing',
+            'batch' => self::getBatchStatus($batchId),
+            'result' => $result
+        ];
+    }
+    
+    /**
+     * Verarbeitet eine Datei mit Fallback-System
+     *
+     * @param string $filename
+     * @param int|null $maxWidth
+     * @param int|null $maxHeight
+     * @return array
+     */
+    public static function reworkFileWithFallback(string $filename, ?int $maxWidth = null, ?int $maxHeight = null): array
+    {
+        try {
+            // Prüfe ob Datei verarbeitet werden kann
+            $canProcess = self::canProcessImage($filename);
+            
+            if (!$canProcess['canProcess']) {
+                return [
+                    'success' => false,
+                    'skipped' => true,
+                    'reason' => $canProcess['reason'],
+                    'filename' => $filename
+                ];
+            }
+            
+            // Versuche Verarbeitung mit bevorzugter Methode
+            if ($canProcess['needsImageMagick'] && self::hasImageMagick()) {
+                $result = self::reworkFileWithImageMagick($filename, $maxWidth, $maxHeight);
+                if ($result) {
+                    return ['success' => true, 'skipped' => false, 'method' => 'ImageMagick', 'filename' => $filename];
+                }
+            }
+            
+            // Fallback zu Media Manager (GD)
+            if (self::hasGD()) {
+                $result = self::reworkFile($filename, $maxWidth, $maxHeight);
+                if ($result) {
+                    return ['success' => true, 'skipped' => false, 'method' => 'GD/MediaManager', 'filename' => $filename];
+                }
+            }
+            
+            return [
+                'success' => false,
+                'skipped' => false,
+                'error' => 'Keine Bildverarbeitungsbibliothek verfügbar',
+                'filename' => $filename
+            ];
+            
+        } catch (Exception $e) {
+            rex_logger::logException($e);
+            return [
+                'success' => false,
+                'skipped' => false,
+                'error' => $e->getMessage(),
+                'filename' => $filename
+            ];
+        }
+    }
+    
+    /**
+     * Verarbeitet Bild mit ImageMagick
+     *
+     * @param string $filename
+     * @param int|null $maxWidth
+     * @param int|null $maxHeight
+     * @return bool
+     */
+    public static function reworkFileWithImageMagick(string $filename, ?int $maxWidth = null, ?int $maxHeight = null): bool
+    {
+        if (!self::hasImageMagick()) {
+            return false;
+        }
+        
+        $media = rex_media::get($filename);
+        if ($media == null || !$media->isImage()) {
+            return false;
+        }
+        
+        if (is_null($maxWidth) || is_null($maxHeight)) {
+            $maxWidth = (int)rex_addon::get('uploader')->getConfig('image-max-width', 0);
+            $maxHeight = (int)rex_addon::get('uploader')->getConfig('image-max-height', 0);
+        }
+        
+        $imagePath = rex_path::media($filename);
+        $imageSizes = getimagesize($imagePath);
+        
+        if (
+            !is_array($imageSizes) ||
+            $imageSizes[0] == 0 ||
+            $imageSizes[1] == 0 ||
+            ($maxWidth == 0 && $maxHeight == 0) ||
+            (
+                ($maxWidth == 0 || $imageSizes[0] <= $maxWidth) &&
+                ($maxHeight == 0 || $imageSizes[1] <= $maxHeight)
+            )
+        ) {
+            return false;
+        }
+        
+        try {
+            if (class_exists('Imagick')) {
+                return self::processWithImagickExtension($filename, $maxWidth, $maxHeight, $imagePath);
+            } else {
+                return self::processWithImageMagickBinary($filename, $maxWidth, $maxHeight, $imagePath);
+            }
+        } catch (Exception $e) {
+            rex_logger::logException($e);
+            return false;
+        }
+    }
+    
+    /**
+     * Verarbeitung mit Imagick PHP Extension
+     */
+    private static function processWithImagickExtension(string $filename, int $maxWidth, int $maxHeight, string $imagePath): bool
+    {
+        if (!class_exists('Imagick')) {
+            return false;
+        }
+        
+        try {
+            $imagick = new \Imagick($imagePath);
+            
+            // Auto-orientierung
+            $imagick->autoOrientImage();
+            
+            // Größe anpassen
+            $imagick->resizeImage($maxWidth, $maxHeight, \Imagick::FILTER_LANCZOS, 1, true);
+            
+            // Kompression für JPEG
+            if ($imagick->getImageFormat() === 'JPEG') {
+                $imagick->setImageCompressionQuality(85);
+            }
+            
+            // Datei speichern
+            $imagick->writeImage($imagePath);
+            
+            // Datenbankupdate
+            $newSize = $imagick->getImageGeometry();
+            $fileSize = filesize($imagePath);
+
+            self::updateMediaAndDeleteCache($filename, $fileSize, $newSize['width'], $newSize['height']);
+
+            $imagick->clear();
+            
+            return true;
+            
+        } catch (Exception $e) {
+            rex_logger::logException($e);
+            return false;
+        }
+    }
+    
+    /**
+     * Verarbeitung mit ImageMagick Binary
+     */
+    private static function processWithImageMagickBinary(string $filename, int $maxWidth, int $maxHeight, string $imagePath): bool
+    {
+        $tempPath = $imagePath . '.tmp';
+        $convertCmd = sprintf(
+            'convert %s -auto-orient -resize %dx%d> -quality 85 %s',
+            escapeshellarg($imagePath),
+            $maxWidth,
+            $maxHeight,
+            escapeshellarg($tempPath)
+        );
+        
+        exec($convertCmd . ' 2>&1', $output, $returnVar);
+        
+        if ($returnVar !== 0 || !file_exists($tempPath)) {
+            if (file_exists($tempPath)) {
+                unlink($tempPath);
+            }
+            return false;
+        }
+        
+        // Ersetze Original
+        if (!rename($tempPath, $imagePath)) {
+            unlink($tempPath);
+            return false;
+        }
+        
+        // Update Datenbank
+        $newImageSizes = getimagesize($imagePath);
+        $fileSize = filesize($imagePath);
+        
+        self::updateMediaAndDeleteCache($filename, $fileSize, $newImageSizes[0], $newImageSizes[1]);
+        
+        rex_media_cache::delete($filename);
+        
+        return true;
+    }
+    
+    /**
+     * Löscht abgeschlossene Batch-Dateien die älter als 1 Stunde sind
+     */
+    public static function cleanupOldBatches(): void
+    {
+        $cacheDir = rex_path::addonCache('uploader');
+        $files = glob($cacheDir . self::BATCH_CACHE_KEY . '*.json');
+        
+        foreach ($files as $file) {
+            if (filemtime($file) < time() - 3600) { // älter als 1 Stunde
+                unlink($file);
+            }
+        }
+    }
     /**
      * rework image file with uploader addon max size settings
      *
@@ -81,24 +512,30 @@ class BulkRework
             'height' => $maxHeight,
         ]);
         $effect->execute();
-        $rescaledFilesize = rex_string::size($rexmedia->getSource());
+        $rescaledFilesize = (int)rex_string::size($rexmedia->getSource());
 
         // replace file in media folder
         rex_file::put(rex_path::media($filename), $rexmedia->getSource());
 
-        // update filesize and dimensions in database
+        self::updateMediaAndDeleteCache($filename, $rescaledFilesize, $rexmedia->getWidth(), $rexmedia->getHeight());
+
+        return true;
+    }
+
+    /**
+     * Aktualisiert die Datenbank und löscht den Cache für ein Medium 
+     */
+    public static function updateMediaAndDeleteCache(string $filename, int $filesize = 0, int $width = 0, int $height = 0): void 
+    {
         $saveObject = rex_sql::factory();
         $saveObject->setTable(rex::getTablePrefix() . 'media');
         $saveObject->setWhere(['filename' => $filename]);
-        $saveObject->setValue('filesize', $rescaledFilesize);
-        $saveObject->setValue('width', $rexmedia->getWidth());
-        $saveObject->setValue('height', $rexmedia->getHeight());
-        $saveObject->setValue('updateuser', rex::getUser()->getLogin());
-        $saveObject->setDateTimeValue('updatedate', time());
+        $saveObject->setValue('filesize', $filesize);
+        $saveObject->setValue('width', $width);
+        $saveObject->setValue('height', $height);
         $saveObject->update();
-
+        
         rex_media_cache::delete($filename);
-        return true;
     }
 
     /**

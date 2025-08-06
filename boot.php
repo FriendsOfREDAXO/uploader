@@ -19,6 +19,9 @@ if (rex::isBackend() && rex::getUser()) {
 
 rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
     if (rex::isBackend() && rex::getUser() && rex::getUser()->hasPerm('uploader[]')) {
+        // API explizit registrieren
+        rex_api_function::register('uploader_bulk_process', FriendsOfRedaxo\Uploader\ApiBulkProcess::class);
+        
         if (rex::isDebugMode() && rex_request_method() == 'get') {
             $compiler = new rex_scss_compiler();
             $compiler->setRootDir($this->getPath());
