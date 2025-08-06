@@ -99,45 +99,82 @@ $(document).on('rex:ready', function (event, element) {
             <div id="bulk-progress-modal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Bilder werden verarbeitet...</h4>
+                        <div class="modal-header bg-primary text-white">
+                            <h4 class="modal-title"><i class="fa fa-cogs"></i> Bilder werden verarbeitet...</h4>
                         </div>
-                        <div class="modal-body">
-                            <div class="progress" style="margin-bottom: 15px;">
-                                <div class="progress-bar progress-bar-striped active" role="progressbar" 
-                                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-                                    <span class="sr-only">0% Complete</span>
+                        <div class="modal-body" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+                            <!-- Main Progress Bar -->
+                            <div class="progress" style="margin-bottom: 20px; height: 25px; border-radius: 12px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" 
+                                     style="background: linear-gradient(45deg, #667eea 0%, #764ba2 100%); transition: width 0.6s ease;" 
+                                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                    <span class="progress-text" style="font-weight: bold; line-height: 25px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);"></span>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="batch-status">
-                                        <div><strong>Status:</strong> <span id="batch-status-text">Wird gestartet...</span></div>
-                                        <div><strong>Fortschritt:</strong> <span id="batch-progress-text">0 von 0</span></div>
-                                        <div><strong>Erfolgreich:</strong> <span id="batch-success-count">0</span></div>
-                                        <div><strong>Übersprungen:</strong> <span id="batch-skipped-count">0</span></div>
-                                        <div><strong>Fehler:</strong> <span id="batch-error-count">0</span></div>
-                                        <div><strong>Aktive Prozesse:</strong> <span id="active-processes-count">0</span></div>
-                                        <div><strong>Warteschlange:</strong> <span id="queue-length">0</span></div>
-                                        <div id="remaining-time-info" style="margin-top: 5px; font-size: 0.9em; color: #666;"></div>
+                            
+                            <!-- Status Cards -->
+                            <div class="row" style="margin-bottom: 20px;">
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="status-card" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #28a745;">
+                                        <div class="status-value" style="font-size: 24px; font-weight: bold; color: #28a745;" id="batch-success-count">0</div>
+                                        <div style="color: #666; font-size: 12px;">ERFOLGREICH</div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div id="currently-processing">
-                                        <strong>Aktuell verarbeitet:</strong>
-                                        <div id="current-files-list" style="margin-top: 5px; font-size: 0.9em;">
-                                            <div class="text-muted">Keine Dateien in Verarbeitung</div>
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="status-card" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #ffc107;">
+                                        <div class="status-value" style="font-size: 24px; font-weight: bold; color: #ffc107;" id="batch-skipped-count">0</div>
+                                        <div style="color: #666; font-size: 12px;">ÜBERSPRUNGEN</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="status-card" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #dc3545;">
+                                        <div class="status-value" style="font-size: 24px; font-weight: bold; color: #dc3545;" id="batch-error-count">0</div>
+                                        <div style="color: #666; font-size: 12px;">FEHLER</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="status-card" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #17a2b8;">
+                                        <div class="status-value" style="font-size: 24px; font-weight: bold; color: #17a2b8;" id="active-processes-count">0</div>
+                                        <div style="color: #666; font-size: 12px;">AKTIV</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Processing Details -->
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="processing-panel" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                        <h5 style="margin: 0 0 10px 0; color: #495057;"><i class="fa fa-tasks"></i> Aktuell verarbeitet</h5>
+                                        <div id="current-files-list" style="min-height: 60px;">
+                                            <div class="text-muted text-center" style="padding: 20px;"><i class="fa fa-hourglass-start"></i> Bereit zum Start...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-panel" style="background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                        <h5 style="margin: 0 0 10px 0; color: #495057;"><i class="fa fa-info-circle"></i> Status</h5>
+                                        <div style="font-size: 14px; line-height: 1.6;">
+                                            <div><strong>Status:</strong> <span id="batch-status-text" class="badge badge-info">Wird gestartet...</span></div>
+                                            <div style="margin-top: 8px;"><strong>Fortschritt:</strong> <span id="batch-progress-text">0 von 0</span></div>
+                                            <div style="margin-top: 8px;"><strong>Warteschlange:</strong> <span id="queue-length">0</span></div>
+                                            <div id="remaining-time-info" style="margin-top: 10px; font-size: 13px; color: #666;"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div id="batch-details" style="margin-top: 15px; max-height: 200px; overflow-y: auto;">
+                            
+                            <div id="batch-details" style="margin-top: 20px;">
                                 <!-- Batch details will be shown here -->
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" id="cancel-batch" disabled>Abbrechen</button>
-                            <button type="button" class="btn btn-primary" id="close-modal" style="display: none;">Schließen</button>
+                        <div class="modal-footer" style="background: #f8f9fa;">
+                            <button type="button" class="btn btn-secondary" id="cancel-batch" disabled>
+                                <i class="fa fa-stop"></i> Abbrechen
+                            </button>
+                            <button type="button" class="btn btn-success" id="close-modal" style="display: none;">
+                                <i class="fa fa-check"></i> Schließen
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -158,71 +195,137 @@ $(document).on('rex:ready', function (event, element) {
     function updateProgressModal(batchStatus) {
         let progressPercent = batchStatus.progress || 0;
         
+        // Update main progress bar
         $('.progress-bar').css('width', progressPercent + '%').attr('aria-valuenow', progressPercent);
-        $('.progress-bar .sr-only').text(Math.round(progressPercent) + '% Complete');
+        $('.progress-text').text(Math.round(progressPercent) + '%');
+        
+        // Update status cards with animation
+        animateCounter('#batch-success-count', batchStatus.successful || 0);
+        animateCounter('#batch-skipped-count', Object.keys(batchStatus.skipped || {}).length);
+        animateCounter('#batch-error-count', Object.keys(batchStatus.errors || {}).length);
+        animateCounter('#active-processes-count', batchStatus.activeProcesses || 0);
         
         $('#batch-progress-text').text(batchStatus.processed + ' von ' + batchStatus.total);
-        $('#batch-success-count').text(batchStatus.successful || 0);
-        $('#batch-skipped-count').text(Object.keys(batchStatus.skipped || {}).length);
-        $('#batch-error-count').text(Object.keys(batchStatus.errors || {}).length);
-        $('#active-processes-count').text(batchStatus.activeProcesses || 0);
         $('#queue-length').text(batchStatus.queueLength || 0);
         
-        // Aktuell verarbeitete Dateien anzeigen
+        // Update status badge
+        if (batchStatus.status === 'running') {
+            $('#batch-status-text').removeClass().addClass('badge badge-primary pulse').html('<i class="fa fa-spinner fa-spin"></i> Läuft...');
+        }
+        
+        // Aktuell verarbeitete Dateien mit cooler Animation
         let currentFilesHtml = '';
         if (batchStatus.currentlyProcessing && batchStatus.currentlyProcessing.length > 0) {
-            currentFilesHtml = batchStatus.currentlyProcessing.map(file => {
+            currentFilesHtml = batchStatus.currentlyProcessing.map((file, index) => {
                 let filename = typeof file === 'string' ? file : file.filename;
                 let duration = typeof file === 'object' && file.duration ? ` (${file.duration}s)` : '';
-                return `<div class="text-info"><i class="fa fa-spinner fa-spin"></i> ${filename}${duration}</div>`;
+                let colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
+                let color = colors[index % colors.length];
+                
+                return `
+                    <div class="processing-file" style="
+                        background: linear-gradient(135deg, ${color}22 0%, ${color}44 100%);
+                        border: 1px solid ${color}66;
+                        border-radius: 6px;
+                        padding: 8px 12px;
+                        margin-bottom: 6px;
+                        animation: pulse-file 2s infinite;
+                        display: flex;
+                        align-items: center;
+                        font-size: 13px;
+                    ">
+                        <div class="spinner" style="
+                            width: 16px;
+                            height: 16px;
+                            border: 2px solid ${color}44;
+                            border-top: 2px solid ${color};
+                            border-radius: 50%;
+                            animation: spin 1s linear infinite;
+                            margin-right: 8px;
+                            flex-shrink: 0;
+                        "></div>
+                        <div style="flex-grow: 1; font-weight: 500; color: #495057;">
+                            ${filename.length > 30 ? '...' + filename.slice(-30) : filename}
+                        </div>
+                        ${duration ? `<div style="color: ${color}; font-size: 11px; margin-left: 8px;">${duration}</div>` : ''}
+                    </div>
+                `;
             }).join('');
         } else {
-            currentFilesHtml = '<div class="text-muted">Keine Dateien in Verarbeitung</div>';
+            currentFilesHtml = `
+                <div class="text-center" style="padding: 30px; color: #6c757d;">
+                    <i class="fa fa-clock-o" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
+                    <div>Keine Dateien in Verarbeitung</div>
+                </div>
+            `;
         }
         $('#current-files-list').html(currentFilesHtml);
         
-        // Zeitschätzung anzeigen
+        // Zeitschätzung mit Icon
         if (batchStatus.remainingTime) {
             let minutes = Math.floor(batchStatus.remainingTime / 60);
             let seconds = batchStatus.remainingTime % 60;
             let timeStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
-            $('#remaining-time-info').html(`<i class="fa fa-clock-o"></i> Geschätzte Restzeit: ${timeStr}`);
+            $('#remaining-time-info').html(`
+                <div style="color: #17a2b8;">
+                    <i class="fa fa-clock-o"></i> Restzeit: <strong>${timeStr}</strong>
+                </div>
+            `);
         } else {
             $('#remaining-time-info').html('');
         }
         
         if (batchStatus.status === 'completed') {
-            $('#batch-status-text').text('Abgeschlossen');
-            $('.progress-bar').removeClass('active');
+            $('#batch-status-text').removeClass().addClass('badge badge-success').html('<i class="fa fa-check"></i> Abgeschlossen');
+            $('.progress-bar').removeClass('progress-bar-animated');
             $('#cancel-batch').hide();
             $('#close-modal').show();
-            $('#current-files-list').html('<div class="text-success"><i class="fa fa-check"></i> Alle Dateien verarbeitet</div>');
+            $('#current-files-list').html(`
+                <div class="text-center" style="padding: 30px; color: #28a745;">
+                    <i class="fa fa-check-circle" style="font-size: 36px; margin-bottom: 10px;"></i>
+                    <div><strong>Alle Dateien verarbeitet!</strong></div>
+                </div>
+            `);
             $('#remaining-time-info').html('');
             
-            // Zeige Zusammenfassung
+            // Animiere den Erfolg
+            $('.progress-bar').css('background', 'linear-gradient(45deg, #28a745 0%, #20c997 100%)');
+            
+            // Zeige detaillierte Zusammenfassung
             let summary = `
-                <div class="alert alert-success">
-                    <strong>Verarbeitung abgeschlossen!</strong><br>
-                    ${batchStatus.successful || 0} Bilder erfolgreich verarbeitet<br>
-                    ${Object.keys(batchStatus.skipped || {}).length} übersprungen<br>
-                    ${Object.keys(batchStatus.errors || {}).length} Fehler
+                <div class="alert alert-success" style="border-radius: 8px; border: none; box-shadow: 0 2px 10px rgba(40,167,69,0.2);">
+                    <h5><i class="fa fa-check-circle"></i> Verarbeitung abgeschlossen!</h5>
+                    <div class="row text-center" style="margin-top: 15px;">
+                        <div class="col-4">
+                            <div style="font-size: 24px; font-weight: bold; color: #28a745;">${batchStatus.successful || 0}</div>
+                            <small>Erfolgreich</small>
+                        </div>
+                        <div class="col-4">
+                            <div style="font-size: 24px; font-weight: bold; color: #ffc107;">${Object.keys(batchStatus.skipped || {}).length}</div>
+                            <small>Übersprungen</small>
+                        </div>
+                        <div class="col-4">
+                            <div style="font-size: 24px; font-weight: bold; color: #dc3545;">${Object.keys(batchStatus.errors || {}).length}</div>
+                            <small>Fehler</small>
+                        </div>
+                    </div>
                 </div>
             `;
             
             // Zeige Details zu übersprungenen und fehlerhaften Dateien
             let details = '';
             if (Object.keys(batchStatus.skipped || {}).length > 0) {
-                details += '<div class="alert alert-warning"><strong>Übersprungene Dateien:</strong><ul>';
+                details += '<div class="alert alert-warning" style="border-radius: 8px;"><strong><i class="fa fa-exclamation-triangle"></i> Übersprungene Dateien:</strong><ul style="margin-top: 10px; margin-bottom: 0;">';
                 Object.entries(batchStatus.skipped).forEach(([file, reason]) => {
-                    details += `<li>${file}: ${reason}</li>`;
+                    details += `<li>${file}: <em>${reason}</em></li>`;
                 });
                 details += '</ul></div>';
             }
             
             if (Object.keys(batchStatus.errors || {}).length > 0) {
-                details += '<div class="alert alert-danger"><strong>Fehlerhafte Dateien:</strong><ul>';
+                details += '<div class="alert alert-danger" style="border-radius: 8px;"><strong><i class="fa fa-times-circle"></i> Fehlerhafte Dateien:</strong><ul style="margin-top: 10px; margin-bottom: 0;">';
                 Object.entries(batchStatus.errors).forEach(([file, error]) => {
-                    details += `<li>${file}: ${error}</li>`;
+                    details += `<li>${file}: <em>${error}</em></li>`;
                 });
                 details += '</ul></div>';
             }
@@ -233,9 +336,19 @@ $(document).on('rex:ready', function (event, element) {
             setTimeout(() => {
                 location.reload();
             }, 3000);
-            
-        } else if (batchStatus.status === 'running') {
-            $('#batch-status-text').text('Läuft...');
+        }
+    }
+    
+    // Animation helper function
+    function animateCounter(selector, targetValue) {
+        let $element = $(selector);
+        let currentValue = parseInt($element.text()) || 0;
+        
+        if (currentValue !== targetValue) {
+            $element.css('transform', 'scale(1.2)').css('transition', 'transform 0.3s ease');
+            setTimeout(() => {
+                $element.text(targetValue).css('transform', 'scale(1)');
+            }, 150);
         }
     }
 
@@ -326,4 +439,73 @@ $(document).on('rex:ready', function (event, element) {
     $(document).on('click', '#close-modal', function() {
         hideProgressModal();
     });
+    
+    // Add CSS animations dynamically
+    if (!$('#bulk-processing-styles').length) {
+        $('head').append(`
+            <style id="bulk-processing-styles">
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                
+                @keyframes pulse-file {
+                    0%, 100% { 
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+                        transform: translateY(0);
+                    }
+                    50% { 
+                        box-shadow: 0 4px 16px rgba(0,0,0,0.15); 
+                        transform: translateY(-1px);
+                    }
+                }
+                
+                .pulse {
+                    animation: pulse 2s infinite;
+                }
+                
+                @keyframes pulse {
+                    0% { opacity: 1; }
+                    50% { opacity: 0.7; }
+                    100% { opacity: 1; }
+                }
+                
+                .status-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+                    transition: all 0.3s ease;
+                }
+                
+                .processing-panel, .info-panel {
+                    transition: all 0.3s ease;
+                }
+                
+                .processing-panel:hover, .info-panel:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+                }
+                
+                .progress-bar {
+                    position: relative;
+                    overflow: visible;
+                }
+                
+                .progress-bar::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                    animation: shine 2s infinite;
+                }
+                
+                @keyframes shine {
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(100%); }
+                }
+            </style>
+        `);
+    }
 });

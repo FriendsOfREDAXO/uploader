@@ -219,15 +219,30 @@ class BulkRework
             $remainingTime = round($avgTimePerFile * $remaining);
         }
         
-        // Aktuell verarbeitete Dateien
+        // Aktuell verarbeitete Dateien - prüfe ob currentFiles existiert
         $currentlyProcessing = [];
-        if (isset($status['currentFiles'])) {
+        if (isset($status['currentFiles']) && is_array($status['currentFiles'])) {
             foreach ($status['currentFiles'] as $process) {
-                $currentlyProcessing[] = [
-                    'filename' => $process['filename'],
-                    'duration' => round(microtime(true) - $process['startTime'], 1)
-                ];
+                if (isset($process['filename']) && isset($process['startTime'])) {
+                    $currentlyProcessing[] = [
+                        'filename' => $process['filename'],
+                        'duration' => round(microtime(true) - $process['startTime'], 1)
+                    ];
+                }
             }
+        }
+        
+        // Debug: Logge den Status für Debugging
+        if (function_exists('rex_logger')) {
+            rex_logger::factory()->log('debug', 'Batch Status Extended Debug', [
+                'batchId' => $batchId,
+                'processed' => $status['processed'],
+                'total' => $status['total'],
+                'progress' => $progress,
+                'currentFiles' => count($status['currentFiles'] ?? []),
+                'processQueue' => count($status['processQueue'] ?? []),
+                'currentlyProcessing' => count($currentlyProcessing)
+            ]);
         }
         
         return array_merge($status, [
