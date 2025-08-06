@@ -330,9 +330,11 @@ $(document).on('rex:ready', function (event, element) {
                         } else if (this.status.status === 'cancelled') {
                             this.running = false;
                         } else if (this.status.status === 'cancelling') {
-                            this.running = false;
-                            // Status wird durch updateProgressModal behandelt
-                        } else if (response.data.status === 'processing') {
+                            // Beim Abbrechen weiter abfragen bis 'cancelled' Status erreicht wird
+                            this.processInterval = setTimeout(() => {
+                                this.processNext();
+                            }, 1000); // Längere Pause beim Abbrechen
+                        } else if (response.data.status === 'processing' || response.data.status === 'cancelling') {
                             // Weiter verarbeiten nach kurzer Pause
                             this.processInterval = setTimeout(() => {
                                 this.processNext();
