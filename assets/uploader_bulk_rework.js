@@ -199,11 +199,6 @@ $(document).on('rex:ready', function (event, element) {
             return;
         }
         
-        console.log('Updating modal with batch status:', batchStatus);
-        console.log('currentlyProcessing:', batchStatus.currentlyProcessing);
-        console.log('activeProcesses:', batchStatus.activeProcesses);
-        console.log('currentFiles:', batchStatus.currentFiles);
-        
         let progressPercent = batchStatus.progress || 0;
         
         // Update main progress bar
@@ -317,9 +312,6 @@ $(document).on('rex:ready', function (event, element) {
                 },
                 success: (response) => {
                     if (response.success) {
-                        // Debug: Logge die Antwort
-                        console.log('Batch response:', response.data);
-                        
                         // Verwende die korrekten Daten
                         this.status = response.data.batch || response.data;
                         updateProgressModal(this.status);
@@ -341,7 +333,6 @@ $(document).on('rex:ready', function (event, element) {
                 error: (xhr, status, error) => {
                     // Bei Netzwerkfehlern etwas länger warten bevor Retry
                     if (this.running) {
-                        console.warn('Netzwerkfehler, versuche erneut in 1s:', error);
                         this.processInterval = setTimeout(() => {
                             this.processNext();
                         }, 1000);

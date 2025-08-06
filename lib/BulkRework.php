@@ -324,12 +324,6 @@ class BulkRework
             'currentFiles' => $currentFiles
         ]);
         
-        // Debug: Logge Status für Debugging
-        error_log('DEBUG: Current files set for batch ' . $batchId . ': ' . json_encode($currentFiles));
-        
-        // Kurze Pause für Frontend-Feedback (damit UI die Dateien anzeigen kann)
-        usleep(500000); // 0.5 Sekunden
-        
         // Verarbeite alle Dateien in diesem Batch
         $results = [];
         foreach ($filesToProcess as $filename) {
