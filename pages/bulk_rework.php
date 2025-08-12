@@ -21,13 +21,13 @@ $hitsPerPage = $this->getConfig('uploader-bulk-rework-hits-per-page', 200);
 // Zeige Informationen über verfügbare Bildverarbeitungsbibliotheken
 $imageLibInfo = [];
 if (BulkRework::hasGD()) {
-    $imageLibInfo[] = '<span class="text-success"><i class="rex-icon fa-check"></i> GD verfügbar</span>';
+    $imageLibInfo[] = '<span><i class="rex-icon fa-check text-success"></i> GD verfügbar</span>';
 }
 if (BulkRework::hasImageMagick()) {
     if (class_exists('Imagick')) {
-        $imageLibInfo[] = '<span class="text-success"><i class="rex-icon fa-check"></i> ImageMagick (PHP Extension) verfügbar</span>';
+        $imageLibInfo[] = '<span><i class="rex-icon fa-check text-success"></i> ImageMagick (PHP Extension) verfügbar</span>';
     } else {
-        $imageLibInfo[] = '<span class="text-success"><i class="rex-icon fa-check"></i> ImageMagick (Binary) verfügbar</span>';
+        $imageLibInfo[] = '<span><i class="rex-icon fa-check text-success"></i> ImageMagick (Binary) verfügbar</span>';
     }
 }
 

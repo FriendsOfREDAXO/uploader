@@ -195,8 +195,8 @@ body.rex-theme-dark {
 
     .uploader-bulk-rework-num-hits-per-page {
         position: absolute;
-        right: 0;
-        bottom: 15px;
+        right: 15px;
+        top: 15px;
         z-index: 1;
         display: flex;
         align-items: center;
@@ -204,15 +204,21 @@ body.rex-theme-dark {
             display: flex;
             align-items: center;
             margin: 0;
-            gap: 15px;
+            gap: 10px;
         }
         label {
             margin: 0;
             font-weight: normal;
+            font-size: 13px;
         }
         .form-control {
-            width: 100px;
-            border: 1px solid #{$border-grey}
+            width: 80px;
+            border: 1px solid #{$border-grey};
+            font-size: 13px;
+        }
+        .btn {
+            font-size: 13px;
+            padding: 3px 8px;
         }
     }
 
