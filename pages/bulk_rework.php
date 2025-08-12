@@ -21,13 +21,13 @@ $hitsPerPage = $this->getConfig('uploader-bulk-rework-hits-per-page', 200);
 // Zeige Informationen über verfügbare Bildverarbeitungsbibliotheken
 $imageLibInfo = [];
 if (BulkRework::hasGD()) {
-    $imageLibInfo[] = '<span><i class="rex-icon fa-check text-success"></i> GD verfügbar</span>';
+    $imageLibInfo[] = '<span class="text-success"><i class="rex-icon fa-check"></i> GD verfügbar</span>';
 }
 if (BulkRework::hasImageMagick()) {
     if (class_exists('Imagick')) {
-        $imageLibInfo[] = '<span><i class="rex-icon fa-check text-success"></i> ImageMagick (PHP Extension) verfügbar</span>';
+        $imageLibInfo[] = '<span class="text-success"><i class="rex-icon fa-check"></i> ImageMagick (PHP Extension) verfügbar</span>';
     } else {
-        $imageLibInfo[] = '<span><i class="rex-icon fa-check text-success"></i> ImageMagick (Binary) verfügbar</span>';
+        $imageLibInfo[] = '<span class="text-success"><i class="rex-icon fa-check"></i> ImageMagick (Binary) verfügbar</span>';
     }
 }
 
@@ -253,23 +253,21 @@ $fragment = new rex_fragment();
 $fragment->setVar('title',
     $addon->i18n('bulk_rework_table_title') .
            '<div class="small uploader-bulk-rework-current-settings">' . sprintf($addon->i18n('bulk_rework_current_settings'), $maxWidth, $maxHeight) . '</div>'.
-           '<div class="small uploader-bulk-rework-hits">' . $list->getRows() . ' ' . $addon->i18n('bulk_rework_table_hits') . '</div>'.
-           '<div class="small uploader-bulk-rework-num-hits-per-page">
-           <form class="uploader-bulk-rework-num-hits-per-page" action="' . rex_url::currentBackendPage() . '" method="post">
-                <div class="form-group form-group-sm rex-form-group-nowrap">
-                    <label for="num-hits-per-page">' . $addon->i18n('uploader_bulk_rework_table_num_hits_per_page') . '</label>
-                    <input class="form-control form-control-sm" type="number" id="num-hits-per-page" name="rework-files-num-hits-per-page" value="' .
-                    $hitsPerPage . '" placeholder="200">
-                </div>
-                <button class="btn btn-sm btn-primary" type="submit">
-                    OK
-                </button>                
-                <input type="hidden" name="formsubmit" value="set-num-hits-per-page" />
-           </form>
-           </div>',
+           '<div class="small uploader-bulk-rework-hits">' . $list->getRows() . ' ' . $addon->i18n('bulk_rework_table_hits') . '</div>',
     false
 );
-$fragment->setVar('options', preg_replace('@(btn btn-save)@', '$1 btn-xs', $submitButton), false);
+$hitsPerPageForm = '<form class="uploader-bulk-rework-num-hits-per-page" action="' . rex_url::currentBackendPage() . '" method="post" style="display: inline-block; margin-right: 10px;">
+    <div class="form-group form-group-sm rex-form-group-nowrap" style="display: inline-flex; align-items: center; margin: 0; gap: 10px;">
+        <label for="num-hits-per-page" style="margin: 0; font-weight: normal; font-size: 13px;">' . $addon->i18n('uploader_bulk_rework_table_num_hits_per_page') . '</label>
+        <input class="form-control form-control-sm" type="number" id="num-hits-per-page" name="rework-files-num-hits-per-page" value="' .
+        $hitsPerPage . '" placeholder="200" style="width: 80px; font-size: 13px;">
+        <button class="btn btn-sm btn-primary" type="submit" style="font-size: 13px; padding: 3px 8px;">
+            OK
+        </button>                
+    </div>
+    <input type="hidden" name="formsubmit" value="set-num-hits-per-page" />
+</form>';
+$fragment->setVar('options', $hitsPerPageForm . preg_replace('@(btn btn-save)@', '$1 btn-xs', $submitButton), false);
 $fragment->setVar('content', $listContent, false);
 $table = $fragment->parse('core/page/section.php');
 
