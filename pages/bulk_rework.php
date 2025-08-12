@@ -256,7 +256,7 @@ $fragment->setVar('title',
            '<div class="small uploader-bulk-rework-hits">' . $list->getRows() . ' ' . $addon->i18n('bulk_rework_table_hits') . '</div>',
     false
 );
-$hitsPerPageForm = '<form class="uploader-bulk-rework-num-hits-per-page" action="' . rex_url::currentBackendPage() . '" method="post" style="display: inline-block; margin-right: 10px;">
+$hitsPerPageForm = '<form class="uploader-bulk-rework-num-hits-per-page" action="' . rex_url::currentBackendPage() . '" method="post" style="display: inline-block; margin-right: 20px;">
     <div class="form-group form-group-sm rex-form-group-nowrap" style="display: inline-flex; align-items: center; margin: 0; gap: 10px;">
         <label for="num-hits-per-page" style="margin: 0; font-weight: normal; font-size: 13px;">' . $addon->i18n('uploader_bulk_rework_table_num_hits_per_page') . '</label>
         <input class="form-control form-control-sm" type="number" id="num-hits-per-page" name="rework-files-num-hits-per-page" value="' .
