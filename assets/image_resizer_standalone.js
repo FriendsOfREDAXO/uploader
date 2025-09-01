@@ -40,7 +40,7 @@ class uploader_resizer_standalone {
     if (self.#fileInput) {
       self.#log('Loaded')
       self.#fileInput.addEventListener('change', function (event) {
-        self.#processFiles(event.target.files)
+        self.#handleFileSelection(event.target.files)
       })
     } else {
       self.#log('No file input found for image resizing.')
@@ -78,6 +78,81 @@ class uploader_resizer_standalone {
     }
   }
 
+  #isSvgFile(file) {
+    if (!file) return false
+    
+    // Check MIME type first
+    if (file.type === 'image/svg+xml') {
+      return true
+    }
+    
+    // Check file extension as fallback
+    if (file.name) {
+      const extension = file.name.toLowerCase().split('.').pop()
+      return extension === 'svg'
+    }
+    
+    return false
+  }
+
+  #handleFileSelection(files) {
+    const self = this
+    
+    if (!files || files.length === 0) {
+      self.#enableResizeOption()
+      return
+    }
+
+    const file = files[0]
+    
+    if (self.#isSvgFile(file)) {
+      self.#log('SVG file detected:', file.name)
+      self.#disableResizeOption()
+    } else {
+      self.#enableResizeOption()
+      self.#processFiles(files)
+    }
+  }
+
+  #disableResizeOption() {
+    const self = this
+    if (self.#shouldResizeInput) {
+      self.#shouldResizeInput.checked = false
+      self.#shouldResizeInput.disabled = true
+      
+      // Find the label and add explanatory text
+      const label = self.#shouldResizeInput.closest('label')
+      if (label && !label.querySelector('.svg-notice')) {
+        const notice = document.createElement('span')
+        notice.className = 'svg-notice text-muted'
+        notice.style.display = 'block'
+        notice.style.fontSize = '0.9em'
+        notice.style.marginTop = '5px'
+        notice.textContent = (self.#options && self.#options.messages && self.#options.messages.svgNotice) || 
+                             'SVG files are not resized as they are vector-based.'
+        label.appendChild(notice)
+      }
+      
+      self.#hideSizeInfo()
+    }
+  }
+
+  #enableResizeOption() {
+    const self = this
+    if (self.#shouldResizeInput) {
+      self.#shouldResizeInput.disabled = false
+      
+      // Remove SVG notice if present
+      const label = self.#shouldResizeInput.closest('label')
+      if (label) {
+        const notice = label.querySelector('.svg-notice')
+        if (notice) {
+          notice.remove()
+        }
+      }
+    }
+  }
+
   #processFiles(files) {
     const self = this
     self.#shouldResize =
@@ -91,6 +166,13 @@ class uploader_resizer_standalone {
     self.#hideSizeInfo.call(self)
 
     if (files && files.length > 0) {
+      // Check if the file is an SVG - if so, skip processing
+      const file = files[0]
+      if (self.#isSvgFile(file)) {
+        self.#log('SVG file detected, skipping resize processing:', file.name)
+        return
+      }
+
       const data = {
         files: Array.from(files),
         index: 0

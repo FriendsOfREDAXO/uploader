@@ -49,6 +49,7 @@ uploader_bulk_rework_success = <b>%s</b> archivo(s) de imagen procesado(s) corre
 uploader_resizer_standalone_calculated_size = Dimensiones calculadas
 uploader_resizer_standalone_original_size = Dimensiones originales
 uploader_resizer_standalone_error = Error en el redimensionamiento de la imagen en el navegador.<br />El redimensionamiento se realizará ahora en el servidor.
+uploader_resizer_standalone_svg_notice = Los archivos SVG no se redimensionan ya que están basados en vectores.
 
 uploader_errors_1 = Archivo demasiado grande (upload_max_filesize / php.ini)
 uploader_errors_2 = Archivo demasiado grande (MAX_FILE_SIZE/ Form)
