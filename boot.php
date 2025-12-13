@@ -33,7 +33,7 @@ rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
         }
         $include_assets = 0;
         $include_template = 0;
-        if (rex_get('page', 'string') == 'mediapool/upload') {
+        if (rex_get('page', 'string') == 'mediapool/upload' && $addon->getConfig('replace-mediapool-checked', true)) {
             $this->setProperty('context', 'mediapool_upload');
             $include_assets = 1;
             $include_template = 1;

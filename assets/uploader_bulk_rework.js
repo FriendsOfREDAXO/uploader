@@ -437,4 +437,42 @@ $(document).on('rex:ready', function (event, element) {
             </style>
         `);
     }
+
+    // Image Preview Modal
+    $(document).on('click', '.uploader-preview-trigger', function(e) {
+        e.preventDefault();
+        let filename = $(this).data('filename');
+        let title = $(this).data('title');
+        let $modal = $('#uploader-preview-modal');
+        let $img = $modal.find('#uploader-preview-image');
+        let $spinner = $modal.find('#uploader-preview-spinner');
+        let $title = $modal.find('.modal-title');
+
+        $title.text(title || filename);
+        $img.hide();
+        $spinner.show();
+        
+        // Use media manager type if available, otherwise raw file
+        let src = 'index.php?rex_media_type=rex_mediapool_detail&rex_media_file=' + filename;
+        
+        // Preload image
+        let tempImg = new Image();
+        tempImg.onload = function() {
+            $img.attr('src', src);
+            $spinner.hide();
+            $img.show();
+        };
+        tempImg.onerror = function() {
+            $spinner.hide();
+            $img.after('<div class="alert alert-danger">Fehler beim Laden des Bildes</div>');
+        };
+        tempImg.src = src;
+
+        $modal.modal('show');
+    });
+    
+    // Clear image when modal is closed to stop loading if cancelled
+    $('#uploader-preview-modal').on('hidden.bs.modal', function () {
+        $(this).find('#uploader-preview-image').attr('src', '');
+    });
 });

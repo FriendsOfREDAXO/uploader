@@ -9,7 +9,8 @@ if (rex_post('config-submit', 'boolean')) {
         ['image-max-width', 'int'],
         ['image-max-height', 'int'],
         ['image-resize-checked', 'bool'],
-        ['filename-as-title-checked', 'bool']
+        ['filename-as-title-checked', 'bool'],
+        ['replace-mediapool-checked', 'bool']
     ]));
 
     echo rex_view::success($this->i18n('settings_saved'));
@@ -77,6 +78,17 @@ $formElements = [];
 $n = [];
 $n['label'] = '<label for="filename-as-title-checked">' . $this->i18n('uploader_settings_filename_as_title_checked') . '</label>';
 $n['field'] = '<input type="checkbox" id="filename-as-title-checked" name="settings[filename-as-title-checked]" value="1" ' . ($this->getConfig('filename-as-title-checked') ? ' checked="checked"' : '') . '>';
+$formElements[] = $n;
+
+$fragment = new rex_fragment();
+$fragment->setVar('elements', $formElements, false);
+$content .= $fragment->parse('core/form/checkbox.php');
+
+// replace mediapool upload (default: ON)
+$formElements = [];
+$n = [];
+$n['label'] = '<label for="replace-mediapool-checked">' . $this->i18n('uploader_settings_replace_mediapool_checked') . '</label>';
+$n['field'] = '<input type="checkbox" id="replace-mediapool-checked" name="settings[replace-mediapool-checked]" value="1" ' . ($this->getConfig('replace-mediapool-checked', true) ? ' checked="checked"' : '') . '>';
 $formElements[] = $n;
 
 $fragment = new rex_fragment();

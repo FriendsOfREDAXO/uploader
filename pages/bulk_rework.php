@@ -115,6 +115,14 @@ foreach($existingFields as $field)  {
     }
 }
 
+// Preview Column
+$list->addColumn('preview', '', 1, ['<th class="rex-table-icon"></th>', '<td class="rex-table-icon">###VALUE###</td>']);
+$list->setColumnFormat('preview', 'custom', static function ($params) {
+    $filename = $params['list']->getValue('filename');
+    $title = $params['list']->getValue('title');
+    return '<a href="#" class="uploader-preview-trigger" data-filename="' . rex_escape($filename) . '" data-title="' . rex_escape($title) . '" title="Vorschau"><i class="rex-icon rex-icon-view"></i></a>';
+});
+
 $list->setColumnLabel('id', rex_i18n::msg('id'));
 $list->setColumnSortable('id');
 $list->setColumnFormat('id', 'custom', static function ($params) use ($list) {
@@ -134,7 +142,7 @@ $list->setColumnFormat('filename', 'custom', static function ($params) use ($lis
            ) . $params['subject'];
 });
 
-$list->setColumnLabel('category_id', '<nobr>' . rex_i18n::msg('pool_file_category') . '</nobr>');
+$list->setColumnLabel('category_id', '<nobr>' . $addon->i18n('bulk_rework_table_column_category') . '</nobr>');
 $list->setColumnSortable('category_id');
 
 $list->setColumnLabel('filesize', '<nobr>' . $addon->i18n('bulk_rework_table_column_filesize') . '</nobr>');
@@ -368,3 +376,22 @@ echo '
     <form action="' . $actionUrl . '" method="post">
         ' . $content . '
     </form>';
+
+// Modal for Image Preview
+echo '
+<div class="modal fade" id="uploader-preview-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body text-center" style="min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                <i class="rex-icon fa-spinner fa-spin fa-3x" id="uploader-preview-spinner"></i>
+                <img src="" class="img-responsive" id="uploader-preview-image" style="display: none; max-height: 80vh; margin: 0 auto;" />
+            </div>
+        </div>
+    </div>
+</div>';

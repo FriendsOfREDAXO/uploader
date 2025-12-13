@@ -1,5 +1,5 @@
 package: uploader
-version: '2.9.2'
+version: '2.9.3'
 author: 'Friends Of REDAXO'
 supportpage: 'https://github.com/FriendsOfREDAXO/uploader'
 
@@ -8,11 +8,11 @@ page:
     icon: rex-icon rex-icon-import
     pjax: true
     subpages:
+        upload:
+            title: 'translate:page_upload'
         settings:
             title: 'translate:page_settings'
             perm: admin
-        upload:
-            title: 'translate:page_upload'
         bulk_rework:
             title: 'translate:page_bulk_rework'
             perm: uploader[bulk_rework]
@@ -22,6 +22,13 @@ page:
             hasLayout: false
 requires:
     redaxo: '^5.16.0'
+
+config:
+    image-max-width: 4000
+    image-max-height: 4000
+    image-resize-checked: true
+    filename-as-title-checked: false
+    replace-mediapool-checked: true
 
 endpoint: 'index.php?page=uploader/endpoint'
 
