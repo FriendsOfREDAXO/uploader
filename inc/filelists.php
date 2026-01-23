@@ -61,7 +61,7 @@ return '
                 <i class="glyphicon glyphicon-ban-circle"></i>
                 <span>'.$this->i18n('uploader_filelist_cancel').'</span>
             </button>
-            {% if ('.$add_to_widget.') { %}
+            {% if ('.$add_to_widget.' && !file.error) { %}
                 <a class="btn btn-xs btn-select" data-filename="{%=file.name%}">'.$this->i18n('uploader_filelist_add_to_widget').'</a>
             {% } %}
         </div>
