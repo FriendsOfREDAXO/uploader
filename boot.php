@@ -8,7 +8,6 @@ $addon = rex_addon::get('uploader');
 if (rex::isBackend() && rex::getUser()) {
     rex_perm::register('uploader[]');
     rex_perm::register('uploader[page]');
-    rex_perm::register('uploader[bulk_rework]');
 
     if (!rex::getUser()->hasPerm('uploader[page]')) {
         $page = $this->getProperty('page');
@@ -19,9 +18,6 @@ if (rex::isBackend() && rex::getUser()) {
 
 rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
     if (rex::isBackend() && rex::getUser() && rex::getUser()->hasPerm('uploader[]')) {
-        // API explizit registrieren
-        rex_api_function::register('uploader_bulk_process', FriendsOfRedaxo\Uploader\ApiBulkProcess::class);
-        
         if (rex::isDebugMode() && rex_request_method() == 'get') {
             $compiler = new rex_scss_compiler();
             $compiler->setRootDir($this->getPath());

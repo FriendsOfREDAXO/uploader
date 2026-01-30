@@ -13,9 +13,6 @@ page:
         settings:
             title: 'translate:page_settings'
             perm: admin
-        bulk_rework:
-            title: 'translate:page_bulk_rework'
-            perm: uploader[bulk_rework]
         endpoint:
             title: 'endpoint'
             hidden: true
