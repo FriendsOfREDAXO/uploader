@@ -368,6 +368,11 @@ class uploader_resizer_standalone {
               'Image loading failed or no image found in the file.'
             )
           } else self.#log('Image loaded', { ...data })
+          // Store original dimensions so #saveImage can detect if the image
+          // was actually scaled down. If not, the original file is kept as-is
+          // to avoid re-encoding (which can increase file size for optimised images).
+          data.originalWidth = data.img ? (data.img.naturalWidth || data.img.width || 0) : 0
+          data.originalHeight = data.img ? (data.img.naturalHeight || data.img.height || 0) : 0
           self.#options.maxWidth = self.#options.imageMaxWidth || 0
           self.#options.maxHeight = self.#options.imageMaxHeight || 0
           data = await self.#resizeImage.call(self, data)
@@ -508,6 +513,28 @@ class uploader_resizer_standalone {
             dfd.resolveWith(self, [data])
             return
           }
+
+          // If the canvas has the same dimensions as the original image, the image
+          // was NOT scaled down (it was within limits). Skip re-encoding to preserve
+          // the original file quality and avoid bloating pre-optimised images.
+          const canvasW = data.canvas.width || 0
+          const canvasH = data.canvas.height || 0
+          const origW = data.originalWidth || 0
+          const origH = data.originalHeight || 0
+          if (
+            origW > 0 &&
+            origH > 0 &&
+            canvasW === origW &&
+            canvasH === origH
+          ) {
+            self.#log('saveImage: image within limits, keeping original file unchanged', {
+              origW, origH, canvasW, canvasH
+            })
+            data.skipMetaDataSave = true
+            dfd.resolveWith(self, [data])
+            return
+          }
+
           const originalType = file && file.type ? file.type : ''
           const originalName = file && file.name ? file.name : 'image'
 

@@ -1,5 +1,11 @@
 # Uploader Changelog
 
+## 3.0.2 - 08.05.2026
+
+### Bugfixes
+
+* Bilder innerhalb der konfigurierten Maximalmaße werden beim Bildaustausch nicht mehr re-enkodiert – bereits optimierte Bilder (z. B. via TinyPNG) landen jetzt 1:1 im Medienpool ohne Qualitätsverlust oder Größenzunahme
+
 ## 3.0.1 - 07.05.2026
 
 ### Bugfixes
@@ -13,6 +19,7 @@
 * Dateityp-Erkennung für Vorschau auf Fallback per Dateiendung erweitert (falls Browser-MIME leer liefert)
 * AVIF-Dateien werden beim Bildaustausch im Browser korrekt erkannt – bei fehlendem Canvas-AVIF-Encode-Support wird das Original direkt zum Server gesendet und dort skaliert
 * AVIF-Unterstützung in `ImageResizer` ergänzt: GD nutzt `imageavif()` (PHP 8.1+ mit libavif) wenn verfügbar; fehlt die Unterstützung, bleibt das Original unverändert erhalten (kein Absturz)
+* **Bilder innerhalb der Maximalmaße werden nicht mehr re-enkodiert**: War „Übergroßes Bild verkleinern" aktiv, wurden bisher alle Bilder durch den Browser via Canvas neu enkodiert – auch bereits optimierte Bilder, was zu größeren Dateien führen konnte. Jetzt werden nur tatsächlich verkleinerte Bilder als neue Blob-Datei übergeben; Bilder innerhalb der Limits landen 1:1 im Medienpool.
 
 ### Features
 
