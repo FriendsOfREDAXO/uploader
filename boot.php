@@ -1,7 +1,6 @@
 <?php
 
-use FriendsOfRedaxo\Uploader\BulkRework;
-use FriendsOfRedaxo\Uploader\BulkReworkList;
+use FriendsOfRedaxo\Uploader\ImageResizer;
 
 $addon = rex_addon::get('uploader');
 
@@ -71,25 +70,6 @@ rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
                     $ep->setSubject(str_replace('</head>', $file_list_templates . '</head>', $ep->getSubject()));
                 }
             });
-        } elseif (rex_be_controller::getCurrentPage() == $addon->getName() . '/bulk_rework') {
-            rex_view::addCssFile($this->getAssetsUrl('uploader.css'));
-            rex_view::addJsFile($this->getAssetsUrl('uploader_bulk_rework.js'));
-
-            rex_extension::register('REX_LIST_GET', function (rex_extension_point $ep) use ($addon) {
-                /** @var BulkReworkList $list  */
-                $list = $ep->getSubject();
-                $sql = $list->getSql();
-
-                // get query string
-                $reflection = new ReflectionClass($sql);
-                $sqlProperty = $reflection->getProperty('query');
-                $query = $sqlProperty->getValue($sql);
-
-                if (is_string($query) && preg_match('@ORDER BY `filesize`@', $query)) {
-                    $query = preg_replace('@ORDER BY `filesize`@', 'ORDER BY CAST(`filesize` as SIGNED INTEGER)', $query);
-                    $list->setCustomQuery($query);
-                }
-            });
         }
 
         // add checkbox to allow rescaling on image update/re-upload
@@ -131,7 +111,7 @@ rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
                 $filename = $ep->getParam('filename', '');
 
                 if (isset($_FILES['file_new']) && rex_request('resize-image', 'string', 'off') === 'on') {
-                    BulkRework::reworkFile($filename, $maxWidth, $maxHeight);
+                    ImageResizer::resizeIfNeeded($filename, $maxWidth, $maxHeight);
                 }
             });
         }

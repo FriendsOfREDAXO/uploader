@@ -1,10 +1,32 @@
 # Uploader Changelog
 
-## x.x.x - xx.xx.20xx
+## 3.0.1 - 07.05.2026
 
-* Namespace changed from `uploader` to `FriendsOfRedaxo\Uploader`
-  - class `uploader\lib\uploader_bulk_rework` renamed to `FriendsOfRedaxo\Uploader\BulkRework`
-  - class `uploader\lib\uploader_bulk_rework_list` renamed to `FriendsOfRedaxo\Uploader\BulkReworkList`
+### Bugfixes
+
+* Fatal error „Class `FriendsOfRedaxo\Uploader\BulkRework` not found" beim Bildaustausch mit aktivierter Resize-Checkbox behoben / fixes #113
+* Tote `use`-Statements (`BulkRework`, `BulkReworkList`) und toter `bulk_rework`-Seitenblock aus `boot.php` entfernt
+
+### Intern
+
+* Neue Klasse `FriendsOfRedaxo\Uploader\ImageResizer` übernimmt das serverseitige Resize beim Bildaustausch im Medienpool
+  * Nutzt ImageMagick (Imagick PHP-Extension) wenn verfügbar, fällt sonst auf GD zurück
+  * Unterstützt JPEG, PNG, GIF, WebP; GIF-Animationen werden via Imagick korrekt behandelt
+
+## 3.0.0 - 07.05.2026
+
+### Breaking Changes
+
+* **Bulk-Verarbeitung entfernt** – die Stapelverarbeitung zum nachträglichen Verkleinern von Medienpool-Bildern wurde in das separate AddOn [`mediapool_tools`](https://github.com/FriendsOfREDAXO/mediapool_tools) ausgelagert
+  * Klassen `BulkRework`, `BulkReworkList`, `ApiBulkProcess` entfernt
+  * Berechtigung `uploader[bulk_rework]` entfernt
+  * Unterseite `bulk_rework` entfernt
+  * Assets `uploader_bulk_rework.js`, `uploader_bulk_rework_simple.js` entfernt
+
+### Features
+
+* Bildvorschau-Modal in der Medienpool-Detailansicht hinzugefügt
+* „Datei übernehmen"-Button wird bei fehlgeschlagener Dateivalidierung ausgeblendet / fixes #111
 
 ## 2.6.0 - 13.06.2025
 
