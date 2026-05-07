@@ -24,6 +24,7 @@ config:
     image-max-width: 4000
     image-max-height: 4000
     image-resize-checked: true
+    image-resize-locked: false
     filename-as-title-checked: false
     replace-mediapool-checked: true
 

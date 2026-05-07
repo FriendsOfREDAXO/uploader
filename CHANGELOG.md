@@ -6,12 +6,23 @@
 
 * Fatal error „Class `FriendsOfRedaxo\Uploader\BulkRework` not found" beim Bildaustausch mit aktivierter Resize-Checkbox behoben / fixes #113
 * Tote `use`-Statements (`BulkRework`, `BulkReworkList`) und toter `bulk_rework`-Seitenblock aus `boot.php` entfernt
+* Robusteres Blob-Handling im Browser-Resize (`toBlob()`-Nullfall), damit kein `TypeError` bei `blob.name` mehr auftritt
+* Bootstrap-3-konformes Dateiauswahl-UI in der Medienpool-Detailansicht (Button + Dateiname im Input-Group-Stil)
+* Sichtbarer Größenstatus direkt bei der Vorschau (`Übergroß` / `innerhalb der Limits`) inkl. konfigurierter Maximalwerte
+* Live-Vorschau und Dimensionsanzeige beim Dateiaustausch robuster gemacht (auch bei dynamischen/duplizierten `file_new`-Feldern)
+* Dateityp-Erkennung für Vorschau auf Fallback per Dateiendung erweitert (falls Browser-MIME leer liefert)
+* AVIF-Dateien werden beim Bildaustausch im Browser korrekt erkannt – bei fehlendem Canvas-AVIF-Encode-Support wird das Original direkt zum Server gesendet und dort skaliert
+* AVIF-Unterstützung in `ImageResizer` ergänzt: GD nutzt `imageavif()` (PHP 8.1+ mit libavif) wenn verfügbar; fehlt die Unterstützung, bleibt das Original unverändert erhalten (kein Absturz)
+
+### Features
+
+* Neue Option „Resize erzwingen" in den AddOn-Einstellungen – sperrt die Resize-Checkbox im Medienpool dauerhaft ein, sodass Redakteure sie nicht deaktivieren können
 
 ### Intern
 
 * Neue Klasse `FriendsOfRedaxo\Uploader\ImageResizer` übernimmt das serverseitige Resize beim Bildaustausch im Medienpool
   * Nutzt ImageMagick (Imagick PHP-Extension) wenn verfügbar, fällt sonst auf GD zurück
-  * Unterstützt JPEG, PNG, GIF, WebP; GIF-Animationen werden via Imagick korrekt behandelt
+  * Unterstützt JPEG, PNG, GIF, WebP, AVIF; GIF-Animationen werden via Imagick korrekt behandelt
 
 ## 3.0.0 - 07.05.2026
 
@@ -59,7 +70,6 @@ the necessary rights / fixed #90 by @skerbis
 * Additional safeguard in `generate_response()` so that `rex_media::get()` is only checked for `isImage()` if an object
 is actually returned / by @skerbis 
 * Preventing a file from being selected multiple times for upload / by @skerbis 
-
 ## 2.4.3 - 03.04.2025
 
 * Switch to `rex_media_service` by @skerbis 

@@ -10,6 +10,19 @@ class uploader_resizer_standalone {
   #oldSizeLabel = null
   #newSizeLabel = null
   #fileInput = null
+  #fileTrigger = null
+  #fileNameInput = null
+  #currentImageLink = null
+  #currentImagePreview = null
+  #currentImageSize = null
+  #currentImageStatus = null
+  #currentImageObjectUrl = null
+
+  #originalCurrentImageLinkHref = ''
+  #originalCurrentImagePreviewSrc = ''
+  #originalCurrentImageSizeText = ''
+  #originalCurrentImageStatusText = ''
+  #originalCurrentImageStatusClass = ''
 
   #data = {
     files: [],
@@ -36,15 +49,67 @@ class uploader_resizer_standalone {
     )
 
     self.#fileInput = self.#form.querySelector('input[name="file_new"]')
+    self.#fileTrigger = self.#form.querySelector('[data-uploader-file-trigger]')
+    self.#fileNameInput = self.#form.querySelector('[data-uploader-file-name]')
+    self.#currentImageLink = self.#form.querySelector('[data-current-image-link]')
+    self.#currentImagePreview = self.#form.querySelector(
+      '[data-current-image-preview]'
+    )
+    self.#currentImageSize = self.#form.querySelector('[data-current-image-size]')
+    self.#currentImageStatus = self.#form.querySelector(
+      '[data-current-image-status]'
+    )
+
+    self.#originalCurrentImageLinkHref = self.#currentImageLink
+      ? self.#currentImageLink.getAttribute('href') || ''
+      : ''
+    self.#originalCurrentImagePreviewSrc = self.#currentImagePreview
+      ? self.#currentImagePreview.getAttribute('src') || ''
+      : ''
+    self.#originalCurrentImageSizeText = self.#currentImageSize
+      ? self.#currentImageSize.textContent || ''
+      : ''
+    self.#originalCurrentImageStatusText = self.#currentImageStatus
+      ? self.#currentImageStatus.textContent || ''
+      : ''
+    self.#originalCurrentImageStatusClass = self.#currentImageStatus
+      ? self.#currentImageStatus.className || ''
+      : ''
+
+    if (self.#fileTrigger && self.#fileInput) {
+      self.#fileTrigger.addEventListener('click', function (event) {
+        event.preventDefault()
+        self.#fileInput.click()
+      })
+    }
 
     if (self.#fileInput) {
       self.#log('Loaded')
       self.#fileInput.addEventListener('change', function (event) {
+        if (self.#fileNameInput) {
+          self.#fileNameInput.value =
+            event.target.files && event.target.files.length > 0
+              ? event.target.files[0].name
+              : ''
+        }
         self.#handleFileSelection(event.target.files)
       })
     } else {
       self.#log('No file input found for image resizing.')
     }
+
+    // Some REDAXO pages replace/duplicate file fields dynamically.
+    self.#form.addEventListener('change', function (event) {
+      const input = event.target.closest('input[type="file"][name="file_new"]')
+      if (!input) return
+
+      self.#fileInput = input
+      if (self.#fileNameInput) {
+        self.#fileNameInput.value =
+          input.files && input.files.length > 0 ? input.files[0].name : ''
+      }
+      self.#handleFileSelection(input.files)
+    })
 
     self.#shouldResizeInput.addEventListener('change', function () {
       self.#shouldResize = self.#shouldResizeInput.checked
@@ -95,15 +160,43 @@ class uploader_resizer_standalone {
     return false
   }
 
+  #isImageFile(file) {
+    if (!file) return false
+
+    if ((file.type || '').startsWith('image/')) {
+      return true
+    }
+
+    if (file.name) {
+      const extension = file.name.toLowerCase().split('.').pop()
+      return [
+        'jpg',
+        'jpeg',
+        'png',
+        'gif',
+        'webp',
+        'avif',
+        'bmp',
+        'tif',
+        'tiff',
+        'svg'
+      ].includes(extension)
+    }
+
+    return false
+  }
+
   #handleFileSelection(files) {
     const self = this
-    
+
     if (!files || files.length === 0) {
+      self.#restoreCurrentMediaInfo()
       self.#enableResizeOption()
       return
     }
 
     const file = files[0]
+    self.#updateCurrentMediaInfo(file)
     
     if (self.#isSvgFile(file)) {
       self.#log('SVG file detected:', file.name)
@@ -111,6 +204,81 @@ class uploader_resizer_standalone {
     } else {
       self.#enableResizeOption()
       self.#processFiles(files)
+    }
+  }
+
+  #updateCurrentMediaInfo(file) {
+    const self = this
+    if (!self.#isImageFile(file)) {
+      return
+    }
+
+    if (self.#currentImageObjectUrl) {
+      URL.revokeObjectURL(self.#currentImageObjectUrl)
+      self.#currentImageObjectUrl = null
+    }
+
+    const objectUrl = URL.createObjectURL(file)
+    self.#currentImageObjectUrl = objectUrl
+
+    if (self.#currentImagePreview) {
+      self.#currentImagePreview.setAttribute('src', objectUrl)
+    }
+    if (self.#currentImageLink) {
+      self.#currentImageLink.setAttribute('href', objectUrl)
+    }
+
+    const tempImage = new Image()
+    tempImage.onload = function () {
+      const width = tempImage.naturalWidth || tempImage.width || 0
+      const height = tempImage.naturalHeight || tempImage.height || 0
+      const maxWidth = self.#options.imageMaxWidth || 0
+      const maxHeight = self.#options.imageMaxHeight || 0
+      const isOversized =
+        (maxWidth > 0 && width > maxWidth) || (maxHeight > 0 && height > maxHeight)
+
+      if (self.#currentImageSize) {
+        self.#currentImageSize.textContent =
+          width +
+          ' × ' +
+          height +
+          ' px (max. ' +
+          maxWidth +
+          ' × ' +
+          maxHeight +
+          ')'
+      }
+
+      if (self.#currentImageStatus) {
+        self.#currentImageStatus.className =
+          'label ' + (isOversized ? 'label-warning' : 'label-success')
+        self.#currentImageStatus.textContent = isOversized
+          ? self.#options.messages.oversized
+          : self.#options.messages.withinLimits
+      }
+    }
+    tempImage.src = objectUrl
+  }
+
+  #restoreCurrentMediaInfo() {
+    const self = this
+    if (self.#currentImageObjectUrl) {
+      URL.revokeObjectURL(self.#currentImageObjectUrl)
+      self.#currentImageObjectUrl = null
+    }
+
+    if (self.#currentImagePreview) {
+      self.#currentImagePreview.setAttribute('src', self.#originalCurrentImagePreviewSrc)
+    }
+    if (self.#currentImageLink) {
+      self.#currentImageLink.setAttribute('href', self.#originalCurrentImageLinkHref)
+    }
+    if (self.#currentImageSize) {
+      self.#currentImageSize.textContent = self.#originalCurrentImageSizeText
+    }
+    if (self.#currentImageStatus) {
+      self.#currentImageStatus.textContent = self.#originalCurrentImageStatusText
+      self.#currentImageStatus.className = self.#originalCurrentImageStatusClass
     }
   }
 
@@ -140,8 +308,11 @@ class uploader_resizer_standalone {
   #enableResizeOption() {
     const self = this
     if (self.#shouldResizeInput) {
-      self.#shouldResizeInput.disabled = false
-      
+      // Don't re-enable if locked by admin config
+      if (!(self.#options && self.#options.imageResizeLocked)) {
+        self.#shouldResizeInput.disabled = false
+      }
+
       // Remove SVG notice if present
       const label = self.#shouldResizeInput.closest('label')
       if (label) {
@@ -156,7 +327,8 @@ class uploader_resizer_standalone {
   #processFiles(files) {
     const self = this
     self.#shouldResize =
-      self.#shouldResizeInput && self.#shouldResizeInput.checked
+      (self.#options && self.#options.imageResizeLocked) ||
+      (self.#shouldResizeInput && self.#shouldResizeInput.checked)
     if (!self.#shouldResize) return
 
     if (self.#options.canvas) delete self.#options.canvas
@@ -331,15 +503,35 @@ class uploader_resizer_standalone {
     if (data.canvas.toBlob) {
       data.canvas.toBlob(
         function (blob) {
-          if (!blob.name) {
-            if (file.type === blob.type) {
-              blob.name = file.name
-            } else if (file.name) {
-              blob.name = file.name.replace(/\.\w+$/, '.' + blob.type.substr(6))
-            }
+          if (!blob || typeof blob !== 'object') {
+            // toBlob returned null (e.g. tainted canvas or browser limitation)
+            dfd.resolveWith(self, [data])
+            return
           }
+          const originalType = file && file.type ? file.type : ''
+          const originalName = file && file.name ? file.name : 'image'
+
+          // Keep extension/type stable for mediapool replace.
+          // If browser cannot encode the original format (e.g. AVIF), keep original file.
+          if (originalType && blob.type && originalType !== blob.type) {
+            self.#log('saveImage: browser output type differs, keep original file', {
+              originalType,
+              blobType: blob.type
+            })
+            data.skipMetaDataSave = true
+            if (self.#imgSizwErrorWrapper) {
+              self.#imgSizwErrorWrapper.style.display = 'block'
+            }
+            dfd.resolveWith(self, [data])
+            return
+          }
+
+          if (!blob.name) {
+            blob.name = originalName
+          }
+          delete data.skipMetaDataSave
           // Don't restore invalid meta data:
-          if (file.type !== blob.type) {
+          if (originalType !== blob.type) {
             delete data.imageHead
           }
           // Store the created blob at the position
@@ -364,7 +556,8 @@ class uploader_resizer_standalone {
         data.canvas &&
         data.canvas.toBlob &&
         !self.#options.disabled
-      )
+      ) ||
+      data.skipMetaDataSave
     ) {
       self.#log(
         'saveImageMetaData',

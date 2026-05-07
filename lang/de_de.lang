@@ -10,6 +10,7 @@ uploader_settings_image_max_width = Maximale Breite
 uploader_settings_image_max_height = Maximale Höhe
 uploader_settings_image_max_filesize = Maximale Dateigröße
 uploader_settings_image_resize_checked = Bildverkleinerung standardmäßig aktiviert
+uploader_settings_image_resize_locked = Bildverkleinerung beim Austausch dauerhaft erzwingen (Nutzer kann Checkbox nicht ändern)
 uploader_settings_filename_as_title_checked = Dateinamen als Medienpool-Titel standardmäßig aktiviert
 uploader_settings_replace_mediapool_checked = Medienpool-Upload ersetzen
 uploader_settings_save = Einstellungen speichern
@@ -30,6 +31,10 @@ uploader_buttonbar_add_files = Datei(en) wählen
 uploader_buttonbar_start_upload = Upload starten
 uploader_buttonbar_cancel = alle entfernen
 uploader_mediapool_details_resize_image = übergroßes Bild verkleinern
+uploader_mediapool_details_oversized = Übergroß
+uploader_mediapool_details_within_limits = innerhalb der Limits
+uploader_mediapool_details_choose_file = Datei auswählen
+uploader_mediapool_details_resize_locked = Resize durch Administrator erzwungen
 
 
 uploader_resizer_standalone_calculated_size = Berechnete Dimensionen

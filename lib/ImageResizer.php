@@ -111,7 +111,7 @@ class ImageResizer
         }
 
         $image = imagecreatefromstring($content);
-        if (!$image) {
+        if ($image === false) {
             return false;
         }
 
@@ -125,13 +125,20 @@ class ImageResizer
             return false;
         }
 
+        if ($newWidth < 1 || $newHeight < 1) {
+            imagedestroy($image);
+            return false;
+        }
+
         $newImage = imagecreatetruecolor($newWidth, $newHeight);
 
-        // Preserve transparency for PNG/WebP/GIF
+        // Preserve transparency for PNG/WebP/GIF/AVIF
         imagealphablending($newImage, false);
         imagesavealpha($newImage, true);
         $transparent = imagecolorallocatealpha($newImage, 255, 255, 255, 127);
-        imagefilledrectangle($newImage, 0, 0, $newWidth, $newHeight, $transparent);
+        if ($transparent !== false) {
+            imagefilledrectangle($newImage, 0, 0, $newWidth, $newHeight, $transparent);
+        }
 
         imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $currentWidth, $currentHeight);
 
@@ -153,6 +160,15 @@ class ImageResizer
                 if (function_exists('imagewebp')) {
                     $success = imagewebp($newImage, $imagePath);
                 }
+                break;
+            case 'avif':
+                // imageavif() requires PHP 8.1+ and GD compiled with libavif support.
+                // quality -1 = default (~60), speed 6 = balanced encode speed.
+                if (function_exists('imageavif')) {
+                    $success = imageavif($newImage, $imagePath, -1, 6);
+                }
+                // If imageavif is unavailable, $success stays false and the original
+                // file is kept untouched. The caller should handle this gracefully.
                 break;
         }
 

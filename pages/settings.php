@@ -9,6 +9,7 @@ if (rex_post('config-submit', 'boolean')) {
         ['image-max-width', 'int'],
         ['image-max-height', 'int'],
         ['image-resize-checked', 'bool'],
+        ['image-resize-locked', 'bool'],
         ['filename-as-title-checked', 'bool'],
         ['replace-mediapool-checked', 'bool']
     ]));
@@ -67,6 +68,17 @@ $formElements = [];
 $n = [];
 $n['label'] = '<label for="image-resize-checked">' . $this->i18n('settings_image_resize_checked') . '</label>';
 $n['field'] = '<input type="checkbox" id="image-resize-checked" name="settings[image-resize-checked]" value="1" ' . ($this->getConfig('image-resize-checked') ? ' checked="checked"' : '') . '>';
+$formElements[] = $n;
+
+$fragment = new rex_fragment();
+$fragment->setVar('elements', $formElements, false);
+$content .= $fragment->parse('core/form/checkbox.php');
+
+// force resize on image replace (locks checkbox for users)
+$formElements = [];
+$n = [];
+$n['label'] = '<label for="image-resize-locked">' . $this->i18n('settings_image_resize_locked') . '</label>';
+$n['field'] = '<input type="checkbox" id="image-resize-locked" name="settings[image-resize-locked]" value="1" ' . ($this->getConfig('image-resize-locked', false) ? ' checked="checked"' : '') . '>';
 $formElements[] = $n;
 
 $fragment = new rex_fragment();

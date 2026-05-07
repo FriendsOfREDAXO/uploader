@@ -12,13 +12,16 @@ var uploader_options = {
         acceptFileTypes: "' . rex_i18n::msg('uploader_errors_accept_file_types') . '",
         maxFileSize: "' . rex_i18n::msg('uploader_errors_max_file_size') . '",
         minFileSize: "' . rex_i18n::msg('uploader_errors_min_file_size') . '",
-        svgNotice: "' . rex_i18n::msg('uploader_resizer_standalone_svg_notice') . '"
+        svgNotice: "' . rex_i18n::msg('uploader_resizer_standalone_svg_notice') . '",
+        oversized: "' . rex_i18n::msg('uploader_mediapool_details_oversized') . '",
+        withinLimits: "' . rex_i18n::msg('uploader_mediapool_details_within_limits') . '"
     },
     context: "' . $this->getProperty('context') . '",
     endpoint: "' . $this->getProperty('endpoint') . '",
     loadImageMaxFileSize: ' . ((int)$this->getConfig('image-max-filesize') * 1000000) . ',
     imageMaxWidth: ' . (int)$this->getConfig('image-max-width') . ',
     imageMaxHeight: ' . (int)$this->getConfig('image-max-height') . ',
+    imageResizeLocked: ' . ($this->getConfig('image-resize-locked', false) ? 'true' : 'false') . ',
     acceptFileTypes: ' . $allowed_filetypes . '
 };
 </script>

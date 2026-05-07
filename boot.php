@@ -58,7 +58,7 @@ rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
             rex_view::addCssFile($this->getAssetsUrl('vendor/jquery-file-upload/css/jquery.fileupload-ui.css'));
             rex_view::addCssFile($this->getAssetsUrl('uploader.css'));
             rex_view::addJsFile($this->getAssetsUrl('uploader.js'));
-            rex_view::addJsFile($this->getAssetsUrl('image_resizer_standalone.js'));
+            rex_view::addJsFile($this->getAssetsUrl('image_resizer_standalone.js') . '?v=' . rawurlencode((string) $addon->getVersion()));
 
             rex_extension::register('OUTPUT_FILTER', function (rex_extension_point $ep) use ($include_template) {
                 $vars = include(rex_path::addon('uploader') . 'inc/vars.php');
@@ -93,14 +93,52 @@ rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
                         !($maxWidth == 0 && $maxHeight == 0)
                     ) {
                         $suchmuster = '<input type="file" name="file_new" />';
-                        $resize = $addon->getConfig('image-resize-checked') == 'true' ? 'checked' : '';
+                        $resizeLocked = (bool) $addon->getConfig('image-resize-locked', false);
+                        $isChecked = ($addon->getConfig('image-resize-checked') == 'true' || $resizeLocked) ? 'checked' : '';
+                        $isDisabled = $resizeLocked ? 'disabled' : '';
+                        $hiddenResizeInput = $resizeLocked ? '<input type="hidden" name="resize-image" value="on">' : '';
 
-                        $ersetzen = $suchmuster . '<label style="font-weight: normal;"><input type="checkbox" ' . $resize . ' id="resize-image" name="resize-image"> ' . $addon->i18n('mediapool_details_resize_image') . '</label>' .
-                            '<div class="alert alert-info" hidden data-new-size-wrap>' .
-                            rex_i18n::msg('uploader_resizer_standalone_calculated_size') . ': <span data-new-size></span><br />' .
-                            rex_i18n::msg('uploader_resizer_standalone_original_size') . ': <span data-old-size></span>' .
-                            '</div>' .
-                            '<div class="alert alert-danger" hidden data-new-size-error>' . rex_i18n::msg('uploader_resizer_standalone_error') . '</div>';
+                        $previewUrl = rex_media_manager::getUrl('rex_media_small', $media->getFileName());
+                        $currentW = (int) $media->getWidth();
+                        $currentH = (int) $media->getHeight();
+                        $isOversized = ($maxWidth > 0 && $currentW > $maxWidth) || ($maxHeight > 0 && $currentH > $maxHeight);
+                        $statusLabel = $isOversized
+                            ? '<span class="label label-warning" data-current-image-status style="font-size:11px;">' . $addon->i18n('mediapool_details_oversized') . '</span>'
+                            : '<span class="label label-success" data-current-image-status style="font-size:11px;">' . $addon->i18n('mediapool_details_within_limits') . '</span>';
+                        $fileInputId = 'uploader-file-new-' . $file_id;
+
+                        $ersetzen = '<div class="input-group" style="max-width:520px;">'
+                            . '<span class="input-group-btn">'
+                            .   '<label class="btn btn-default" for="' . $fileInputId . '" style="margin-bottom:0;">' . $addon->i18n('mediapool_details_choose_file') . '</label>'
+                            . '</span>'
+                            . '<input class="form-control" type="text" readonly data-uploader-file-name value="' . htmlspecialchars($media->getFileName(), ENT_QUOTES) . '">'
+                            . '</div>'
+                            . '<input type="file" id="' . $fileInputId . '" name="file_new" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">'
+                            . $hiddenResizeInput
+                            . '<div class="uploader-resize-wrap" style="margin-top:8px;">'
+                            . '<div class="media" style="margin-bottom:8px;">'
+                            .   '<a class="media-left" data-current-image-link href="' . rex_url::media($media->getFileName()) . '" target="_blank" style="display:block;margin-right:10px;">'
+                            .     '<img data-current-image-preview src="' . $previewUrl . '" alt="" style="max-width:64px;max-height:64px;border:1px solid #ddd;padding:2px;background:#fff;display:block;">'
+                            .   '</a>'
+                            .   '<div class="media-body">'
+                            .     '<small class="text-muted" data-current-image-size>' . $currentW . ' &times; ' . $currentH . ' px (max. ' . $maxWidth . ' &times; ' . $maxHeight . ')</small>'
+                            .     ' &nbsp;' . $statusLabel
+                            .   '</div>'
+                            . '</div>'
+                            . '<label style="font-weight:normal;margin-bottom:4px;">'
+                            .   '<input type="checkbox" id="resize-image" name="resize-image" ' . $isChecked . ' ' . $isDisabled . '> '
+                            .   $addon->i18n('mediapool_details_resize_image')
+                            .   ($resizeLocked ? ' <i class="rex-icon fa-lock" style="color:#aaa;" title="' . $addon->i18n('mediapool_details_resize_locked') . '"></i>' : '')
+                            . '</label>'
+                            . '<div class="alert alert-info" style="padding:8px 12px;margin-top:6px;margin-bottom:0;" hidden data-new-size-wrap>'
+                            .   '<i class="rex-icon fa-compress"></i> '
+                            .   '<strong>' . rex_i18n::msg('uploader_resizer_standalone_calculated_size') . ':</strong> <span data-new-size></span>'
+                            .   '<br><small class="text-muted">' . rex_i18n::msg('uploader_resizer_standalone_original_size') . ': <span data-old-size></span></small>'
+                            . '</div>'
+                            . '<div class="alert alert-warning" style="padding:8px 12px;margin-top:6px;margin-bottom:0;" hidden data-new-size-error>'
+                            .   rex_i18n::msg('uploader_resizer_standalone_error')
+                            . '</div>'
+                            . '</div>';
                         $ep->setSubject(str_replace($suchmuster, $ersetzen, $ep->getSubject()));
                     }
                 }
@@ -109,8 +147,9 @@ rex_extension::register('PACKAGES_INCLUDED', function () use ($addon) {
             // resize image on update/re-upload
             rex_extension::register('MEDIA_UPDATED', function (rex_extension_point $ep) use ($addon, $maxWidth, $maxHeight) {
                 $filename = $ep->getParam('filename', '');
+                $resizeLocked = (bool) $addon->getConfig('image-resize-locked', false);
 
-                if (isset($_FILES['file_new']) && rex_request('resize-image', 'string', 'off') === 'on') {
+                if (isset($_FILES['file_new']) && ($resizeLocked || rex_request('resize-image', 'string', 'off') === 'on')) {
                     ImageResizer::resizeIfNeeded($filename, $maxWidth, $maxHeight);
                 }
             });
