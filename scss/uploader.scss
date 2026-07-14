@@ -1,12 +1,34 @@
 $border-grey: #c1c9d4;
 $error-color: #a94442;
+
+#fileupload {
+    --uploader-bg: #f6f8fc;
+    --uploader-surface: #ffffff;
+    --uploader-surface-soft: #f2f6ff;
+    --uploader-border: #c9d3e1;
+    --uploader-border-strong: #aebcd1;
+    --uploader-text-muted: #5b6c84;
+    --uploader-accent: #3478f6;
+    --uploader-shadow: 0 12px 30px -22px rgba(42, 73, 122, 0.45);
+}
+
 .uploader-dropzone {
-    background: #fff;
-    border: 2px dashed $border-grey;
+    background: var(--uploader-surface-soft);
+    border: 2px dashed var(--uploader-border-strong);
+    border-radius: 0;
+    box-shadow: var(--uploader-shadow);
     min-height: 91px;
-    padding: 5px;
+    padding: 8px;
     position: relative;
     margin: 1em 0;
+    transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+
+    &:hover {
+        border-color: var(--uploader-accent);
+        box-shadow: 0 16px 38px -24px rgba(52, 120, 246, 0.55);
+        transform: translateY(-1px);
+            background: var(--uploader-surface-soft);
+    }
 
     .hint {
         display: block;
@@ -16,8 +38,10 @@ $error-color: #a94442;
         width: 100%;
         text-align: center;
         line-height: 91px;
-        color: $border-grey;
-        font-size: 2em;
+        color: var(--uploader-text-muted);
+        font-size: 1.8em;
+        letter-spacing: 0.02em;
+        font-weight: 600;
     }
 
     img {
@@ -37,9 +61,15 @@ $error-color: #a94442;
         padding: 10px 200px 0 90px;
         position: relative;
         overflow: hidden;
-        background: #fff;
+        background: var(--uploader-surface);
         min-height: 81px;
-        border: 1px solid $border-grey;
+        border: 1px solid var(--uploader-border);
+        transition: border-color 0.2s ease, background-color 0.2s ease;
+
+        &:hover {
+            border-color: var(--uploader-border-strong);
+            background: var(--uploader-surface);
+        }
 
         & + li {
             border-top: 0;
@@ -68,8 +98,8 @@ $error-color: #a94442;
         justify-content: center;
         width: 81px !important;
         height: 80px !important;
-        //background: #f3f6fb;
-        border-right: 1px solid $border-grey;
+        background: var(--uploader-bg);
+        border-right: 1px solid var(--uploader-border);
     }
 
     .processing .preview {
@@ -93,13 +123,27 @@ $error-color: #a94442;
 }
 
 .fileupload-buttonbar {
+    margin-top: 8px;
+
     .btn-primary {
         margin-top: 0;
+    }
+
+    .btn {
+        border-radius: 0;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        &:hover,
+        &:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 22px -16px rgba(34, 53, 84, 0.8);
+        }
     }
 }
 
 #uploader-row .fileupload-options label {
     font-weight: normal;
+    color: var(--uploader-text-muted);
 }
 
 @media (max-width: 767px) {
@@ -129,22 +173,35 @@ $error-color: #a94442;
 
 @mixin _uploader-dark {
 
+    #fileupload {
+        --uploader-bg: #141d26;
+        --uploader-surface: #1f2a35;
+        --uploader-surface-soft: #23303d;
+        --uploader-border: #39495c;
+        --uploader-border-strong: #4f6480;
+        --uploader-text-muted: #bdd0e8;
+        --uploader-accent: #7cb5ff;
+        --uploader-shadow: 0 16px 34px -24px rgba(5, 9, 16, 0.8);
+    }
+
     .uploader-dropzone {
-        color: rgba(255, 255, 255, 0.75);
-        background-color: rgba(#202b35, 0.6);
-        border-color: rgba(#1b232c, 0.6);
+        color: rgba(255, 255, 255, 0.88);
+        background: var(--uploader-surface-soft);
+        border-color: var(--uploader-border-strong);
+
         .hint {
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--uploader-text-muted);
         }
     }
 
     .uploader-queue {
         li {
-            background-color: rgba(#1b232c, 0.8);
-            border-color: rgba(#151c22, 0.8);
+            background-color: var(--uploader-surface);
+            border-color: var(--uploader-border);
         }
+
         .preview {
-            border-right-color: rgba(#151c22, 0.8);
+            border-right-color: var(--uploader-border);
         }
     }
 }

@@ -86,6 +86,14 @@ class uploader_iw_upload_handler extends uploader_upload_handler
     protected function handle_file_upload($uploaded_file, $name, $size, $type, $error,
         $index = null, $content_range = null) {
         $file = new \stdClass();
+
+        // Zielname fuer den Medienpool aus dem urspruenglichen Uploadnamen bilden.
+        // Kollisionsaufloesung uebernimmt spaeter rex_media_service.
+        $target_filename = $this->trim_file_name($uploaded_file, $name, $size, $type, $error,
+            $index, $content_range);
+        $target_filename = $this->fix_file_extension($uploaded_file, $target_filename, $size, $type, $error,
+            $index, $content_range);
+
         $file->name = $this->get_file_name($uploaded_file, $name, $size, $type, $error,
             $index, $content_range);
         $file->size = $this->fix_integer_overflow((int)$size);
@@ -143,7 +151,7 @@ class uploader_iw_upload_handler extends uploader_upload_handler
             if ($file_size === $file->size) {
                 // iw patch start
                 $file->upload_complete = 1;
-                $orig_filename = basename($file_path);
+                $orig_filename = $target_filename;
                 // jfucounter-Platzhalter früh ersetzen
                 $orig_filename = preg_replace_callback(
                     '/\s*\(jfucounter(\d+)jfucounter\)/',
@@ -180,10 +188,11 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                         ]
                     ];
                     
-                    // Die Prüfung, ob eine Datei bereits existiert, überlassen wir komplett rex_media_service
-                    // Nur wenn die Datei nicht die aktuelle ist, sollte sie inkrementiert werden
-                    // Der Dateiname wird in der rex_media_service::addMedia() automatisch normalisiert
-                    $do_subindexing = is_file(rex_path::media($orig_filename)) && $orig_filename !== basename($file_path);
+                    // Kollision nur dann aktivieren, wenn bereits ein anderes Asset mit diesem Namen existiert.
+                    // Die aktuell hochgeladene Temp-Datei im Media-Ordner darf dabei nicht als Kollision zaehlen.
+                    $target_path = rex_path::media($orig_filename);
+                    $do_subindexing = null !== rex_media::get($orig_filename)
+                        || (is_file($target_path) && realpath($target_path) !== realpath($file_path));
                     
                     // Verwende die rex_media_service Klasse für den Upload
                     $result = rex_media_service::addMedia($mediaData, $do_subindexing);
@@ -241,8 +250,13 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                     return $file;
                 }
                 // iw patch end
-                
-                $file->url = $this->get_download_url($file->name);
+
+                $file->downloadUrl = $this->get_download_url($file->name);
+                if (isset($mediaFile) && $mediaFile instanceof rex_media) {
+                    $file->url = rex_url::backendPage('mediapool/media', ['file_id' => $mediaFile->getId()], false);
+                } else {
+                    $file->url = $file->downloadUrl;
+                }
                 if ($this->has_image_file_extension($file->name)) {
                     if ($content_range && !$this->validate_image_file($file_path, $file, $error, $index)) {
                         rex_file::delete($file_path);

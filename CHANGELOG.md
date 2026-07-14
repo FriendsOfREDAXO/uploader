@@ -1,5 +1,22 @@
 # Uploader Changelog
 
+## 3.0.3 - 14.07.2026
+
+### Bugfixes
+
+* Dateinamens-Kollisionen beim Mehrfach-Upload werden wieder korrekt über den Medienpool aufgelöst: Jahreszahlen im Dateinamen werden nicht mehr als Zähler interpretiert (z. B. `bericht_2025.pdf` bleibt Basisname, statt fälschlich auf `bericht_2026.pdf` zu springen) / fixes #115
+* Regression behoben: `_1` wird nicht mehr pauschal angehängt, wenn noch keine echte Kollision existiert
+* Uploader-Initialisierung für wiederholte Seitenaufrufe (inkl. PJAX) robuster gemacht, sodass die Upload-UI beim zweiten Aufruf nicht mehr verschwindet
+* Upload-Einträge verschwinden nach erfolgreichem Upload nicht mehr kurzzeitig aus der Liste (Fade-Verhalten in den Templates entfernt)
+* Erneuter Upload derselben Datei ist nach Abschluss wieder möglich: Duplikat-Sperre gilt jetzt nur für aktuell laufende Queue-/Upload-Einträge
+* Dateiname in der Ergebnisliste verlinkt nach Upload auf die Medienpool-Detailseite statt auf den Direkt-Download
+
+### UI
+
+* Upload-Oberfläche modernisiert (Dropzone, Queue, Buttonbar) mit konsistenten CSS-Variablen
+* Theme-Handling strikt nach REDAXO-Muster umgesetzt: Light-Default + `body.rex-theme-dark` + Auto-Theme über `@media (prefers-color-scheme: dark)` mit identischen Dark-Werten
+* Verläufe und Rundungen im neuen Design entfernt (flacher, klarer Look)
+
 ## 3.0.2 - 08.05.2026
 
 ### Bugfixes

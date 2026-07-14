@@ -1,8 +1,8 @@
 /* globals jQuery,$,selectMedia,selectMediaList,uploader_options */
 
 jQuery(function () {
-  // Liste bereits hinzugefügter Dateinamen
-  var uploadedFiles = []
+  // Dateinamen nur waehrend laufender Uploads/Queue blockieren (pro Formularinstanz)
+  var pendingFilesByForm = {}
 
   // https://stackoverflow.com/a/11582513
   function getURLParameter(name) {
@@ -15,7 +15,7 @@ jQuery(function () {
     )
   }
 
-  function update_metafields(str_html) {
+  function update_metafields($mediacatselect, str_html) {
     var $local_parent = $mediacatselect.closest('.form-group').parent(),
       $ajax_parent = $(str_html)
         .find('#rex-mediapool-category')
@@ -88,17 +88,24 @@ jQuery(function () {
     return '<i class="rex-mime" data-extension="' + ext + '"></i>'
   }
 
-  var $mediacatselect = $('#rex-mediapool-category'),
-    $form = $mediacatselect.closest('form'),
-    $buttonbar = $('#uploader-row'),
-    $buttonbar_wrapper = $('<fieldset></fieldset>'),
-    context = uploader_options.context
+  function init_uploader(rootElement) {
+    var context = uploader_options.context,
+      $root = rootElement ? $(rootElement) : $(document),
+      $form = $root.find('#fileupload').first(),
+      $mediacatselect = $form.find('#rex-mediapool-category').first(),
+      formId
 
-  if (context === 'mediapool_media') {
-    return
-  } else {
+    if (context === 'mediapool_media' || !$form.length || !$mediacatselect.length) {
+      return
+    }
+
+    if ($form.data('uploaderInitialized')) {
+      return
+    }
+    $form.data('uploaderInitialized', true)
+
     // reload per pjax verhindern
-    $('a[href="index.php?page=mediapool/upload"]').attr('data-pjax', 'false')
+    $('a[href="index.php?page=mediapool/upload"], a[href="index.php?page=uploader/upload"]').attr('data-pjax', 'false')
 
     // kontextunabhaengig html anpassen
     $mediacatselect.prop('onchange', null).off('onchange')
@@ -108,6 +115,21 @@ jQuery(function () {
       .closest('.form-group')
       .addClass('preserve append-meta-after')
     $mediacatselect.closest('.form-group').addClass('preserve')
+
+    // Buttonbar immer aus Template klonen, nicht aus dem DOM verschieben
+    var templateHtml = $('#uploader-buttonbar-template').html(),
+      $buttonbar = $(),
+      $buttonbar_wrapper = $('<fieldset></fieldset>')
+
+    if (templateHtml) {
+      var $templateRoot = $('<div>' + templateHtml + '</div>')
+      $buttonbar = $templateRoot.find('#uploader-row').first()
+    }
+
+    $form.find('#uploader-row').remove()
+    if ($buttonbar.length) {
+      $buttonbar_wrapper.append($buttonbar)
+    }
 
     // erlaubte metafelder bei kategoriewechsel holen
     $mediacatselect.on('change', function () {
@@ -120,25 +142,32 @@ jQuery(function () {
         },
         dataType: 'html',
         success: function (result) {
-          update_metafields(result)
+          update_metafields($mediacatselect, result)
         }
       })
     })
 
     // kontextabhaengig html anpassen
     if (context === 'mediapool_upload') {
-      $('#rex-mediapool-choose-file').closest('dl').remove()
+      $root.find('#rex-mediapool-choose-file').closest('dl').remove()
       $form.find('footer').remove()
-      $buttonbar_wrapper.append($buttonbar)
-      $form.find('fieldset:last').after($buttonbar_wrapper)
+      if ($buttonbar.length) {
+        $form.find('fieldset:last').after($buttonbar_wrapper)
+      }
     } else if (context === 'addon_upload') {
-      $buttonbar_wrapper.append($buttonbar)
-      $form.find('fieldset').after($buttonbar_wrapper)
+      if ($buttonbar.length) {
+        $form.find('fieldset').after($buttonbar_wrapper)
+      }
       // metainfos holen
       $mediacatselect.trigger('change')
     }
 
     $form.fileupload(get_fileupload_options())
+
+    formId = $form.attr('id') || 'fileupload'
+    if (!pendingFilesByForm[formId]) {
+      pendingFilesByForm[formId] = {}
+    }
 
     $form.bind('fileuploadadded', function (e, data) {
       $(data.context[0])
@@ -148,7 +177,7 @@ jQuery(function () {
 
     $form.on('fileuploadadd', function (e, data) {
       var name = data.files[0].name
-      if (uploadedFiles.indexOf(name) !== -1) {
+      if (pendingFilesByForm[formId][name]) {
         // Duplikat entfernen und Hinweis anzeigen
         data.context.remove()
         alert(
@@ -158,10 +187,32 @@ jQuery(function () {
         )
         return false
       }
-      uploadedFiles.push(name)
+      pendingFilesByForm[formId][name] = true
     })
 
-    $('#resize-images').on('click', function () {
+    // Dateinamen nach Abschluss/Fail wieder freigeben,
+    // damit erneuter Upload derselben Datei moeglich ist.
+    function releasePendingName(data) {
+      if (!data || !data.files || !data.files.length) {
+        return
+      }
+      var uploadedName = data.files[0].name
+      delete pendingFilesByForm[formId][uploadedName]
+    }
+
+    $form.on('fileuploaddone', function (e, data) {
+      releasePendingName(data)
+    })
+
+    $form.on('fileuploadfail', function (e, data) {
+      releasePendingName(data)
+    })
+
+    $form.on('fileuploadalways', function (e, data) {
+      releasePendingName(data)
+    })
+
+    $form.on('click', '#resize-images', function () {
       $form.fileupload('destroy')
       $form.fileupload(get_fileupload_options())
     })
@@ -205,4 +256,9 @@ jQuery(function () {
 
     console.log('uploader.js loaded')
   }
+
+  init_uploader(document)
+  $(document).on('rex:ready pjax:success', function (event, element) {
+    init_uploader(element || document)
+  })
 })

@@ -6,7 +6,7 @@ if (rex_get('opener_input_field', 'string')) {
 return '
 <script id="template-upload" type="text/x-tmpl">
 {% for (var i=0, file; file=o.files[i]; i++) { %}
-    <li class="template-upload fade">
+    <li class="template-upload">
         <div class="preview"></div>
 
         <p class="name">{%=file.name%}</p>
@@ -34,10 +34,10 @@ return '
 <!-- The template to display files available for download -->
 <script id="template-download" type="text/x-tmpl">
 {% for (var i=0, file; file=o.files[i]; i++) { %}
-    <li class="template-download fade">
+    <li class="template-download">
         <div class="preview">
             {% if (file.thumbnailUrl) { %}
-                <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" data-gallery><img src="{%=file.thumbnailUrl%}"></a>
+                <a href="{%=file.downloadUrl || file.url%}" title="{%=file.name%}" data-gallery><img src="{%=file.thumbnailUrl%}"></a>
             {% } %}
             {% if (file.icon) { %}
                 <i class="rex-mime {%=file.iconclass%}" data-extension="{%=file.iconextension%}"></i>
@@ -45,7 +45,7 @@ return '
         </div>
         <p class="name">
             {% if (file.url) { %}
-                <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?\'data-gallery\':\'\'%}>{%=file.name%}</a>
+                    <a href="{%=file.url%}" title="{%=file.name%}" class="rex-popup uploader-open-mediapool-detail" onclick="if (typeof newPoolWindow === \'function\') { newPoolWindow(this.href); return false; }">{%=file.name%}</a>
             {% } else { %}
                 <span>{%=file.name%}</span>
             {% } %}
