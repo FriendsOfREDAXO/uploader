@@ -92,8 +92,19 @@ jQuery(function () {
     var context = uploader_options.context,
       $root = rootElement ? $(rootElement) : $(document),
       $form = $root.find('#fileupload').first(),
-      $mediacatselect = $form.find('#rex-mediapool-category').first(),
+      $mediacatselect = $(),
       formId
+
+    if ($form.length) {
+      $mediacatselect = $form.find('#rex-mediapool-category').first()
+    } else {
+      // Auf der nativen Medienpool-Uploadseite fehlt die ID #fileupload.
+      // Dort das Formular ueber die Kategorien-Auswahl aufloesen.
+      $mediacatselect = $root.find('#rex-mediapool-category').first()
+      if ($mediacatselect.length) {
+        $form = $mediacatselect.closest('form').first()
+      }
+    }
 
     if (context === 'mediapool_media' || !$form.length || !$mediacatselect.length) {
       return

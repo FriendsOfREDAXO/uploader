@@ -1,5 +1,11 @@
 # Uploader Changelog
 
+## 3.0.4 - 15.07.2026
+
+### Bugfixes
+
+* Regression behoben: Bei aktivierter Option „Medienpool-Upload ersetzen" wird auf `mediapool/upload` wieder zuverlässig die Uploader-Oberfläche geladen (statt nur der Standard-Einzelupload) / fixes #116
+
 ## 3.0.3 - 14.07.2026
 
 ### Bugfixes
