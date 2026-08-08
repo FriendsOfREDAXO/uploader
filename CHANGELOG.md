@@ -1,6 +1,6 @@
 # Uploader Changelog
 
-## 3.0.4 - 15.07.2026
+## 3.0.5 - 08.08.2026
 
 ### Bugfixes
 
