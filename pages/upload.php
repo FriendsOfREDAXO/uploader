@@ -15,32 +15,34 @@ $cats_sel->setName('rex_file_category');
 $cats_sel->setId('rex-mediapool-category');
 $cats_sel->addOption(rex_i18n::msg('pool_kats_no'), '0');
 $cats_sel->setSelected($rex_file_category);
-?>
 
-<section class="rex-page-section">
-    <div class="panel panel-edit">
-        <div class="panel-body">
-            <form id="fileupload" action="<?php echo $addon->getProperty('endpoint'); ?>" method="POST"
-                  enctype="multipart/form-data">
-                <fieldset>
-                    <dl class="rex-form-group form-group">
-                        <dt>
-                            <label for="rex-mediapool-title">Titel</label>
-                        </dt>
-                        <dd>
-                            <input class="form-control" type="text" name="ftitle" value="" id="rex-mediapool-title">
-                        </dd>
-                    </dl>
-                    <dl class="rex-form-group form-group">
-                        <dt>
-                            <label for="rex-mediapool-category"><?php echo rex_i18n::msg('pool_file_category'); ?></label>
-                        </dt>
-                        <dd>
-                            <?php echo $cats_sel->get(); ?>
-                        </dd>
-                    </dl>
-                </fieldset>
-            </form>
-        </div>
-    </div>
-</section>
+$formElements = [];
+
+$e = [];
+$e['label'] = '<label for="rex-mediapool-title">' . rex_i18n::msg('pool_file_title') . '</label>';
+$e['field'] = '<input class="form-control" type="text" name="ftitle" value="" id="rex-mediapool-title" />';
+$formElements[] = $e;
+
+$e = [];
+$e['label'] = '<label for="rex-mediapool-category">' . rex_i18n::msg('pool_file_category') . '</label>';
+$e['field'] = $cats_sel->get();
+$formElements[] = $e;
+
+$fragment = new rex_fragment();
+$fragment->setVar('elements', $formElements, false);
+$content = $fragment->parse('core/form/form.php');
+
+// Das Formular bleibt im Panel-Body: das Uploader-JS haengt Dropzone und
+// Buttonleiste per $form.find('fieldset:last').after() innerhalb des Formulars ein.
+$body = '
+    <form id="fileupload" action="' . rex_escape($addon->getProperty('endpoint')) . '" method="POST" enctype="multipart/form-data">
+        <fieldset>
+            ' . $content . '
+        </fieldset>
+    </form>';
+
+$fragment = new rex_fragment();
+$fragment->setVar('class', 'edit');
+$fragment->setVar('title', rex_i18n::msg('pool_file_insert'));
+$fragment->setVar('body', $body, false);
+echo $fragment->parse('core/page/section.php');
