@@ -4,6 +4,49 @@ jQuery(function () {
   // Dateinamen nur waehrend laufender Uploads/Queue blockieren (pro Formularinstanz)
   var pendingFilesByForm = {}
 
+  // Sichtbare Rueckmeldung, waehrend eine Datei gezogen wird.
+  //
+  // Das Drop-Ziel bleibt bewusst $(document) — der Default von
+  // jquery.fileupload. Wer die Datei irgendwo im Backend fallen laesst, soll das
+  // weiterhin koennen. Neu ist nur, dass der Kasten sich meldet:
+  //   .is-dragging  eine Datei wird irgendwo ueber dem Dokument gezogen
+  //   .is-over      sie befindet sich direkt ueber dem Kasten
+  //
+  // dragleave feuert unzuverlaessig, unter anderem beim Wechsel auf ein
+  // Kindelement. Beide Zustaende laufen deshalb ueber einen Timer aus, den das
+  // fortlaufende dragover immer wieder neu setzt.
+  var dragTimer = null
+  var overTimer = null
+
+  jQuery(document)
+    .on('dragover', function () {
+      var $dropzones = jQuery('.uploader-dropzone')
+
+      if (!$dropzones.length) {
+        return
+      }
+
+      $dropzones.addClass('is-dragging')
+      window.clearTimeout(dragTimer)
+      dragTimer = window.setTimeout(function () {
+        $dropzones.removeClass('is-dragging')
+      }, 140)
+    })
+    .on('dragover', '.uploader-dropzone', function () {
+      var $dropzone = jQuery(this)
+
+      $dropzone.addClass('is-over')
+      window.clearTimeout(overTimer)
+      overTimer = window.setTimeout(function () {
+        $dropzone.removeClass('is-over')
+      }, 140)
+    })
+    .on('drop dragend', function () {
+      window.clearTimeout(dragTimer)
+      window.clearTimeout(overTimer)
+      jQuery('.uploader-dropzone').removeClass('is-dragging is-over')
+    })
+
   // https://stackoverflow.com/a/11582513
   function getURLParameter(name) {
     return (
