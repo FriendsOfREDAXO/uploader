@@ -160,6 +160,47 @@ body.rex-theme-dark {
     }
 }
 
+// Rueckmeldung beim Ziehen einer Datei.
+//
+// Muss NACH den Ruhezustaenden stehen, auch nach dem Dark-Media-Query:
+// `body.rex-theme-dark .uploader-dropzone.is-over` und
+// `body.rex-has-theme:not(.rex-theme-light) .uploader-dropzone` haben beide die
+// Spezifitaet (0,3,1) — `:not()` zaehlt wie sein Argument. Bei Gleichstand
+// entscheidet die Reihenfolge im Stylesheet.
+//
+// Farben aus be_style/plugins/redaxo/scss/_variables.scss bzw. _variables-dark.scss:
+// $brand-primary #4b9ad9, $color-b-lighter #dbedf7, $color-blue-4 #409be4,
+// $color-blue-1 #0b304d.
+
+@mixin _uploader-drag-states($accent, $over-bg) {
+    .uploader-dropzone {
+        &.is-dragging {
+            border-color: $accent;
+        }
+
+        &.is-over {
+            border-color: $accent;
+            background-color: $over-bg;
+        }
+    }
+}
+
+.uploader-dropzone {
+    transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+@include _uploader-drag-states(#4b9ad9, #dbedf7);
+
+body.rex-theme-dark {
+    @include _uploader-drag-states(#409be4, #0b304d);
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) {
+        @include _uploader-drag-states(#409be4, #0b304d);
+    }
+}
+
 .uploader-bulk-rework-wrapper {
     .rex-panel-options {
         z-index: 1;
