@@ -1,5 +1,11 @@
 # Uploader Changelog
 
+## 3.0.6 - 14.08.2026
+
+### UI
+
+* Optische Anpassung zurück an die REDAXO-Standards: Panel mit Überschrift wie im Medienpool-Upload, Dropzone mit sichtbarer Rückmeldung beim Ziehen einer Datei, Farben und Button-Optik aus be_style statt eigener Palette
+
 ## 3.0.5 - 08.08.2026
 
 ### Bugfixes
