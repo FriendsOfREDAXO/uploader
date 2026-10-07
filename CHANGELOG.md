@@ -2,7 +2,7 @@
 
 ## 3.0.7 - 07.10.2026
 
-### Bugfixe
+### Bugfix
 
 * Datei wurde gespeichert, aber der Endpoint antwortet mit 500 statt JSON, und die Metadaten aus dem Upload-Formular (Titel, med_*-Felder) wurden nicht übernommen.
 
