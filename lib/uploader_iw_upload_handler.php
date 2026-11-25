@@ -226,11 +226,11 @@ class uploader_iw_upload_handler extends uploader_upload_handler
                                     $value = $postValue;
                                 } elseif (is_array($postValue) && !empty($postValue)) {
                                     //Handle array values (e.g., from multi-select fields)
-                                    $value = implode(',', array_filter($postValue, 'strlen'));
+                                    $value = $postValue;
                                 }
                             }
 
-                            $metainfos[$metaName] = $value;
+                            $metainfos[$metaName] = is_array($value) ? implode(',', $value) : $value;
                             $_POST[$metaName] = $value;
                         }
                     }
