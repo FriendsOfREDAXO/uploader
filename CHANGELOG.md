@@ -1,5 +1,11 @@
 # Uploader Changelog
 
+## 3.0.8 - 25.11.2026
+
+### Bugfix
+
+* Mehrwertige Medien-Metafelder (Select multiple, Checkbox) wurden beim Upload mit Komma statt mit Pipe gespeichert (`|a,b|` statt `|a|b|`), Datums- und Zeitfelder als Text statt als Zeitstempel.
+
 ## 3.0.7 - 07.10.2026
 
 ### Bugfix
